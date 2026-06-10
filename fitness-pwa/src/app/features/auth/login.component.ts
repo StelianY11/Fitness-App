@@ -23,6 +23,11 @@ import { AuthService } from '../../core/services/auth.service';
             autocomplete="email"
             class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
           />
+          @if (showEmailRequiredError) {
+            <span class="mt-1 block text-sm text-red-700">Email is required.</span>
+          } @else if (showEmailFormatError) {
+            <span class="mt-1 block text-sm text-red-700">Enter a valid email address.</span>
+          }
         </label>
 
         <label class="block">
@@ -33,6 +38,9 @@ import { AuthService } from '../../core/services/auth.service';
             autocomplete="current-password"
             class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
           />
+          @if (showPasswordRequiredError) {
+            <span class="mt-1 block text-sm text-red-700">Password is required.</span>
+          }
         </label>
       </div>
 
@@ -70,8 +78,24 @@ export class LoginComponent {
   isLoading = false;
   errorMessage = '';
 
+  get showEmailRequiredError(): boolean {
+    const email = this.form.controls.email;
+    return email.touched && email.hasError('required');
+  }
+
+  get showEmailFormatError(): boolean {
+    const email = this.form.controls.email;
+    return email.touched && email.hasError('email');
+  }
+
+  get showPasswordRequiredError(): boolean {
+    const password = this.form.controls.password;
+    return password.touched && password.hasError('required');
+  }
+
   async submit(): Promise<void> {
     if (this.form.invalid || this.isLoading) {
+      this.form.markAllAsTouched();
       return;
     }
 
@@ -79,7 +103,7 @@ export class LoginComponent {
     this.errorMessage = '';
 
     const { email, password } = this.form.getRawValue();
-    const { error } = await this.authService.signIn(email, password);
+    const { error } = await this.authService.signIn(email.trim().toLowerCase(), password);
 
     this.isLoading = false;
 

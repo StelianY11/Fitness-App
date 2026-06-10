@@ -31,12 +31,26 @@ export class AuthService {
     );
   }
 
-  signIn(email: string, password: string): Promise<AuthTokenResponsePassword> {
-    return this.supabase.auth.signInWithPassword({ email, password });
+  async signIn(email: string, password: string): Promise<AuthTokenResponsePassword> {
+    const response = await this.supabase.auth.signInWithPassword({ email, password });
+
+    if (response.data.session) {
+      this.currentSession.set(response.data.session);
+      this.currentUser.set(response.data.session.user);
+    }
+
+    return response;
   }
 
-  signUp(email: string, password: string): Promise<AuthResponse> {
-    return this.supabase.auth.signUp({ email, password });
+  async signUp(email: string, password: string): Promise<AuthResponse> {
+    const response = await this.supabase.auth.signUp({ email, password });
+
+    if (response.data.session) {
+      this.currentSession.set(response.data.session);
+      this.currentUser.set(response.data.session.user);
+    }
+
+    return response;
   }
 
   async signOut(): Promise<void> {
@@ -45,6 +59,9 @@ export class AuthService {
     if (error) {
       throw error;
     }
+
+    this.currentSession.set(null);
+    this.currentUser.set(null);
   }
 
   async getCurrentUser(): Promise<User | null> {
