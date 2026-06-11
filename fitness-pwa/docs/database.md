@@ -9,9 +9,10 @@ Run SQL in this order:
 1. `supabase/schema.sql`
 2. `supabase/migrations/001_fitness_schema.sql`
 3. `supabase/migrations/002_extend_exercises.sql`
-4. `supabase/seed/001_exercises_seed.sql`
+4. `supabase/migrations/003_exercise_variants.sql`
+5. `supabase/seed/001_exercises_seed.sql`
 
-The first file sets up the auth profile foundation and allowlist. The first migration creates the fitness tables and RLS policies. The second migration extends exercises for future Gym, Calisthenics, and Street Workout support. The seed inserts builtin exercise categories and starter exercises.
+The first file sets up the auth profile foundation and allowlist. The first migration creates the fitness tables and RLS policies. The second migration extends exercises for future Gym, Calisthenics, and Street Workout support. The third migration adds exercise variants. The seed inserts builtin exercise categories and starter exercises.
 
 ## Tables
 
@@ -20,6 +21,8 @@ The first file sets up the auth profile foundation and allowlist. The first migr
 `exercise_categories` groups exercises by category. Builtin rows have `is_builtin = true` and `owner_id = null`; user-created rows have `owner_id` set to the user.
 
 `exercises` stores the exercise library. Builtin exercises are shared with all authenticated users. User-created exercises are private to the owning user. Exercise classification fields support future training styles such as Gym, Bodyweight, Weighted Bodyweight, Assisted, Hold, Time, Distance, Calisthenics, and Street Workout.
+
+`exercise_variants` stores alternate ways to perform an exercise. Examples include pull-up grip types, push-up variations, weighted or assisted versions, and calisthenics progressions. Builtin variants are shared with authenticated users; custom variants are private to the user who created them.
 
 `workout_templates` stores reusable workout plans. Builtin templates can be shared with authenticated users; personal templates are private to their owner.
 
@@ -37,6 +40,7 @@ Shared data:
 
 - Builtin exercise categories
 - Builtin exercises
+- Builtin exercise variants
 - Builtin workout templates, when added later
 
 Private per-user data:
@@ -44,6 +48,7 @@ Private per-user data:
 - Profiles
 - User-created categories
 - User-created exercises
+- User-created exercise variants
 - User-created templates
 - Workout sessions
 - Workout sets
@@ -64,6 +69,21 @@ Builtin rows use `is_builtin = true` and `owner_id = null`. Private rows use `ow
 The capability flags `supports_weight`, `supports_assistance`, `supports_duration`, and `supports_distance` tell future UI and workout logging flows what inputs make sense for an exercise.
 
 The starter seed remains valid because these fields are nullable or have conservative defaults.
+
+## Exercise Variants
+
+Variants are attached to a base exercise and describe useful alternatives without duplicating the whole exercise.
+
+Examples:
+
+- Pull-up grips: overhand pull-up, chin-up, neutral-grip pull-up, wide-grip pull-up
+- Push-up variations: incline push-up, diamond push-up, archer push-up, deficit push-up
+- Weighted or assisted versions: weighted dip, band-assisted pull-up, machine-assisted pull-up
+- Calisthenics progressions: tuck front lever, advanced tuck front lever, straddle front lever
+
+`variant_type`, `grip_type`, `equipment`, `assistance_type`, `load_type`, and `progression_level` are intentionally flexible text/number fields for future UI and logging flows.
+
+Builtin variants use `is_builtin = true` and `created_by = null`. Custom variants use `is_builtin = false` and `created_by = auth.uid()`.
 
 ## RLS Protection
 

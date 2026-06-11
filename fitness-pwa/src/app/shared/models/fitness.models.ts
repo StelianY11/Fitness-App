@@ -40,6 +40,24 @@ export interface Exercise {
   updatedAt: string;
 }
 
+export interface ExerciseVariant {
+  id: string;
+  exerciseId: string;
+  name: string;
+  description: string | null;
+  variantType: string | null;
+  gripType: string | null;
+  equipment: string | null;
+  assistanceType: string | null;
+  loadType: string | null;
+  progressionLevel: number | null;
+  sortOrder: number;
+  isBuiltin: boolean;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface WorkoutTemplate {
   id: string;
   ownerId: string | null;
