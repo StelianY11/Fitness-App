@@ -1,9 +1,10 @@
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
+  imports: [RouterLink],
   template: `
     <div class="space-y-5">
       <div>
@@ -24,6 +25,13 @@ import { AuthService } from '../../core/services/auth.service';
           <p class="mt-1 font-semibold">Add profile setup after database policies are applied</p>
         </div>
       </div>
+
+      <a
+        routerLink="/exercises"
+        class="inline-flex w-full justify-center rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
+      >
+        Open Exercise Library
+      </a>
 
       @if (errorMessage) {
         <p class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

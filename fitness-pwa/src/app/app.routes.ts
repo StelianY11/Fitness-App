@@ -22,6 +22,14 @@ export const routes: Routes = [
       import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
   },
   {
+    path: 'exercises',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/exercises/exercise-library.component').then(
+        (m) => m.ExerciseLibraryComponent,
+      ),
+  },
+  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'dashboard',
