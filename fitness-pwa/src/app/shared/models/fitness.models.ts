@@ -77,6 +77,7 @@ export type WorkoutTemplateBlockType =
   | 'superset'
   | 'dropset'
   | 'giant_set'
+  | 'circuit'
   | 'notes';
 
 export interface WorkoutTemplateBlock {

@@ -74,6 +74,29 @@ export interface UpdateWorkoutTemplateInput {
   estimatedDurationMinutes?: number | null;
 }
 
+export interface CreateWorkoutTemplateBlockInput {
+  workoutTemplateId: string;
+  title?: string | null;
+  blockType: WorkoutTemplateBlockType;
+  sortOrder: number;
+  notes?: string | null;
+}
+
+export interface UpdateWorkoutTemplateBlockInput {
+  title?: string | null;
+  blockType?: WorkoutTemplateBlockType;
+  sortOrder?: number;
+  notes?: string | null;
+}
+
+export interface CreateWorkoutTemplateBlockExerciseInput {
+  workoutTemplateBlockId: string;
+  exerciseId: string;
+  exerciseVariantId?: string | null;
+  sortOrder: number;
+  setType?: WorkoutTemplateSetType;
+}
+
 interface WorkoutTemplateRow {
   id: string;
   owner_id: string | null;
@@ -144,6 +167,13 @@ interface WorkoutTemplateBlockInsertRow {
   notes: string | null;
 }
 
+interface WorkoutTemplateBlockUpdateRow {
+  title?: string | null;
+  block_type?: WorkoutTemplateBlockType;
+  sort_order?: number;
+  notes?: string | null;
+}
+
 interface WorkoutTemplateBlockExerciseInsertRow {
   workout_template_block_id: string;
   exercise_id: string | null;
@@ -159,6 +189,10 @@ interface WorkoutTemplateBlockExerciseInsertRow {
   tempo: string | null;
   rir: number | null;
   notes: string | null;
+}
+
+interface WorkoutTemplateBlockExerciseUpdateRow {
+  sort_order?: number;
 }
 
 @Injectable({
@@ -398,6 +432,147 @@ export class WorkoutTemplateService {
     };
   }
 
+  async createBlock(
+    input: CreateWorkoutTemplateBlockInput,
+  ): Promise<WorkoutTemplateServiceResult<WorkoutTemplateBlock | null>> {
+    const payload: WorkoutTemplateBlockInsertRow = {
+      workout_template_id: input.workoutTemplateId,
+      title: input.title ?? null,
+      block_type: input.blockType,
+      sort_order: input.sortOrder,
+      notes: input.notes ?? null,
+    };
+
+    const { data, error } = await this.supabase
+      .from('workout_template_blocks')
+      .insert(payload)
+      .select(BLOCK_SELECT)
+      .returns<WorkoutTemplateBlockRow>()
+      .single();
+
+    return {
+      data: data ? mapWorkoutTemplateBlock(data) : null,
+      error: this.formatError(error),
+    };
+  }
+
+  async updateBlock(
+    id: string,
+    input: UpdateWorkoutTemplateBlockInput,
+  ): Promise<WorkoutTemplateServiceResult<WorkoutTemplateBlock | null>> {
+    const payload: WorkoutTemplateBlockUpdateRow = {};
+
+    if (input.title !== undefined) {
+      payload.title = input.title;
+    }
+
+    if (input.blockType !== undefined) {
+      payload.block_type = input.blockType;
+    }
+
+    if (input.sortOrder !== undefined) {
+      payload.sort_order = input.sortOrder;
+    }
+
+    if (input.notes !== undefined) {
+      payload.notes = input.notes;
+    }
+
+    const { data, error } = await this.supabase
+      .from('workout_template_blocks')
+      .update(payload)
+      .eq('id', id)
+      .select(BLOCK_SELECT)
+      .returns<WorkoutTemplateBlockRow>()
+      .maybeSingle();
+
+    return {
+      data: data ? mapWorkoutTemplateBlock(data) : null,
+      error: this.formatError(error),
+    };
+  }
+
+  async deleteBlock(id: string): Promise<WorkoutTemplateServiceResult<null>> {
+    const { error } = await this.supabase
+      .from('workout_template_blocks')
+      .delete()
+      .eq('id', id);
+
+    return {
+      data: null,
+      error: this.formatError(error),
+    };
+  }
+
+  async reorderBlocks(
+    blocks: WorkoutTemplateBlock[],
+  ): Promise<WorkoutTemplateServiceResult<null>> {
+    return this.updateSortOrders(
+      blocks.map((block, index) => ({
+        table: 'workout_template_blocks',
+        id: block.id,
+        sortOrder: index + 1,
+      })),
+    );
+  }
+
+  async addExerciseToBlock(
+    input: CreateWorkoutTemplateBlockExerciseInput,
+  ): Promise<WorkoutTemplateServiceResult<WorkoutTemplateBlockExercise | null>> {
+    const payload: WorkoutTemplateBlockExerciseInsertRow = {
+      workout_template_block_id: input.workoutTemplateBlockId,
+      exercise_id: input.exerciseId,
+      exercise_variant_id: input.exerciseVariantId ?? null,
+      sort_order: input.sortOrder,
+      set_type: input.setType ?? 'working',
+      target_sets: null,
+      target_reps: null,
+      target_weight_kg: null,
+      target_duration_seconds: null,
+      target_distance_meters: null,
+      rest_seconds: null,
+      tempo: null,
+      rir: null,
+      notes: null,
+    };
+
+    const { data, error } = await this.supabase
+      .from('workout_template_block_exercises')
+      .insert(payload)
+      .select(BLOCK_EXERCISE_SELECT)
+      .returns<WorkoutTemplateBlockExerciseRow>()
+      .single();
+
+    return {
+      data: data ? mapWorkoutTemplateBlockExercise(data) : null,
+      error: this.formatError(error),
+    };
+  }
+
+  async deleteTemplateExercise(id: string): Promise<WorkoutTemplateServiceResult<null>> {
+    const { error } = await this.supabase
+      .from('workout_template_block_exercises')
+      .delete()
+      .eq('id', id);
+
+    return {
+      data: null,
+      error: this.formatError(error),
+    };
+  }
+
+  async reorderTemplateExercises(
+    exercises: WorkoutTemplateBlockExercise[],
+  ): Promise<WorkoutTemplateServiceResult<null>> {
+    return this.updateSortOrders(
+      exercises.map((exercise, index) => ({
+        table: 'workout_template_block_exercises',
+        id: exercise.id,
+        sortOrder: index + 1,
+      })),
+    );
+  }
+
   private async duplicateBlock(
     block: WorkoutTemplateBlock,
     templateId: string,
@@ -421,6 +596,41 @@ export class WorkoutTemplateService {
       data: data ? mapWorkoutTemplateBlock(data) : null,
       error: this.formatError(error),
     };
+  }
+
+  private async updateSortOrders(
+    updates: {
+      table: 'workout_template_blocks' | 'workout_template_block_exercises';
+      id: string;
+      sortOrder: number;
+    }[],
+  ): Promise<WorkoutTemplateServiceResult<null>> {
+    for (const update of updates) {
+      const { error } = await this.supabase
+        .from(update.table)
+        .update({ sort_order: update.sortOrder + 1000 })
+        .eq('id', update.id);
+
+      if (error) {
+        return { data: null, error: this.formatError(error) };
+      }
+    }
+
+    for (const update of updates) {
+      const payload: WorkoutTemplateBlockExerciseUpdateRow = {
+        sort_order: update.sortOrder,
+      };
+      const { error } = await this.supabase
+        .from(update.table)
+        .update(payload)
+        .eq('id', update.id);
+
+      if (error) {
+        return { data: null, error: this.formatError(error) };
+      }
+    }
+
+    return { data: null, error: null };
   }
 
   private async duplicateBlockExercises(

@@ -38,6 +38,15 @@ export interface ExerciseServiceResult<T> {
   error: string | null;
 }
 
+export interface CreateCustomExerciseInput {
+  name: string;
+  categoryId?: string | null;
+  description?: string | null;
+  trainingType?: string | null;
+  exerciseType?: string | null;
+  equipment?: string | null;
+}
+
 interface ExerciseCategoryRow {
   id: string;
   owner_id: string | null;
@@ -69,6 +78,22 @@ interface ExerciseRow {
   is_builtin: boolean;
   created_at: string;
   updated_at: string;
+}
+
+interface BaseExerciseInsertRow {
+  category_id: string | null;
+  owner_id: string;
+  name: string;
+  description: string | null;
+  instructions: string | null;
+  muscle_groups: string[];
+  equipment: string | null;
+  is_builtin: false;
+}
+
+interface ExtendedExerciseInsertRow extends BaseExerciseInsertRow {
+  training_type: string | null;
+  exercise_type: string | null;
 }
 
 @Injectable({
@@ -110,6 +135,47 @@ export class ExerciseService {
     }
 
     return this.fetchExercises({ searchQuery: trimmedQuery });
+  }
+
+  async createCustomExercise(
+    input: CreateCustomExerciseInput,
+  ): Promise<ExerciseServiceResult<Exercise | null>> {
+    const { data: userData, error: userError } = await this.supabase.auth.getUser();
+    const userId = userData.user?.id;
+
+    if (userError || !userId) {
+      return {
+        data: null,
+        error: userError?.message ?? 'No authenticated user.',
+      };
+    }
+
+    const basePayload: BaseExerciseInsertRow = {
+      category_id: input.categoryId ?? null,
+      owner_id: userId,
+      name: input.name.trim(),
+      description: input.description ?? null,
+      instructions: null,
+      muscle_groups: [],
+      equipment: input.equipment ?? null,
+      is_builtin: false,
+    };
+    const extendedPayload: ExtendedExerciseInsertRow = {
+      ...basePayload,
+      training_type: input.trainingType ?? null,
+      exercise_type: input.exerciseType ?? null,
+    };
+
+    const extendedResult = await this.insertExercise(
+      extendedPayload,
+      EXTENDED_EXERCISE_SELECT,
+    );
+
+    if (!this.isMissingColumnError(extendedResult.error)) {
+      return extendedResult;
+    }
+
+    return this.insertExercise(basePayload, BASE_EXERCISE_SELECT);
   }
 
   private formatError(error: PostgrestError | null): string | null {
@@ -184,6 +250,23 @@ export class ExerciseService {
 
   private isMissingColumnError(error: string | null): boolean {
     return error?.toLowerCase().includes('column') === true;
+  }
+
+  private async insertExercise(
+    payload: BaseExerciseInsertRow | ExtendedExerciseInsertRow,
+    selectColumns: string,
+  ): Promise<ExerciseServiceResult<Exercise | null>> {
+    const { data, error } = await this.supabase
+      .from('exercises')
+      .insert(payload)
+      .select(selectColumns)
+      .returns<ExerciseRow>()
+      .single();
+
+    return {
+      data: data ? mapExercise(data) : null,
+      error: this.formatError(error),
+    };
   }
 }
 

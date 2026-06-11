@@ -142,13 +142,12 @@ import { WorkoutTemplate } from '../../../shared/models/fitness.models';
               </div>
 
               <div class="mt-4 grid gap-2 sm:grid-cols-3">
-                <button
-                  type="button"
-                  (click)="showEditorPlaceholder(template)"
+                <a
+                  [routerLink]="['/templates', template.id]"
                   class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800"
                 >
                   View/Edit
-                </button>
+                </a>
                 <button
                   type="button"
                   (click)="duplicateTemplate(template)"
@@ -290,11 +289,6 @@ export class WorkoutTemplatesComponent {
       this.processingTemplateId = null;
       this.changeDetectorRef.detectChanges();
     }
-  }
-
-  showEditorPlaceholder(template: WorkoutTemplate): void {
-    this.statusMessage = `Template editor for "${template.name}" is coming in a later phase.`;
-    this.errorMessage = '';
   }
 
   formatDuration(template: WorkoutTemplate): string {

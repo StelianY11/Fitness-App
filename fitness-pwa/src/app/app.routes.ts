@@ -30,6 +30,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'templates/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/workouts/templates/template-editor.component').then(
+        (m) => m.TemplateEditorComponent,
+      ),
+  },
+  {
     path: 'templates',
     canActivate: [authGuard],
     loadComponent: () =>
