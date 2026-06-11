@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ExerciseService } from '../../core/services/exercise.service';
@@ -32,6 +32,7 @@ import {
         <input
           type="search"
           [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearchChange($event)"
           placeholder="Search exercises"
           class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
         />
@@ -124,11 +125,13 @@ import {
 })
 export class ExerciseLibraryComponent {
   private readonly exerciseService = inject(ExerciseService);
+  private readonly changeDetectorRef = inject(ChangeDetectorRef);
 
   readonly loadingCards = [1, 2, 3];
 
   categories: ExerciseCategory[] = [];
   exercises: Exercise[] = [];
+  filteredExercises: Exercise[] = [];
   selectedCategoryId: string | null = null;
   searchQuery = '';
   isLoading = true;
@@ -138,10 +141,20 @@ export class ExerciseLibraryComponent {
     void this.loadExerciseLibrary();
   }
 
-  get filteredExercises(): Exercise[] {
+  onSearchChange(query: string): void {
+    this.searchQuery = query;
+    this.applyFilters();
+  }
+
+  selectCategory(categoryId: string | null): void {
+    this.selectedCategoryId = categoryId;
+    this.applyFilters();
+  }
+
+  private applyFilters(): void {
     const query = this.searchQuery.trim().toLowerCase();
 
-    return this.exercises.filter((exercise) => {
+    this.filteredExercises = this.exercises.filter((exercise) => {
       const matchesCategory =
         this.selectedCategoryId === null || exercise.categoryId === this.selectedCategoryId;
       const searchableText = [
@@ -155,10 +168,6 @@ export class ExerciseLibraryComponent {
 
       return matchesCategory && (!query || searchableText.includes(query));
     });
-  }
-
-  selectCategory(categoryId: string | null): void {
-    this.selectedCategoryId = categoryId;
   }
 
   getCategoryName(categoryId: string | null): string {
@@ -187,14 +196,32 @@ export class ExerciseLibraryComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const [categoriesResult, exercisesResult] = await Promise.all([
-      this.exerciseService.getCategories(),
-      this.exerciseService.getExercises(),
-    ]);
+    try {
+      const [categoriesResult, exercisesResult] = await Promise.all([
+        this.exerciseService.getCategories(),
+        this.exerciseService.getExercises(),
+      ]);
 
-    this.categories = categoriesResult.data;
-    this.exercises = exercisesResult.data;
-    this.errorMessage = categoriesResult.error ?? exercisesResult.error ?? '';
-    this.isLoading = false;
+      this.categories = categoriesResult.data;
+      this.exercises = exercisesResult.data;
+      this.errorMessage = categoriesResult.error ?? exercisesResult.error ?? '';
+
+      if (this.selectedCategoryId && !this.categories.some((category) => category.id === this.selectedCategoryId)) {
+        this.selectedCategoryId = null;
+      }
+
+      this.applyFilters();
+
+      if (this.errorMessage) {
+        console.error('Exercise library load error:', this.errorMessage);
+      }
+    } catch (error) {
+      this.errorMessage =
+        error instanceof Error ? error.message : 'Unable to load the exercise library.';
+      console.error('Exercise library load failed:', error);
+    } finally {
+      this.isLoading = false;
+      this.changeDetectorRef.detectChanges();
+    }
   }
 }
