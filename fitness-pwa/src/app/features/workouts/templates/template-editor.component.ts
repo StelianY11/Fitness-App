@@ -466,6 +466,7 @@ export class TemplateEditorComponent {
   statusMessage = '';
   private readonly addingExerciseKeys = new Set<string>();
   private searchRequestId = 0;
+  private readonly loadTimeoutMs = 15000;
 
   get canEdit(): boolean {
     return this.template?.isBuiltin === false;
@@ -794,31 +795,28 @@ export class TemplateEditorComponent {
 
       if (!templateId) {
         this.errorMessage = 'Template id is missing.';
+        console.error('Template editor load error: missing route id.');
         return;
       }
 
-      const [templateResult, exercisesResult, categoriesResult] = await Promise.all([
+      const templateResult = await withLoadTimeout(
         this.workoutTemplateService.getTemplateById(templateId),
-        this.exerciseService.getExercises(),
-        this.exerciseService.getCategories(),
-      ]);
+        'template',
+        this.loadTimeoutMs,
+      );
 
       if (templateResult.error || !templateResult.data) {
         this.errorMessage = templateResult.error ?? 'Template not found.';
-        return;
-      }
-
-      if (exercisesResult.error) {
-        this.errorMessage = exercisesResult.error;
+        console.error('Template editor template load error:', this.errorMessage);
         return;
       }
 
       this.template = templateResult.data;
-      this.exercises = exercisesResult.data;
-      this.categories = categoriesResult.data;
       await this.loadBlocks();
+      void this.loadExerciseMetadata();
     } catch (error) {
       this.errorMessage = getErrorMessage(error, 'Unable to load template editor.');
+      console.error('Template editor load failed:', error);
     } finally {
       this.isLoading = false;
       this.changeDetectorRef.detectChanges();
@@ -830,24 +828,36 @@ export class TemplateEditorComponent {
       return;
     }
 
-    const blocksResult = await this.workoutTemplateService.getTemplateBlocks(this.template.id);
+    const blocksResult = await withLoadTimeout(
+      this.workoutTemplateService.getTemplateBlocks(this.template.id),
+      'template blocks',
+      this.loadTimeoutMs,
+    );
 
     if (blocksResult.error) {
       this.errorMessage = blocksResult.error;
+      console.error('Template editor blocks load error:', blocksResult.error);
       return;
     }
 
     this.blocks = blocksResult.data;
     this.blockExercises = {};
 
-    await Promise.all(this.blocks.map((block) => this.loadBlockExercises(block.id)));
+    for (const block of this.blocks) {
+      await this.loadBlockExercises(block.id);
+    }
   }
 
   private async loadBlockExercises(blockId: string): Promise<void> {
-    const exercisesResult = await this.workoutTemplateService.getTemplateExercises(blockId);
+    const exercisesResult = await withLoadTimeout(
+      this.workoutTemplateService.getTemplateExercises(blockId),
+      'template block exercises',
+      this.loadTimeoutMs,
+    );
 
     if (exercisesResult.error) {
       this.errorMessage = exercisesResult.error;
+      console.error('Template editor block exercises load error:', exercisesResult.error);
       return;
     }
 
@@ -855,6 +865,34 @@ export class TemplateEditorComponent {
       ...this.blockExercises,
       [blockId]: exercisesResult.data,
     };
+  }
+
+  private async loadExerciseMetadata(): Promise<void> {
+    try {
+      const [exercisesResult, categoriesResult] = await Promise.all([
+        withLoadTimeout(this.exerciseService.getExercises(), 'exercises', this.loadTimeoutMs),
+        withLoadTimeout(this.exerciseService.getCategories(), 'exercise categories', this.loadTimeoutMs),
+      ]);
+
+      if (exercisesResult.error) {
+        this.errorMessage = exercisesResult.error;
+        console.error('Template editor exercises load error:', exercisesResult.error);
+      } else {
+        this.exercises = exercisesResult.data;
+      }
+
+      if (categoriesResult.error) {
+        this.errorMessage = categoriesResult.error;
+        console.error('Template editor categories load error:', categoriesResult.error);
+      } else {
+        this.categories = categoriesResult.data;
+      }
+    } catch (error) {
+      this.errorMessage = getErrorMessage(error, 'Unable to load exercise metadata.');
+      console.error('Template editor exercise metadata load failed:', error);
+    } finally {
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   private async updateBlock(
@@ -898,6 +936,23 @@ function getDefaultSetType(blockType: WorkoutTemplateBlockType): WorkoutTemplate
 
 function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
+}
+
+function withLoadTimeout<T>(
+  promise: Promise<T>,
+  label: string,
+  timeoutMs: number,
+): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      reject(new Error(`Timed out while loading ${label}.`));
+    }, timeoutMs);
+
+    promise
+      .then(resolve)
+      .catch(reject)
+      .finally(() => clearTimeout(timeoutId));
+  });
 }
 
 function createEmptyCustomExerciseForm(): CustomExerciseForm {
