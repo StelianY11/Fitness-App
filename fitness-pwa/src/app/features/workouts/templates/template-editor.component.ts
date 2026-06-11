@@ -77,6 +77,13 @@ interface CustomExerciseForm {
         <div class="rounded-lg border border-red-200 bg-red-50 p-4">
           <p class="font-semibold text-red-800">Unable to load template</p>
           <p class="mt-1 text-sm text-red-700">{{ errorMessage || 'Template not found.' }}</p>
+          <button
+            type="button"
+            (click)="reloadTemplate()"
+            class="mt-4 rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
+          >
+            Retry
+          </button>
         </div>
       } @else {
         @if (canEdit) {
@@ -465,15 +472,20 @@ export class TemplateEditorComponent {
   errorMessage = '';
   statusMessage = '';
   private readonly addingExerciseKeys = new Set<string>();
+  private readonly templateId = this.route.snapshot.paramMap.get('id');
+  private mainLoadId = 0;
+  private metadataLoadId = 0;
   private searchRequestId = 0;
-  private readonly loadTimeoutMs = 15000;
+  private mainLoadingSafetyTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly mainLoadingSafetyMs = 8000;
 
   get canEdit(): boolean {
     return this.template?.isBuiltin === false;
   }
 
   constructor() {
-    void this.loadTemplateEditor();
+    void this.reloadTemplate();
+    void this.loadExerciseMetadata();
   }
 
   async addBlock(): Promise<void> {
@@ -493,17 +505,23 @@ export class TemplateEditorComponent {
         sortOrder: this.blocks.length + 1,
       });
 
-      if (result.error) {
-        this.errorMessage = result.error;
+      if (result.error || !result.data) {
+        this.errorMessage = result.error ?? 'Unable to add block.';
+        console.error('Template editor add block error:', this.errorMessage);
         return;
       }
 
       this.newBlockTitle = '';
       this.newBlockType = 'normal';
       this.statusMessage = 'Block added.';
-      await this.loadBlocks();
+      this.blocks = [...this.blocks, result.data].sort((a, b) => a.sortOrder - b.sortOrder);
+      this.blockExercises = {
+        ...this.blockExercises,
+        [result.data.id]: [],
+      };
     } catch (error) {
       this.errorMessage = getErrorMessage(error, 'Unable to add block.');
+      console.error('Template editor add block failed:', error);
     } finally {
       this.isSaving = false;
       this.changeDetectorRef.detectChanges();
@@ -536,9 +554,16 @@ export class TemplateEditorComponent {
       }
 
       this.statusMessage = 'Block removed.';
-      await this.loadBlocks();
+      this.blocks = this.blocks
+        .filter((currentBlock) => currentBlock.id !== block.id)
+        .map((currentBlock, index) => ({ ...currentBlock, sortOrder: index + 1 }));
+      const { [block.id]: _removed, ...remainingExercises } = this.blockExercises;
+      this.blockExercises = remainingExercises;
+      await this.saveBlockOrder();
     } catch (error) {
       this.errorMessage = getErrorMessage(error, 'Unable to remove block.');
+      console.error('Template editor remove block failed:', error);
+      await this.reloadTemplate({ showLoading: false });
     } finally {
       this.isSaving = false;
       this.changeDetectorRef.detectChanges();
@@ -546,28 +571,40 @@ export class TemplateEditorComponent {
   }
 
   async moveBlock(index: number, direction: -1 | 1): Promise<void> {
+    if (this.isSaving) {
+      return;
+    }
+
     const targetIndex = index + direction;
 
     if (targetIndex < 0 || targetIndex >= this.blocks.length) {
       return;
     }
 
-    const reorderedBlocks = [...this.blocks];
-    [reorderedBlocks[index], reorderedBlocks[targetIndex]] = [
-      reorderedBlocks[targetIndex],
-      reorderedBlocks[index],
-    ];
+    const previousBlocks = this.blocks;
+    this.isSaving = true;
+    this.errorMessage = '';
 
-    this.blocks = reorderedBlocks.map((block, blockIndex) => ({
-      ...block,
-      sortOrder: blockIndex + 1,
-    }));
+    try {
+      const reorderedBlocks = [...this.blocks];
+      [reorderedBlocks[index], reorderedBlocks[targetIndex]] = [
+        reorderedBlocks[targetIndex],
+        reorderedBlocks[index],
+      ];
 
-    const result = await this.workoutTemplateService.reorderBlocks(this.blocks);
+      this.blocks = reorderedBlocks.map((block, blockIndex) => ({
+        ...block,
+        sortOrder: blockIndex + 1,
+      }));
 
-    if (result.error) {
-      this.errorMessage = result.error;
-      await this.loadBlocks();
+      await this.saveBlockOrder();
+    } catch (error) {
+      this.blocks = previousBlocks;
+      this.errorMessage = getErrorMessage(error, 'Unable to reorder blocks.');
+      console.error('Template editor block reorder failed:', error);
+    } finally {
+      this.isSaving = false;
+      this.changeDetectorRef.detectChanges();
     }
   }
 
@@ -652,7 +689,7 @@ export class TemplateEditorComponent {
       }
 
       this.statusMessage = 'Exercise added.';
-      await this.loadBlockExercises(block.id);
+      await this.reloadBlockExercises(block.id);
     } catch (error) {
       this.errorMessage = getErrorMessage(error, 'Unable to add exercise.');
     } finally {
@@ -717,22 +754,45 @@ export class TemplateEditorComponent {
   }
 
   async removeExercise(templateExercise: WorkoutTemplateBlockExercise): Promise<void> {
-    if (!this.canEdit) {
+    if (!this.canEdit || this.isSaving) {
       return;
     }
 
-    const result = await this.workoutTemplateService.deleteTemplateExercise(templateExercise.id);
+    this.isSaving = true;
+    this.errorMessage = '';
+    this.statusMessage = '';
 
-    if (result.error) {
-      this.errorMessage = result.error;
-      return;
+    try {
+      const result = await this.workoutTemplateService.deleteTemplateExercise(templateExercise.id);
+
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      this.statusMessage = 'Exercise removed.';
+      const blockId = templateExercise.workoutTemplateBlockId;
+      this.blockExercises = {
+        ...this.blockExercises,
+        [blockId]: this.getBlockExercises(blockId)
+          .filter((exercise) => exercise.id !== templateExercise.id)
+          .map((exercise, index) => ({ ...exercise, sortOrder: index + 1 })),
+      };
+      await this.saveExerciseOrder(blockId);
+    } catch (error) {
+      this.errorMessage = getErrorMessage(error, 'Unable to remove exercise.');
+      console.error('Template editor remove exercise failed:', error);
+      await this.reloadBlockExercises(templateExercise.workoutTemplateBlockId);
+    } finally {
+      this.isSaving = false;
+      this.changeDetectorRef.detectChanges();
     }
-
-    this.statusMessage = 'Exercise removed.';
-    await this.loadBlockExercises(templateExercise.workoutTemplateBlockId);
   }
 
   async moveExercise(blockId: string, index: number, direction: -1 | 1): Promise<void> {
+    if (this.isSaving) {
+      return;
+    }
+
     const exercises = [...this.getBlockExercises(blockId)];
     const targetIndex = index + direction;
 
@@ -740,19 +800,25 @@ export class TemplateEditorComponent {
       return;
     }
 
-    [exercises[index], exercises[targetIndex]] = [exercises[targetIndex], exercises[index]];
-    this.blockExercises[blockId] = exercises.map((exercise, exerciseIndex) => ({
-      ...exercise,
-      sortOrder: exerciseIndex + 1,
-    }));
+    const previousExercises = this.getBlockExercises(blockId);
+    this.isSaving = true;
+    this.errorMessage = '';
 
-    const result = await this.workoutTemplateService.reorderTemplateExercises(
-      this.blockExercises[blockId],
-    );
+    try {
+      [exercises[index], exercises[targetIndex]] = [exercises[targetIndex], exercises[index]];
+      this.blockExercises[blockId] = exercises.map((exercise, exerciseIndex) => ({
+        ...exercise,
+        sortOrder: exerciseIndex + 1,
+      }));
 
-    if (result.error) {
-      this.errorMessage = result.error;
-      await this.loadBlockExercises(blockId);
+      await this.saveExerciseOrder(blockId);
+    } catch (error) {
+      this.blockExercises[blockId] = previousExercises;
+      this.errorMessage = getErrorMessage(error, 'Unable to reorder exercises.');
+      console.error('Template editor exercise reorder failed:', error);
+    } finally {
+      this.isSaving = false;
+      this.changeDetectorRef.detectChanges();
     }
   }
 
@@ -786,112 +852,160 @@ export class TemplateEditorComponent {
     return setType.replace('_', ' ');
   }
 
-  private async loadTemplateEditor(): Promise<void> {
-    this.isLoading = true;
+  async reloadTemplate(options: { showLoading?: boolean } = {}): Promise<void> {
+    const loadId = ++this.mainLoadId;
+    const showLoading = options.showLoading ?? true;
+
+    if (showLoading) {
+      this.isLoading = true;
+      this.startMainLoadingSafetyTimer(loadId);
+    }
+
     this.errorMessage = '';
 
     try {
-      const templateId = this.route.snapshot.paramMap.get('id');
+      if (!this.templateId) {
+        console.error('Template editor load failed before template step: missing route id.');
+        throw new Error('Template id is missing.');
+      }
 
-      if (!templateId) {
-        this.errorMessage = 'Template id is missing.';
-        console.error('Template editor load error: missing route id.');
+      console.info('Template editor loading template:', this.templateId);
+      const templateResult = await this.workoutTemplateService.getTemplateById(this.templateId);
+
+      if (loadId !== this.mainLoadId) {
         return;
       }
 
-      const templateResult = await withLoadTimeout(
-        this.workoutTemplateService.getTemplateById(templateId),
-        'template',
-        this.loadTimeoutMs,
-      );
-
       if (templateResult.error || !templateResult.data) {
-        this.errorMessage = templateResult.error ?? 'Template not found.';
-        console.error('Template editor template load error:', this.errorMessage);
+        console.error('Template editor template load error:', {
+          templateId: this.templateId,
+          error: templateResult.error ?? 'Template not found.',
+        });
+        throw new Error(templateResult.error ?? 'Template not found.');
+      }
+
+      console.info('Template editor loading blocks:', templateResult.data.id);
+      const blocksResult = await this.workoutTemplateService.getTemplateBlocks(templateResult.data.id);
+
+      if (loadId !== this.mainLoadId) {
         return;
+      }
+
+      if (blocksResult.error) {
+        console.error('Template editor blocks load error:', {
+          templateId: templateResult.data.id,
+          error: blocksResult.error,
+        });
+        throw new Error(blocksResult.error);
+      }
+
+      const nextBlockExercises: Record<string, WorkoutTemplateBlockExercise[]> = {};
+
+      for (const block of blocksResult.data) {
+        console.info('Template editor loading block exercises:', block.id);
+        const exercisesResult = await this.workoutTemplateService.getTemplateExercises(block.id);
+
+        if (loadId !== this.mainLoadId) {
+          return;
+        }
+
+        if (exercisesResult.error) {
+          console.error('Template editor block exercises load error:', {
+            blockId: block.id,
+            error: exercisesResult.error,
+          });
+          throw new Error(exercisesResult.error);
+        }
+
+        nextBlockExercises[block.id] = exercisesResult.data;
       }
 
       this.template = templateResult.data;
-      await this.loadBlocks();
-      void this.loadExerciseMetadata();
+      this.blocks = blocksResult.data;
+      this.blockExercises = nextBlockExercises;
     } catch (error) {
+      this.template = null;
+      this.blocks = [];
+      this.blockExercises = {};
       this.errorMessage = getErrorMessage(error, 'Unable to load template editor.');
-      console.error('Template editor load failed:', error);
+      console.error('Template editor reload failed:', error);
     } finally {
-      this.isLoading = false;
+      if (loadId === this.mainLoadId) {
+        this.clearMainLoadingSafetyTimer();
+        this.isLoading = false;
+        this.changeDetectorRef.detectChanges();
+      }
+    }
+  }
+
+  private async reloadBlockExercises(blockId: string): Promise<void> {
+    try {
+      const exercisesResult = await this.workoutTemplateService.getTemplateExercises(blockId);
+
+      if (exercisesResult.error) {
+        throw new Error(exercisesResult.error);
+      }
+
+      this.blockExercises = {
+        ...this.blockExercises,
+        [blockId]: exercisesResult.data,
+      };
+    } catch (error) {
+      this.errorMessage = getErrorMessage(error, 'Unable to load block exercises.');
+      console.error('Template editor block exercises reload failed:', error);
+    } finally {
       this.changeDetectorRef.detectChanges();
     }
   }
 
-  private async loadBlocks(): Promise<void> {
-    if (!this.template) {
-      return;
-    }
-
-    const blocksResult = await withLoadTimeout(
-      this.workoutTemplateService.getTemplateBlocks(this.template.id),
-      'template blocks',
-      this.loadTimeoutMs,
-    );
-
-    if (blocksResult.error) {
-      this.errorMessage = blocksResult.error;
-      console.error('Template editor blocks load error:', blocksResult.error);
-      return;
-    }
-
-    this.blocks = blocksResult.data;
-    this.blockExercises = {};
-
-    for (const block of this.blocks) {
-      await this.loadBlockExercises(block.id);
-    }
-  }
-
-  private async loadBlockExercises(blockId: string): Promise<void> {
-    const exercisesResult = await withLoadTimeout(
-      this.workoutTemplateService.getTemplateExercises(blockId),
-      'template block exercises',
-      this.loadTimeoutMs,
-    );
-
-    if (exercisesResult.error) {
-      this.errorMessage = exercisesResult.error;
-      console.error('Template editor block exercises load error:', exercisesResult.error);
-      return;
-    }
-
-    this.blockExercises = {
-      ...this.blockExercises,
-      [blockId]: exercisesResult.data,
-    };
-  }
-
   private async loadExerciseMetadata(): Promise<void> {
+    const metadataLoadId = ++this.metadataLoadId;
+
     try {
       const [exercisesResult, categoriesResult] = await Promise.all([
-        withLoadTimeout(this.exerciseService.getExercises(), 'exercises', this.loadTimeoutMs),
-        withLoadTimeout(this.exerciseService.getCategories(), 'exercise categories', this.loadTimeoutMs),
+        this.exerciseService.getExercises(),
+        this.exerciseService.getCategories(),
       ]);
 
+      if (metadataLoadId !== this.metadataLoadId) {
+        return;
+      }
+
       if (exercisesResult.error) {
-        this.errorMessage = exercisesResult.error;
         console.error('Template editor exercises load error:', exercisesResult.error);
       } else {
         this.exercises = exercisesResult.data;
       }
 
       if (categoriesResult.error) {
-        this.errorMessage = categoriesResult.error;
         console.error('Template editor categories load error:', categoriesResult.error);
       } else {
         this.categories = categoriesResult.data;
       }
     } catch (error) {
-      this.errorMessage = getErrorMessage(error, 'Unable to load exercise metadata.');
       console.error('Template editor exercise metadata load failed:', error);
     } finally {
-      this.changeDetectorRef.detectChanges();
+      if (metadataLoadId === this.metadataLoadId) {
+        this.changeDetectorRef.detectChanges();
+      }
+    }
+  }
+
+  private async saveBlockOrder(): Promise<void> {
+    const result = await this.workoutTemplateService.reorderBlocks(this.blocks);
+
+    if (result.error) {
+      throw new Error(result.error);
+    }
+  }
+
+  private async saveExerciseOrder(blockId: string): Promise<void> {
+    const result = await this.workoutTemplateService.reorderTemplateExercises(
+      this.getBlockExercises(blockId),
+    );
+
+    if (result.error) {
+      throw new Error(result.error);
     }
   }
 
@@ -903,18 +1017,60 @@ export class TemplateEditorComponent {
       return;
     }
 
-    const result = await this.workoutTemplateService.updateBlock(block.id, input);
+    this.errorMessage = '';
 
-    if (result.error) {
-      this.errorMessage = result.error;
-      return;
+    try {
+      const result = await this.workoutTemplateService.updateBlock(block.id, input);
+
+      if (result.error || !result.data) {
+        throw new Error(result.error ?? 'Unable to update block.');
+      }
+
+      this.blocks = this.blocks.map((currentBlock) =>
+        currentBlock.id === block.id ? result.data as WorkoutTemplateBlock : currentBlock,
+      );
+      this.statusMessage = 'Block updated.';
+    } catch (error) {
+      this.errorMessage = getErrorMessage(error, 'Unable to update block.');
+      console.error('Template editor update block failed:', error);
+      await this.reloadTemplate({ showLoading: false });
+    } finally {
+      this.changeDetectorRef.detectChanges();
     }
-
-    this.statusMessage = 'Block updated.';
   }
 
   private getAddingExerciseKey(blockId: string, exerciseId: string): string {
     return `${blockId}:${exerciseId}`;
+  }
+
+  private startMainLoadingSafetyTimer(loadId: number): void {
+    this.clearMainLoadingSafetyTimer();
+    this.mainLoadingSafetyTimer = setTimeout(() => {
+      if (loadId !== this.mainLoadId || !this.isLoading) {
+        return;
+      }
+
+      this.mainLoadId++;
+      this.isLoading = false;
+      this.template = null;
+      this.blocks = [];
+      this.blockExercises = {};
+      this.errorMessage = 'Template loading took too long. Please retry.';
+      console.error('Template editor main load timed out after 8 seconds.', {
+        templateId: this.templateId,
+        loadId,
+      });
+      this.changeDetectorRef.detectChanges();
+    }, this.mainLoadingSafetyMs);
+  }
+
+  private clearMainLoadingSafetyTimer(): void {
+    if (!this.mainLoadingSafetyTimer) {
+      return;
+    }
+
+    clearTimeout(this.mainLoadingSafetyTimer);
+    this.mainLoadingSafetyTimer = null;
   }
 }
 
@@ -936,23 +1092,6 @@ function getDefaultSetType(blockType: WorkoutTemplateBlockType): WorkoutTemplate
 
 function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
-}
-
-function withLoadTimeout<T>(
-  promise: Promise<T>,
-  label: string,
-  timeoutMs: number,
-): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const timeoutId = setTimeout(() => {
-      reject(new Error(`Timed out while loading ${label}.`));
-    }, timeoutMs);
-
-    promise
-      .then(resolve)
-      .catch(reject)
-      .finally(() => clearTimeout(timeoutId));
-  });
 }
 
 function createEmptyCustomExerciseForm(): CustomExerciseForm {
