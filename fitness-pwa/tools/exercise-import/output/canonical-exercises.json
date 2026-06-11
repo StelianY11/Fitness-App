@@ -1,0 +1,2125 @@
+[
+  {
+    "canonicalName": "Ab Crunch Machine",
+    "sourceIds": [
+      "Ab_Crunch_Machine"
+    ],
+    "aliases": [],
+    "categoryName": "Core",
+    "primaryMuscle": "core",
+    "muscleGroups": [
+      "core"
+    ],
+    "equipmentOptions": [
+      "Machine"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "intermediate",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Ab Roller",
+    "sourceIds": [
+      "Ab_Roller"
+    ],
+    "aliases": [],
+    "categoryName": "Core",
+    "primaryMuscle": "core",
+    "muscleGroups": [
+      "core",
+      "shoulders"
+    ],
+    "equipmentOptions": [
+      "Other"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "intermediate",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Air Bike",
+    "sourceIds": [
+      "Air_Bike"
+    ],
+    "aliases": [],
+    "categoryName": "Core",
+    "primaryMuscle": "core",
+    "muscleGroups": [
+      "core"
+    ],
+    "equipmentOptions": [
+      "Bodyweight"
+    ],
+    "trainingTypes": [
+      "calisthenics"
+    ],
+    "exerciseTypes": [
+      "bodyweight"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Alternate Hammer Curl",
+    "sourceIds": [
+      "Alternate_Hammer_Curl"
+    ],
+    "aliases": [],
+    "categoryName": "Arms",
+    "primaryMuscle": "biceps",
+    "muscleGroups": [
+      "biceps",
+      "forearms"
+    ],
+    "equipmentOptions": [
+      "Dumbbells"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Alternate Heel Touchers",
+    "sourceIds": [
+      "Alternate_Heel_Touchers"
+    ],
+    "aliases": [],
+    "categoryName": "Core",
+    "primaryMuscle": "core",
+    "muscleGroups": [
+      "core"
+    ],
+    "equipmentOptions": [
+      "Bodyweight"
+    ],
+    "trainingTypes": [
+      "calisthenics"
+    ],
+    "exerciseTypes": [
+      "bodyweight"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Alternate Incline Dumbbell Curl",
+    "sourceIds": [
+      "Alternate_Incline_Dumbbell_Curl"
+    ],
+    "aliases": [],
+    "categoryName": "Arms",
+    "primaryMuscle": "biceps",
+    "muscleGroups": [
+      "biceps",
+      "forearms"
+    ],
+    "equipmentOptions": [
+      "Dumbbells"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Alternating Cable Shoulder Press",
+    "sourceIds": [
+      "Alternating_Cable_Shoulder_Press"
+    ],
+    "aliases": [],
+    "categoryName": "Shoulders",
+    "primaryMuscle": "shoulders",
+    "muscleGroups": [
+      "shoulders",
+      "triceps"
+    ],
+    "equipmentOptions": [
+      "Cable machine"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Alternating Deltoid Raise",
+    "sourceIds": [
+      "Alternating_Deltoid_Raise"
+    ],
+    "aliases": [],
+    "categoryName": "Shoulders",
+    "primaryMuscle": "shoulders",
+    "muscleGroups": [
+      "shoulders"
+    ],
+    "equipmentOptions": [
+      "Dumbbells"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Alternating Floor Press",
+    "sourceIds": [
+      "Alternating_Floor_Press"
+    ],
+    "aliases": [],
+    "categoryName": "Chest",
+    "primaryMuscle": "chest",
+    "muscleGroups": [
+      "chest",
+      "core",
+      "shoulders",
+      "triceps"
+    ],
+    "equipmentOptions": [
+      "Kettlebell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Anti-Gravity Press",
+    "sourceIds": [
+      "Anti-Gravity_Press"
+    ],
+    "aliases": [],
+    "categoryName": "Shoulders",
+    "primaryMuscle": "shoulders",
+    "muscleGroups": [
+      "back",
+      "shoulders",
+      "traps",
+      "triceps"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Barbell Curls Lying Against An Incline",
+    "sourceIds": [
+      "Barbell_Curls_Lying_Against_An_Incline"
+    ],
+    "aliases": [],
+    "categoryName": "Arms",
+    "primaryMuscle": "biceps",
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Barbell Deadlift",
+    "sourceIds": [
+      "Barbell_Deadlift"
+    ],
+    "aliases": [],
+    "categoryName": "Back",
+    "primaryMuscle": "back",
+    "muscleGroups": [
+      "back",
+      "calves",
+      "forearms",
+      "glutes",
+      "hamstrings",
+      "quads",
+      "traps"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "intermediate",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Barbell Incline Bench Press",
+    "sourceIds": [
+      "Barbell_Incline_Bench_Press_-_Medium_Grip"
+    ],
+    "aliases": [
+      "Barbell Incline Bench Press - Medium Grip"
+    ],
+    "categoryName": "Chest",
+    "primaryMuscle": "chest",
+    "muscleGroups": [
+      "chest",
+      "shoulders",
+      "triceps"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "high",
+    "reasons": [
+      "normalized punctuation/pluralization"
+    ]
+  },
+  {
+    "canonicalName": "Barbell Incline Shoulder Raise",
+    "sourceIds": [
+      "Barbell_Incline_Shoulder_Raise"
+    ],
+    "aliases": [],
+    "categoryName": "Shoulders",
+    "primaryMuscle": "shoulders",
+    "muscleGroups": [
+      "chest",
+      "shoulders"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Barbell Rear Delt Row",
+    "sourceIds": [
+      "Barbell_Rear_Delt_Row"
+    ],
+    "aliases": [],
+    "categoryName": "Shoulders",
+    "primaryMuscle": "shoulders",
+    "muscleGroups": [
+      "back",
+      "biceps",
+      "shoulders"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Barbell Seated Calf Raise",
+    "sourceIds": [
+      "Barbell_Seated_Calf_Raise"
+    ],
+    "aliases": [],
+    "categoryName": "Legs",
+    "primaryMuscle": "calves",
+    "muscleGroups": [
+      "calves"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Barbell Shrug",
+    "sourceIds": [
+      "Barbell_Shrug"
+    ],
+    "aliases": [],
+    "categoryName": "Back",
+    "primaryMuscle": "traps",
+    "muscleGroups": [
+      "traps"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Barbell Shrug Behind The Back",
+    "sourceIds": [
+      "Barbell_Shrug_Behind_The_Back"
+    ],
+    "aliases": [],
+    "categoryName": "Back",
+    "primaryMuscle": "traps",
+    "muscleGroups": [
+      "back",
+      "forearms",
+      "traps"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Barbell Side Bend",
+    "sourceIds": [
+      "Barbell_Side_Bend"
+    ],
+    "aliases": [],
+    "categoryName": "Core",
+    "primaryMuscle": "core",
+    "muscleGroups": [
+      "back",
+      "core"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Barbell Side Split Squat",
+    "sourceIds": [
+      "Barbell_Side_Split_Squat"
+    ],
+    "aliases": [],
+    "categoryName": "Legs",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "back",
+      "calves",
+      "hamstrings",
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Barbell Walking Lunge",
+    "sourceIds": [
+      "Barbell_Walking_Lunge"
+    ],
+    "aliases": [],
+    "categoryName": "Legs",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "calves",
+      "glutes",
+      "hamstrings",
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Bench Dips",
+    "sourceIds": [
+      "Bench_Dips"
+    ],
+    "aliases": [],
+    "categoryName": "Arms",
+    "primaryMuscle": "triceps",
+    "muscleGroups": [
+      "chest",
+      "shoulders",
+      "triceps"
+    ],
+    "equipmentOptions": [
+      "Bodyweight"
+    ],
+    "trainingTypes": [
+      "street_workout"
+    ],
+    "exerciseTypes": [
+      "bodyweight"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Bench Press",
+    "sourceIds": [
+      "Barbell_Bench_Press_-_Medium_Grip"
+    ],
+    "aliases": [
+      "Barbell Bench Press - Medium Grip"
+    ],
+    "categoryName": "Chest",
+    "primaryMuscle": "chest",
+    "muscleGroups": [
+      "chest",
+      "shoulders",
+      "triceps"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "high",
+    "reasons": [
+      "explicit alias rule"
+    ]
+  },
+  {
+    "canonicalName": "Bent Over Barbell Row",
+    "sourceIds": [
+      "Bent_Over_Barbell_Row"
+    ],
+    "aliases": [],
+    "categoryName": "Back",
+    "primaryMuscle": "back",
+    "muscleGroups": [
+      "back",
+      "biceps",
+      "shoulders"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Bent Over Dumbbell Rear Delt Raise With Head On Bench",
+    "sourceIds": [
+      "Bent_Over_Dumbbell_Rear_Delt_Raise_With_Head_On_Bench"
+    ],
+    "aliases": [],
+    "categoryName": "Shoulders",
+    "primaryMuscle": "shoulders",
+    "muscleGroups": [
+      "shoulders"
+    ],
+    "equipmentOptions": [
+      "Dumbbells"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Bent Over Low-Pulley Side Lateral",
+    "sourceIds": [
+      "Bent_Over_Low-Pulley_Side_Lateral"
+    ],
+    "aliases": [],
+    "categoryName": "Shoulders",
+    "primaryMuscle": "shoulders",
+    "muscleGroups": [
+      "back",
+      "shoulders",
+      "traps"
+    ],
+    "equipmentOptions": [
+      "Cable machine"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Bent Over One-Arm Long Bar Row",
+    "sourceIds": [
+      "Bent_Over_One-Arm_Long_Bar_Row"
+    ],
+    "aliases": [],
+    "categoryName": "Back",
+    "primaryMuscle": "back",
+    "muscleGroups": [
+      "back",
+      "biceps",
+      "traps"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Bent Over Two-Dumbbell Row",
+    "sourceIds": [
+      "Bent_Over_Two-Dumbbell_Row"
+    ],
+    "aliases": [],
+    "categoryName": "Back",
+    "primaryMuscle": "back",
+    "muscleGroups": [
+      "back",
+      "biceps",
+      "shoulders"
+    ],
+    "equipmentOptions": [
+      "Dumbbells"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Bent Over Two-Dumbbell Row With Palms In",
+    "sourceIds": [
+      "Bent_Over_Two-Dumbbell_Row_With_Palms_In"
+    ],
+    "aliases": [],
+    "categoryName": "Back",
+    "primaryMuscle": "back",
+    "muscleGroups": [
+      "back",
+      "biceps"
+    ],
+    "equipmentOptions": [
+      "Dumbbells"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Bent-Knee Hip Raise",
+    "sourceIds": [
+      "Bent-Knee_Hip_Raise"
+    ],
+    "aliases": [],
+    "categoryName": "Core",
+    "primaryMuscle": "core",
+    "muscleGroups": [
+      "core"
+    ],
+    "equipmentOptions": [
+      "Bodyweight"
+    ],
+    "trainingTypes": [
+      "calisthenics"
+    ],
+    "exerciseTypes": [
+      "bodyweight"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Biceps Curl",
+    "sourceIds": [
+      "Barbell_Curl"
+    ],
+    "aliases": [
+      "Barbell Curl"
+    ],
+    "categoryName": "Arms",
+    "primaryMuscle": "biceps",
+    "muscleGroups": [
+      "biceps",
+      "forearms"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "high",
+    "reasons": [
+      "explicit alias rule"
+    ]
+  },
+  {
+    "canonicalName": "Bicycling",
+    "sourceIds": [
+      "Bicycling"
+    ],
+    "aliases": [],
+    "categoryName": "Cardio",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "calves",
+      "glutes",
+      "hamstrings",
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Other"
+    ],
+    "trainingTypes": [
+      "cardio"
+    ],
+    "exerciseTypes": [
+      "distance"
+    ],
+    "defaultUnit": "minutes",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Bicycling, Stationary",
+    "sourceIds": [
+      "Bicycling_Stationary"
+    ],
+    "aliases": [],
+    "categoryName": "Cardio",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "calves",
+      "glutes",
+      "hamstrings",
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Machine"
+    ],
+    "trainingTypes": [
+      "cardio"
+    ],
+    "exerciseTypes": [
+      "distance"
+    ],
+    "defaultUnit": "minutes",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Body Tricep Press",
+    "sourceIds": [
+      "Body_Tricep_Press"
+    ],
+    "aliases": [],
+    "categoryName": "Arms",
+    "primaryMuscle": "triceps",
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipmentOptions": [
+      "Bodyweight"
+    ],
+    "trainingTypes": [
+      "calisthenics"
+    ],
+    "exerciseTypes": [
+      "bodyweight"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Bodyweight Squat",
+    "sourceIds": [
+      "Bodyweight_Squat"
+    ],
+    "aliases": [],
+    "categoryName": "Legs",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "glutes",
+      "hamstrings",
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Bodyweight"
+    ],
+    "trainingTypes": [
+      "calisthenics"
+    ],
+    "exerciseTypes": [
+      "bodyweight"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Bottoms Up",
+    "sourceIds": [
+      "Bottoms_Up"
+    ],
+    "aliases": [],
+    "categoryName": "Core",
+    "primaryMuscle": "core",
+    "muscleGroups": [
+      "core"
+    ],
+    "equipmentOptions": [
+      "Bodyweight"
+    ],
+    "trainingTypes": [
+      "calisthenics"
+    ],
+    "exerciseTypes": [
+      "bodyweight"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Cable Crunch",
+    "sourceIds": [
+      "Cable_Crunch"
+    ],
+    "aliases": [],
+    "categoryName": "Core",
+    "primaryMuscle": "core",
+    "muscleGroups": [
+      "core"
+    ],
+    "equipmentOptions": [
+      "Cable machine"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Calf Press",
+    "sourceIds": [
+      "Calf_Press"
+    ],
+    "aliases": [],
+    "categoryName": "Legs",
+    "primaryMuscle": "calves",
+    "muscleGroups": [
+      "calves"
+    ],
+    "equipmentOptions": [
+      "Machine"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Chin-Up",
+    "sourceIds": [
+      "Chin-Up"
+    ],
+    "aliases": [],
+    "categoryName": "Back",
+    "primaryMuscle": "back",
+    "muscleGroups": [
+      "back",
+      "biceps",
+      "forearms"
+    ],
+    "equipmentOptions": [
+      "Bodyweight"
+    ],
+    "trainingTypes": [
+      "street_workout"
+    ],
+    "exerciseTypes": [
+      "bodyweight"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Close-Grip Barbell Bench Press",
+    "sourceIds": [
+      "Close-Grip_Barbell_Bench_Press"
+    ],
+    "aliases": [],
+    "categoryName": "Arms",
+    "primaryMuscle": "triceps",
+    "muscleGroups": [
+      "chest",
+      "shoulders",
+      "triceps"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Crunch",
+    "sourceIds": [
+      "Crunches"
+    ],
+    "aliases": [
+      "Crunches"
+    ],
+    "categoryName": "Core",
+    "primaryMuscle": "core",
+    "muscleGroups": [
+      "core"
+    ],
+    "equipmentOptions": [
+      "Bodyweight"
+    ],
+    "trainingTypes": [
+      "calisthenics"
+    ],
+    "exerciseTypes": [
+      "bodyweight"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "high",
+    "reasons": [
+      "explicit alias rule"
+    ]
+  },
+  {
+    "canonicalName": "Dips",
+    "sourceIds": [
+      "Dips_-_Triceps_Version",
+      "Dips_-_Chest_Version"
+    ],
+    "aliases": [
+      "Dips - Chest Version",
+      "Dips - Triceps Version"
+    ],
+    "categoryName": "Arms",
+    "primaryMuscle": "triceps",
+    "muscleGroups": [
+      "chest",
+      "shoulders",
+      "triceps"
+    ],
+    "equipmentOptions": [
+      "Bodyweight",
+      "Other"
+    ],
+    "trainingTypes": [
+      "gym",
+      "street_workout"
+    ],
+    "exerciseTypes": [
+      "bodyweight",
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "high",
+    "reasons": [
+      "normalized punctuation/pluralization"
+    ]
+  },
+  {
+    "canonicalName": "Dumbbell Bench Press",
+    "sourceIds": [
+      "Dumbbell_Bench_Press"
+    ],
+    "aliases": [],
+    "categoryName": "Chest",
+    "primaryMuscle": "chest",
+    "muscleGroups": [
+      "chest",
+      "shoulders",
+      "triceps"
+    ],
+    "equipmentOptions": [
+      "Dumbbells"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Dumbbell Flyes",
+    "sourceIds": [
+      "Dumbbell_Flyes"
+    ],
+    "aliases": [],
+    "categoryName": "Chest",
+    "primaryMuscle": "chest",
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipmentOptions": [
+      "Dumbbells"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Dumbbell Lunges",
+    "sourceIds": [
+      "Dumbbell_Lunges"
+    ],
+    "aliases": [],
+    "categoryName": "Legs",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "calves",
+      "glutes",
+      "hamstrings",
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Dumbbells"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Dumbbell Shoulder Press",
+    "sourceIds": [
+      "Dumbbell_Shoulder_Press"
+    ],
+    "aliases": [],
+    "categoryName": "Shoulders",
+    "primaryMuscle": "shoulders",
+    "muscleGroups": [
+      "shoulders",
+      "triceps"
+    ],
+    "equipmentOptions": [
+      "Dumbbells"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "intermediate",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Elliptical Trainer",
+    "sourceIds": [
+      "Elliptical_Trainer"
+    ],
+    "aliases": [],
+    "categoryName": "Cardio",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "calves",
+      "glutes",
+      "hamstrings",
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Machine"
+    ],
+    "trainingTypes": [
+      "cardio"
+    ],
+    "exerciseTypes": [
+      "distance"
+    ],
+    "defaultUnit": "minutes",
+    "difficulty": "intermediate",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Exercise Ball Crunch",
+    "sourceIds": [
+      "Exercise_Ball_Crunch"
+    ],
+    "aliases": [],
+    "categoryName": "Core",
+    "primaryMuscle": "core",
+    "muscleGroups": [
+      "core"
+    ],
+    "equipmentOptions": [
+      "Exercise ball"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Flat Bench Leg Pull-In",
+    "sourceIds": [
+      "Flat_Bench_Leg_Pull-In"
+    ],
+    "aliases": [],
+    "categoryName": "Core",
+    "primaryMuscle": "core",
+    "muscleGroups": [
+      "core"
+    ],
+    "equipmentOptions": [
+      "Bodyweight"
+    ],
+    "trainingTypes": [
+      "street_workout"
+    ],
+    "exerciseTypes": [
+      "bodyweight"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Front Dumbbell Raise",
+    "sourceIds": [
+      "Front_Dumbbell_Raise"
+    ],
+    "aliases": [],
+    "categoryName": "Shoulders",
+    "primaryMuscle": "shoulders",
+    "muscleGroups": [
+      "shoulders"
+    ],
+    "equipmentOptions": [
+      "Dumbbells"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Goblet Squat",
+    "sourceIds": [
+      "Goblet_Squat"
+    ],
+    "aliases": [],
+    "categoryName": "Legs",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "calves",
+      "glutes",
+      "hamstrings",
+      "quads",
+      "shoulders"
+    ],
+    "equipmentOptions": [
+      "Kettlebell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Hammer Curls",
+    "sourceIds": [
+      "Hammer_Curls"
+    ],
+    "aliases": [],
+    "categoryName": "Arms",
+    "primaryMuscle": "biceps",
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipmentOptions": [
+      "Dumbbells"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Hanging Leg Raise",
+    "sourceIds": [
+      "Hanging_Leg_Raise"
+    ],
+    "aliases": [],
+    "categoryName": "Core",
+    "primaryMuscle": "core",
+    "muscleGroups": [
+      "core"
+    ],
+    "equipmentOptions": [
+      "Bodyweight"
+    ],
+    "trainingTypes": [
+      "calisthenics"
+    ],
+    "exerciseTypes": [
+      "bodyweight"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "expert",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Incline Dumbbell Press",
+    "sourceIds": [
+      "Incline_Dumbbell_Press"
+    ],
+    "aliases": [],
+    "categoryName": "Chest",
+    "primaryMuscle": "chest",
+    "muscleGroups": [
+      "chest",
+      "shoulders",
+      "triceps"
+    ],
+    "equipmentOptions": [
+      "Dumbbells"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Jogging, Treadmill",
+    "sourceIds": [
+      "Jogging_Treadmill"
+    ],
+    "aliases": [],
+    "categoryName": "Cardio",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "glutes",
+      "hamstrings",
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Machine"
+    ],
+    "trainingTypes": [
+      "cardio"
+    ],
+    "exerciseTypes": [
+      "distance"
+    ],
+    "defaultUnit": "minutes",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Lat Pulldown",
+    "sourceIds": [
+      "Wide-Grip_Lat_Pulldown"
+    ],
+    "aliases": [
+      "Wide-Grip Lat Pulldown"
+    ],
+    "categoryName": "Back",
+    "primaryMuscle": "back",
+    "muscleGroups": [
+      "back",
+      "biceps",
+      "shoulders"
+    ],
+    "equipmentOptions": [
+      "Cable machine"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "high",
+    "reasons": [
+      "explicit alias rule"
+    ]
+  },
+  {
+    "canonicalName": "Lateral Raise",
+    "sourceIds": [
+      "Side_Lateral_Raise"
+    ],
+    "aliases": [
+      "Side Lateral Raise"
+    ],
+    "categoryName": "Shoulders",
+    "primaryMuscle": "shoulders",
+    "muscleGroups": [
+      "shoulders"
+    ],
+    "equipmentOptions": [
+      "Dumbbells"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "high",
+    "reasons": [
+      "explicit alias rule"
+    ]
+  },
+  {
+    "canonicalName": "Leg Extensions",
+    "sourceIds": [
+      "Leg_Extensions"
+    ],
+    "aliases": [],
+    "categoryName": "Legs",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Machine"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Leg Press",
+    "sourceIds": [
+      "Leg_Press"
+    ],
+    "aliases": [],
+    "categoryName": "Legs",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "calves",
+      "glutes",
+      "hamstrings",
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Machine"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Lying Leg Curls",
+    "sourceIds": [
+      "Lying_Leg_Curls"
+    ],
+    "aliases": [],
+    "categoryName": "Legs",
+    "primaryMuscle": "hamstrings",
+    "muscleGroups": [
+      "hamstrings"
+    ],
+    "equipmentOptions": [
+      "Machine"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Mountain Climbers",
+    "sourceIds": [
+      "Mountain_Climbers"
+    ],
+    "aliases": [],
+    "categoryName": "Legs",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "chest",
+      "hamstrings",
+      "quads",
+      "shoulders"
+    ],
+    "equipmentOptions": [
+      "None"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "One-Arm Dumbbell Row",
+    "sourceIds": [
+      "One-Arm_Dumbbell_Row"
+    ],
+    "aliases": [],
+    "categoryName": "Back",
+    "primaryMuscle": "back",
+    "muscleGroups": [
+      "back",
+      "biceps",
+      "shoulders"
+    ],
+    "equipmentOptions": [
+      "Dumbbells"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Plank",
+    "sourceIds": [
+      "Plank"
+    ],
+    "aliases": [],
+    "categoryName": "Core",
+    "primaryMuscle": "core",
+    "muscleGroups": [
+      "core"
+    ],
+    "equipmentOptions": [
+      "Bodyweight"
+    ],
+    "trainingTypes": [
+      "calisthenics"
+    ],
+    "exerciseTypes": [
+      "hold"
+    ],
+    "defaultUnit": "seconds",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Pull Up",
+    "sourceIds": [
+      "Pullups"
+    ],
+    "aliases": [
+      "Pullups"
+    ],
+    "categoryName": "Back",
+    "primaryMuscle": "back",
+    "muscleGroups": [
+      "back",
+      "biceps"
+    ],
+    "equipmentOptions": [
+      "Bodyweight"
+    ],
+    "trainingTypes": [
+      "street_workout"
+    ],
+    "exerciseTypes": [
+      "bodyweight"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "high",
+    "reasons": [
+      "explicit alias rule"
+    ]
+  },
+  {
+    "canonicalName": "Push Up",
+    "sourceIds": [
+      "Pushups"
+    ],
+    "aliases": [
+      "Pushups"
+    ],
+    "categoryName": "Chest",
+    "primaryMuscle": "chest",
+    "muscleGroups": [
+      "chest",
+      "shoulders",
+      "triceps"
+    ],
+    "equipmentOptions": [
+      "Bodyweight"
+    ],
+    "trainingTypes": [
+      "calisthenics"
+    ],
+    "exerciseTypes": [
+      "bodyweight"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "high",
+    "reasons": [
+      "explicit alias rule"
+    ]
+  },
+  {
+    "canonicalName": "Recumbent Bike",
+    "sourceIds": [
+      "Recumbent_Bike"
+    ],
+    "aliases": [],
+    "categoryName": "Cardio",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "calves",
+      "glutes",
+      "hamstrings",
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Machine"
+    ],
+    "trainingTypes": [
+      "cardio"
+    ],
+    "exerciseTypes": [
+      "distance"
+    ],
+    "defaultUnit": "minutes",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Romanian Deadlift",
+    "sourceIds": [
+      "Romanian_Deadlift"
+    ],
+    "aliases": [],
+    "categoryName": "Legs",
+    "primaryMuscle": "hamstrings",
+    "muscleGroups": [
+      "back",
+      "calves",
+      "glutes",
+      "hamstrings"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "intermediate",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Rowing, Stationary",
+    "sourceIds": [
+      "Rowing_Stationary"
+    ],
+    "aliases": [],
+    "categoryName": "Cardio",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "back",
+      "biceps",
+      "calves",
+      "glutes",
+      "hamstrings",
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Machine"
+    ],
+    "trainingTypes": [
+      "cardio"
+    ],
+    "exerciseTypes": [
+      "distance"
+    ],
+    "defaultUnit": "minutes",
+    "difficulty": "intermediate",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Running, Treadmill",
+    "sourceIds": [
+      "Running_Treadmill"
+    ],
+    "aliases": [],
+    "categoryName": "Cardio",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "calves",
+      "glutes",
+      "hamstrings",
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Machine"
+    ],
+    "trainingTypes": [
+      "cardio"
+    ],
+    "exerciseTypes": [
+      "distance"
+    ],
+    "defaultUnit": "minutes",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Seated Cable Row",
+    "sourceIds": [
+      "Seated_Cable_Rows"
+    ],
+    "aliases": [
+      "Seated Cable Rows"
+    ],
+    "categoryName": "Back",
+    "primaryMuscle": "back",
+    "muscleGroups": [
+      "back",
+      "biceps",
+      "shoulders"
+    ],
+    "equipmentOptions": [
+      "Cable machine"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "high",
+    "reasons": [
+      "explicit alias rule"
+    ]
+  },
+  {
+    "canonicalName": "Seated Dumbbell Press",
+    "sourceIds": [
+      "Seated_Dumbbell_Press"
+    ],
+    "aliases": [],
+    "categoryName": "Shoulders",
+    "primaryMuscle": "shoulders",
+    "muscleGroups": [
+      "shoulders",
+      "triceps"
+    ],
+    "equipmentOptions": [
+      "Dumbbells"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Sit Up",
+    "sourceIds": [
+      "3_4_Sit-Up"
+    ],
+    "aliases": [
+      "3/4 Sit-Up"
+    ],
+    "categoryName": "Core",
+    "primaryMuscle": "core",
+    "muscleGroups": [
+      "core"
+    ],
+    "equipmentOptions": [
+      "Bodyweight"
+    ],
+    "trainingTypes": [
+      "calisthenics"
+    ],
+    "exerciseTypes": [
+      "bodyweight"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "high",
+    "reasons": [
+      "explicit alias rule"
+    ]
+  },
+  {
+    "canonicalName": "Squat",
+    "sourceIds": [
+      "Barbell_Full_Squat",
+      "Barbell_Squat"
+    ],
+    "aliases": [
+      "Barbell Full Squat",
+      "Barbell Squat"
+    ],
+    "categoryName": "Legs",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "back",
+      "calves",
+      "glutes",
+      "hamstrings",
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Barbell"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "intermediate",
+    "confidence": "high",
+    "reasons": [
+      "explicit alias rule"
+    ]
+  },
+  {
+    "canonicalName": "Stairmaster",
+    "sourceIds": [
+      "Stairmaster"
+    ],
+    "aliases": [],
+    "categoryName": "Cardio",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "calves",
+      "glutes",
+      "hamstrings",
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Machine"
+    ],
+    "trainingTypes": [
+      "cardio"
+    ],
+    "exerciseTypes": [
+      "distance"
+    ],
+    "defaultUnit": "minutes",
+    "difficulty": "intermediate",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Standing Calf Raises",
+    "sourceIds": [
+      "Standing_Calf_Raises"
+    ],
+    "aliases": [],
+    "categoryName": "Legs",
+    "primaryMuscle": "calves",
+    "muscleGroups": [
+      "calves"
+    ],
+    "equipmentOptions": [
+      "Machine"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Step Mill",
+    "sourceIds": [
+      "Step_Mill"
+    ],
+    "aliases": [],
+    "categoryName": "Cardio",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "calves",
+      "glutes",
+      "hamstrings",
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Machine"
+    ],
+    "trainingTypes": [
+      "cardio"
+    ],
+    "exerciseTypes": [
+      "distance"
+    ],
+    "defaultUnit": "minutes",
+    "difficulty": "intermediate",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Triceps Pushdown",
+    "sourceIds": [
+      "Triceps_Pushdown"
+    ],
+    "aliases": [],
+    "categoryName": "Arms",
+    "primaryMuscle": "triceps",
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipmentOptions": [
+      "Cable machine"
+    ],
+    "trainingTypes": [
+      "gym"
+    ],
+    "exerciseTypes": [
+      "gym"
+    ],
+    "defaultUnit": "reps",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  },
+  {
+    "canonicalName": "Walking, Treadmill",
+    "sourceIds": [
+      "Walking_Treadmill"
+    ],
+    "aliases": [],
+    "categoryName": "Cardio",
+    "primaryMuscle": "quads",
+    "muscleGroups": [
+      "calves",
+      "glutes",
+      "hamstrings",
+      "quads"
+    ],
+    "equipmentOptions": [
+      "Machine"
+    ],
+    "trainingTypes": [
+      "cardio"
+    ],
+    "exerciseTypes": [
+      "distance"
+    ],
+    "defaultUnit": "minutes",
+    "difficulty": "beginner",
+    "confidence": "single-record",
+    "reasons": []
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "canonicalName": "Barbell Incline Bench Press",
+    "alias": "Barbell Incline Bench Press - Medium Grip",
+    "confidence": "high",
+    "reason": "normalized punctuation/pluralization"
+  },
+  {
+    "canonicalName": "Bench Press",
+    "alias": "Barbell Bench Press - Medium Grip",
+    "confidence": "high",
+    "reason": "explicit alias rule"
+  },
+  {
+    "canonicalName": "Biceps Curl",
+    "alias": "Barbell Curl",
+    "confidence": "high",
+    "reason": "explicit alias rule"
+  },
+  {
+    "canonicalName": "Crunch",
+    "alias": "Crunches",
+    "confidence": "high",
+    "reason": "explicit alias rule"
+  },
+  {
+    "canonicalName": "Dips",
+    "alias": "Dips - Chest Version",
+    "confidence": "high",
+    "reason": "normalized punctuation/pluralization"
+  },
+  {
+    "canonicalName": "Dips",
+    "alias": "Dips - Triceps Version",
+    "confidence": "high",
+    "reason": "normalized punctuation/pluralization"
+  },
+  {
+    "canonicalName": "Lat Pulldown",
+    "alias": "Wide-Grip Lat Pulldown",
+    "confidence": "high",
+    "reason": "explicit alias rule"
+  },
+  {
+    "canonicalName": "Lateral Raise",
+    "alias": "Side Lateral Raise",
+    "confidence": "high",
+    "reason": "explicit alias rule"
+  },
+  {
+    "canonicalName": "Pull Up",
+    "alias": "Pullups",
+    "confidence": "high",
+    "reason": "explicit alias rule"
+  },
+  {
+    "canonicalName": "Push Up",
+    "alias": "Pushups",
+    "confidence": "high",
+    "reason": "explicit alias rule"
+  },
+  {
+    "canonicalName": "Seated Cable Row",
+    "alias": "Seated Cable Rows",
+    "confidence": "high",
+    "reason": "explicit alias rule"
+  },
+  {
+    "canonicalName": "Sit Up",
+    "alias": "3/4 Sit-Up",
+    "confidence": "high",
+    "reason": "explicit alias rule"
+  },
+  {
+    "canonicalName": "Squat",
+    "alias": "Barbell Full Squat",
+    "confidence": "high",
+    "reason": "explicit alias rule"
+  },
+  {
+    "canonicalName": "Squat",
+    "alias": "Barbell Squat",
+    "confidence": "high",
+    "reason": "explicit alias rule"
+  }
+]

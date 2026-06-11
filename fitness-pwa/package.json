@@ -7,6 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "tsc -p tsconfig.app.json --noEmit",
+    "normalize:exercises": "node tools/exercise-import/normalize-exercises.mjs",
     "preview:exercises": "node tools/exercise-import/generate-exercise-preview.mjs",
     "serve:ssr:fitness-pwa": "node dist/fitness-pwa/server/server.mjs"
   },
