@@ -15,6 +15,15 @@ const EXERCISE_SELECT = [
   'instructions',
   'muscle_groups',
   'equipment',
+  'training_type',
+  'exercise_type',
+  'progression_group',
+  'progression_level',
+  'default_unit',
+  'supports_weight',
+  'supports_assistance',
+  'supports_duration',
+  'supports_distance',
   'is_builtin',
   'created_at',
   'updated_at',
@@ -44,6 +53,15 @@ interface ExerciseRow {
   instructions: string | null;
   muscle_groups: string[];
   equipment: string | null;
+  training_type: string | null;
+  exercise_type: string | null;
+  progression_group: string | null;
+  progression_level: number | null;
+  default_unit: string | null;
+  supports_weight: boolean;
+  supports_assistance: boolean;
+  supports_duration: boolean;
+  supports_distance: boolean;
   is_builtin: boolean;
   created_at: string;
   updated_at: string;
@@ -146,6 +164,15 @@ function mapExercise(row: ExerciseRow): Exercise {
     instructions: row.instructions,
     muscleGroups: row.muscle_groups,
     equipment: row.equipment,
+    trainingType: row.training_type,
+    exerciseType: row.exercise_type,
+    progressionGroup: row.progression_group,
+    progressionLevel: row.progression_level,
+    defaultUnit: row.default_unit,
+    supportsWeight: row.supports_weight,
+    supportsAssistance: row.supports_assistance,
+    supportsDuration: row.supports_duration,
+    supportsDistance: row.supports_distance,
     isBuiltin: row.is_builtin,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

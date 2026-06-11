@@ -26,6 +26,15 @@ export interface Exercise {
   instructions: string | null;
   muscleGroups: string[];
   equipment: string | null;
+  trainingType: string | null;
+  exerciseType: string | null;
+  progressionGroup: string | null;
+  progressionLevel: number | null;
+  defaultUnit: string | null;
+  supportsWeight: boolean;
+  supportsAssistance: boolean;
+  supportsDuration: boolean;
+  supportsDistance: boolean;
   isBuiltin: boolean;
   createdAt: string;
   updatedAt: string;

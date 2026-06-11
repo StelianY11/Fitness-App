@@ -8,9 +8,10 @@ Run SQL in this order:
 
 1. `supabase/schema.sql`
 2. `supabase/migrations/001_fitness_schema.sql`
-3. `supabase/seed/001_exercises_seed.sql`
+3. `supabase/migrations/002_extend_exercises.sql`
+4. `supabase/seed/001_exercises_seed.sql`
 
-The first file sets up the auth profile foundation and allowlist. The migration creates the fitness tables and RLS policies. The seed inserts builtin exercise categories and starter exercises.
+The first file sets up the auth profile foundation and allowlist. The first migration creates the fitness tables and RLS policies. The second migration extends exercises for future Gym, Calisthenics, and Street Workout support. The seed inserts builtin exercise categories and starter exercises.
 
 ## Tables
 
@@ -18,7 +19,7 @@ The first file sets up the auth profile foundation and allowlist. The migration 
 
 `exercise_categories` groups exercises by category. Builtin rows have `is_builtin = true` and `owner_id = null`; user-created rows have `owner_id` set to the user.
 
-`exercises` stores the exercise library. Builtin exercises are shared with all authenticated users. User-created exercises are private to the owning user.
+`exercises` stores the exercise library. Builtin exercises are shared with all authenticated users. User-created exercises are private to the owning user. Exercise classification fields support future training styles such as Gym, Bodyweight, Weighted Bodyweight, Assisted, Hold, Time, Distance, Calisthenics, and Street Workout.
 
 `workout_templates` stores reusable workout plans. Builtin templates can be shared with authenticated users; personal templates are private to their owner.
 
@@ -49,6 +50,20 @@ Private per-user data:
 - Body weight history
 
 Builtin rows use `is_builtin = true` and `owner_id = null`. Private rows use `owner_id = auth.uid()` or `user_id = auth.uid()`.
+
+## Exercise Classification
+
+`training_type` describes the broad context: `gym`, `calisthenics`, `street_workout`, `cardio`, or `mobility`.
+
+`exercise_type` describes how the exercise is usually performed or measured: `gym`, `bodyweight`, `weighted_bodyweight`, `assisted`, `hold`, `time`, or `distance`.
+
+`progression_group` and `progression_level` can group skills such as push-up, pull-up, dip, squat, or handstand progressions.
+
+`default_unit` describes the expected logging unit: `reps`, `kg`, `seconds`, `minutes`, `meters`, or `kilometers`.
+
+The capability flags `supports_weight`, `supports_assistance`, `supports_duration`, and `supports_distance` tell future UI and workout logging flows what inputs make sense for an exercise.
+
+The starter seed remains valid because these fields are nullable or have conservative defaults.
 
 ## RLS Protection
 
