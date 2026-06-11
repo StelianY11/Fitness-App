@@ -33,6 +33,13 @@ import { AuthService } from '../../core/services/auth.service';
         Open Exercise Library
       </a>
 
+      <a
+        routerLink="/templates"
+        class="inline-flex w-full justify-center rounded-md border border-green-600 px-4 py-3 text-sm font-semibold text-green-700"
+      >
+        Open Workout Templates
+      </a>
+
       @if (errorMessage) {
         <p class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
           {{ errorMessage }}
