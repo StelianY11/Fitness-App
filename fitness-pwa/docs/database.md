@@ -10,9 +10,12 @@ Run SQL in this order:
 2. `supabase/migrations/001_fitness_schema.sql`
 3. `supabase/migrations/002_extend_exercises.sql`
 4. `supabase/migrations/003_exercise_variants.sql`
-5. `supabase/seed/001_exercises_seed.sql`
+5. `supabase/migrations/004_workout_template_engine.sql`
+6. `supabase/seed/001_exercises_seed.sql`
+7. `supabase/seed/002_exercise_variants_seed.sql`
+8. `supabase/seed/003_canonical_exercises_seed.sql`
 
-The first file sets up the auth profile foundation and allowlist. The first migration creates the fitness tables and RLS policies. The second migration extends exercises for future Gym, Calisthenics, and Street Workout support. The third migration adds exercise variants. The seed inserts builtin exercise categories and starter exercises.
+The first file sets up the auth profile foundation and allowlist. The first migration creates the fitness tables and RLS policies. The second migration extends exercises for future Gym, Calisthenics, and Street Workout support. The third migration adds exercise variants. The fourth migration adds the block-based workout template engine. The seeds insert builtin exercise categories, starter exercises, exercise variants, and canonical imported exercise data.
 
 ## Tables
 
@@ -24,9 +27,13 @@ The first file sets up the auth profile foundation and allowlist. The first migr
 
 `exercise_variants` stores alternate ways to perform an exercise. Examples include pull-up grip types, push-up variations, weighted or assisted versions, and calisthenics progressions. Builtin variants are shared with authenticated users; custom variants are private to the user who created them.
 
-`workout_templates` stores reusable workout plans. Builtin templates can be shared with authenticated users; personal templates are private to their owner.
+`workout_templates` stores reusable workout plans. Builtin templates can be shared with authenticated users; personal templates are private to their owner. Template metadata can include a goal, difficulty, and estimated duration.
 
-`workout_template_exercises` stores the ordered exercises inside a template, including target sets, reps, rest time, and notes.
+`workout_template_blocks` stores ordered sections inside a workout template. Blocks can represent normal exercise groups, warmups, supersets, dropsets, giant sets, or note-only sections.
+
+`workout_template_block_exercises` stores ordered exercise prescriptions inside a block. It can reference a base exercise and optionally an exercise variant. Target fields are intentionally flexible for reps, weight, duration, distance, rest, tempo, RIR, and notes.
+
+`workout_template_exercises` is the older flat template exercise table from the initial schema. It remains available for compatibility, but future template features should prefer the block-based `workout_template_blocks` and `workout_template_block_exercises` model.
 
 `workout_sessions` stores a user workout log instance, optionally linked to a template.
 
@@ -50,6 +57,8 @@ Private per-user data:
 - User-created exercises
 - User-created exercise variants
 - User-created templates
+- User-created template blocks
+- User-created template block exercises
 - Workout sessions
 - Workout sets
 - Body weight history
@@ -85,13 +94,43 @@ Examples:
 
 Builtin variants use `is_builtin = true` and `created_by = null`. Custom variants use `is_builtin = false` and `created_by = auth.uid()`.
 
+## Workout Template Engine
+
+Workout templates now use a three-level structure:
+
+1. `workout_templates`
+2. `workout_template_blocks`
+3. `workout_template_block_exercises`
+
+Blocks provide the structure for a workout. A normal strength workout might use one block per section. A superset or giant set can keep multiple exercises inside one block so future UI can render them together. A dropset block can contain the main movement plus drop prescriptions. A notes block can store instructions without requiring a specific exercise.
+
+Supported block types:
+
+- `normal`
+- `warmup`
+- `superset`
+- `dropset`
+- `giant_set`
+- `notes`
+
+Supported set types inside block exercises:
+
+- `warmup`
+- `working`
+- `dropset`
+- `backoff`
+- `failure`
+- `note`
+
+The engine does not change workout history yet. `workout_sessions` and `workout_sets` still represent completed workouts and can be connected to templates later.
+
 ## RLS Protection
 
 Row Level Security is enabled on all fitness tables.
 
 Authenticated users can read builtin categories, exercises, and templates. For private data, policies require `owner_id = auth.uid()` or `user_id = auth.uid()`.
 
-Nested tables are protected through their parent records. For example, `workout_sets` can be read or modified only when the related `workout_sessions.user_id` matches the current authenticated user.
+Nested tables are protected through their parent records. For example, `workout_template_blocks` and `workout_template_block_exercises` are accessible only when the parent template is builtin or owned by the current user. `workout_sets` can be read or modified only when the related `workout_sessions.user_id` matches the current authenticated user.
 
 Frontend route guards are only UX. RLS is the database security layer.
 

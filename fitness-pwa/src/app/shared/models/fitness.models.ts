@@ -63,7 +63,57 @@ export interface WorkoutTemplate {
   ownerId: string | null;
   name: string;
   description: string | null;
+  goal: string | null;
+  difficulty: string | null;
+  estimatedDurationMinutes: number | null;
   isBuiltin: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type WorkoutTemplateBlockType =
+  | 'normal'
+  | 'warmup'
+  | 'superset'
+  | 'dropset'
+  | 'giant_set'
+  | 'notes';
+
+export interface WorkoutTemplateBlock {
+  id: string;
+  workoutTemplateId: string;
+  title: string | null;
+  blockType: WorkoutTemplateBlockType;
+  sortOrder: number;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type WorkoutTemplateSetType =
+  | 'warmup'
+  | 'working'
+  | 'dropset'
+  | 'backoff'
+  | 'failure'
+  | 'note';
+
+export interface WorkoutTemplateBlockExercise {
+  id: string;
+  workoutTemplateBlockId: string;
+  exerciseId: string | null;
+  exerciseVariantId: string | null;
+  sortOrder: number;
+  setType: WorkoutTemplateSetType;
+  targetSets: number | null;
+  targetReps: string | null;
+  targetWeightKg: number | null;
+  targetDurationSeconds: number | null;
+  targetDistanceMeters: number | null;
+  restSeconds: number | null;
+  tempo: string | null;
+  rir: number | null;
+  notes: string | null;
   createdAt: string;
   updatedAt: string;
 }
