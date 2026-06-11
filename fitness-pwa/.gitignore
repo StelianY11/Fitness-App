@@ -39,6 +39,9 @@ testem.log
 /typings
 __screenshots__/
 
+# Local import source data
+tools/exercise-import/source/exercises.json
+
 # System files
 .DS_Store
 Thumbs.db
