@@ -11,11 +11,13 @@ Run SQL in this order:
 3. `supabase/migrations/002_extend_exercises.sql`
 4. `supabase/migrations/003_exercise_variants.sql`
 5. `supabase/migrations/004_workout_template_engine.sql`
-6. `supabase/seed/001_exercises_seed.sql`
-7. `supabase/seed/002_exercise_variants_seed.sql`
-8. `supabase/seed/003_canonical_exercises_seed.sql`
+6. `supabase/migrations/005_add_circuit_template_block_type.sql`
+7. `supabase/migrations/006_live_workout_foundation.sql`
+8. `supabase/seed/001_exercises_seed.sql`
+9. `supabase/seed/002_exercise_variants_seed.sql`
+10. `supabase/seed/003_canonical_exercises_seed.sql`
 
-The first file sets up the auth profile foundation and allowlist. The first migration creates the fitness tables and RLS policies. The second migration extends exercises for future Gym, Calisthenics, and Street Workout support. The third migration adds exercise variants. The fourth migration adds the block-based workout template engine. The seeds insert builtin exercise categories, starter exercises, exercise variants, and canonical imported exercise data.
+The first file sets up the auth profile foundation and allowlist. The first migration creates the fitness tables and RLS policies. The second migration extends exercises for future Gym, Calisthenics, and Street Workout support. The third migration adds exercise variants. The fourth migration adds the block-based workout template engine. The fifth migration adds circuit blocks. The sixth migration adds the live workout logging foundation. The seeds insert builtin exercise categories, starter exercises, exercise variants, and canonical imported exercise data.
 
 ## Tables
 
@@ -35,9 +37,11 @@ The first file sets up the auth profile foundation and allowlist. The first migr
 
 `workout_template_exercises` is the older flat template exercise table from the initial schema. It remains available for compatibility, but future template features should prefer the block-based `workout_template_blocks` and `workout_template_block_exercises` model.
 
-`workout_sessions` stores a user workout log instance, optionally linked to a template.
+`workout_sessions` stores a user workout log instance, optionally linked to a template. A session can be `active`, `completed`, or `cancelled`.
 
-`workout_sets` stores the sets performed during a workout session, including reps, weight, duration, distance, completion time, and notes.
+`workout_exercises` stores the ordered exercises performed inside a workout session. It is the live workout bridge between a session and its performed sets. It can reference the original template block/exercise and an exercise variant.
+
+`workout_sets` stores every performed set as an individual record. A set can belong directly to a legacy session/exercise pair or, for new live workouts, to a `workout_exercise`. Set fields support reps, weight, assistance, duration, distance, RPE, RIR, tempo, warmups, set type, completion time, and notes.
 
 `body_weight_history` stores private body weight measurements for each user.
 
@@ -60,6 +64,7 @@ Private per-user data:
 - User-created template blocks
 - User-created template block exercises
 - Workout sessions
+- Workout exercises
 - Workout sets
 - Body weight history
 
@@ -111,6 +116,7 @@ Supported block types:
 - `superset`
 - `dropset`
 - `giant_set`
+- `circuit`
 - `notes`
 
 Supported set types inside block exercises:
@@ -122,7 +128,44 @@ Supported set types inside block exercises:
 - `failure`
 - `note`
 
-The engine does not change workout history yet. `workout_sessions` and `workout_sets` still represent completed workouts and can be connected to templates later.
+The template engine remains separate from live workout history. Live workouts can reference templates through `workout_sessions`, `workout_exercises`, and the optional template reference fields on performed exercises.
+
+## Live Workout Logging
+
+Live workouts use a three-level structure:
+
+1. `workout_sessions`
+2. `workout_exercises`
+3. `workout_sets`
+
+`workout_sessions` represents the workout as a whole. It tracks the owning user, optional template, status, start time, finish time, and notes.
+
+`workout_exercises` represents one performed movement inside that session. This avoids repeating exercise-level metadata on every set and supports template-derived workouts, custom exercise ordering, variants, and future live workout UI.
+
+`workout_sets` represents each individual performed set. This is the source of truth for training history and future statistics.
+
+Supported performed set types:
+
+- `normal`
+- `warmup`
+- `dropset`
+- `failure`
+- `assisted`
+- `forced`
+- `partial`
+- `hold`
+- `timed`
+- `distance`
+
+Set fields are intentionally broad enough for Gym, Calisthenics, Street Workout, weighted bodyweight, band-assisted work, holds, and cardio:
+
+- Strength: `reps`, `weight_kg`, `rpe`, `rir`, `tempo`
+- Assisted work: `assistance_kg`, `assistance_type`
+- Holds and timed work: `duration_seconds`
+- Cardio and distance work: `distance_meters`
+- Warmups and advanced sets: `is_warmup`, `set_type`
+
+For compatibility, `workout_sets.exercise_id` remains in place. New live workout features should also set `workout_exercise_id`.
 
 ## RLS Protection
 
@@ -130,7 +173,7 @@ Row Level Security is enabled on all fitness tables.
 
 Authenticated users can read builtin categories, exercises, and templates. For private data, policies require `owner_id = auth.uid()` or `user_id = auth.uid()`.
 
-Nested tables are protected through their parent records. For example, `workout_template_blocks` and `workout_template_block_exercises` are accessible only when the parent template is builtin or owned by the current user. `workout_sets` can be read or modified only when the related `workout_sessions.user_id` matches the current authenticated user.
+Nested tables are protected through their parent records. For example, `workout_template_blocks` and `workout_template_block_exercises` are accessible only when the parent template is builtin or owned by the current user. `workout_exercises` and `workout_sets` can be read or modified only when the related `workout_sessions.user_id` matches the current authenticated user.
 
 Frontend route guards are only UX. RLS is the database security layer.
 

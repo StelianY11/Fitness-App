@@ -136,6 +136,7 @@ export interface WorkoutSession {
   id: string;
   userId: string;
   workoutTemplateId: string | null;
+  status: 'active' | 'completed' | 'cancelled';
   startedAt: string;
   finishedAt: string | null;
   notes: string | null;
@@ -143,15 +144,49 @@ export interface WorkoutSession {
   updatedAt: string;
 }
 
-export interface WorkoutSet {
+export interface WorkoutExercise {
   id: string;
   workoutSessionId: string;
   exerciseId: string;
+  exerciseVariantId: string | null;
+  workoutTemplateBlockId: string | null;
+  workoutTemplateBlockExerciseId: string | null;
+  sortOrder: number;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type WorkoutSetType =
+  | 'normal'
+  | 'warmup'
+  | 'dropset'
+  | 'failure'
+  | 'assisted'
+  | 'forced'
+  | 'partial'
+  | 'hold'
+  | 'timed'
+  | 'distance';
+
+export interface WorkoutSet {
+  id: string;
+  workoutSessionId: string;
+  workoutExerciseId: string | null;
+  exerciseId: string;
+  exerciseVariantId: string | null;
   setNumber: number;
   reps: number | null;
   weightKg: number | null;
+  assistanceKg: number | null;
+  assistanceType: string | null;
   durationSeconds: number | null;
   distanceMeters: number | null;
+  rpe: number | null;
+  rir: number | null;
+  tempo: string | null;
+  isWarmup: boolean;
+  setType: WorkoutSetType;
   completedAt: string | null;
   notes: string | null;
   createdAt: string;
