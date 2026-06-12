@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { PostgrestError } from '@supabase/supabase-js';
 import { SupabaseService } from '../supabase/supabase.service';
 import {
+  PreFillMode,
   WorkoutExercise,
   WorkoutSession,
   WorkoutSet,
@@ -71,6 +72,14 @@ const TEMPLATE_BLOCK_EXERCISE_SELECT = [
   'notes',
 ].join(', ');
 
+const TEMPLATE_TARGET_SELECT = [
+  'id',
+  'target_sets',
+  'target_reps',
+  'target_weight_kg',
+  'notes',
+].join(', ');
+
 export interface LiveWorkoutServiceResult<T> {
   data: T;
   error: string | null;
@@ -108,6 +117,14 @@ export interface UpdateWorkoutSetInput {
   setType?: WorkoutSetType;
   completedAt?: string | null;
   notes?: string | null;
+}
+
+export interface LiveWorkoutPreFillSet {
+  setNumber: number;
+  reps: number | null;
+  weightKg: number | null;
+  notes: string | null;
+  source: 'LAST_WORKOUT' | 'TEMPLATE' | 'EMPTY';
 }
 
 interface WorkoutSessionRow {
@@ -170,6 +187,14 @@ interface TemplateBlockExerciseRow {
   exercise_id: string | null;
   exercise_variant_id: string | null;
   sort_order: number;
+  notes: string | null;
+}
+
+interface TemplateTargetRow {
+  id: string;
+  target_sets: number | null;
+  target_reps: string | null;
+  target_weight_kg: number | string | null;
   notes: string | null;
 }
 
@@ -325,6 +350,62 @@ export class LiveWorkoutService {
     };
   }
 
+  async getPreFillMode(): Promise<LiveWorkoutServiceResult<PreFillMode>> {
+    const userResult = await this.getCurrentUserId();
+
+    if (userResult.error || !userResult.data) {
+      return {
+        data: 'LAST_WORKOUT',
+        error: userResult.error ?? 'No authenticated user.',
+      };
+    }
+
+    const { data, error } = await this.supabase
+      .from('profiles')
+      .select('pre_fill_mode')
+      .eq('id', userResult.data)
+      .returns<{ pre_fill_mode: PreFillMode }>()
+      .maybeSingle();
+
+    const formattedError = this.formatError(error);
+    const profileRow = data as { pre_fill_mode?: PreFillMode } | null;
+
+    return {
+      data: profileRow?.pre_fill_mode ?? 'LAST_WORKOUT',
+      error: this.isMissingColumnError(formattedError) ? null : formattedError,
+    };
+  }
+
+  async getPreFillSetsForWorkoutExercise(
+    workoutExercise: WorkoutExercise,
+    mode: PreFillMode = 'LAST_WORKOUT',
+  ): Promise<LiveWorkoutServiceResult<LiveWorkoutPreFillSet[]>> {
+    if (mode === 'EMPTY') {
+      return { data: [], error: null };
+    }
+
+    if (mode === 'LAST_WORKOUT') {
+      const previousResult = await this.getPreviousSetsForExercise(
+        workoutExercise.exerciseId,
+        workoutExercise.workoutSessionId,
+      );
+
+      if (previousResult.error) {
+        return previousResult;
+      }
+
+      if (previousResult.data.length > 0) {
+        return previousResult;
+      }
+    }
+
+    if (!workoutExercise.workoutTemplateBlockExerciseId) {
+      return { data: [], error: null };
+    }
+
+    return this.getTemplatePreFillSets(workoutExercise.workoutTemplateBlockExerciseId);
+  }
+
   async addSet(
     workoutExerciseId: string,
     input: AddWorkoutSetInput,
@@ -412,6 +493,104 @@ export class LiveWorkoutService {
 
   async cancelWorkout(sessionId: string): Promise<LiveWorkoutServiceResult<WorkoutSession | null>> {
     return this.updateWorkoutSessionStatus(sessionId, 'cancelled');
+  }
+
+  private async getPreviousSetsForExercise(
+    exerciseId: string,
+    currentSessionId: string,
+  ): Promise<LiveWorkoutServiceResult<LiveWorkoutPreFillSet[]>> {
+    const userResult = await this.getCurrentUserId();
+
+    if (userResult.error || !userResult.data) {
+      return { data: [], error: userResult.error ?? 'No authenticated user.' };
+    }
+
+    const { data: sessions, error: sessionsError } = await this.supabase
+      .from('workout_sessions')
+      .select('id')
+      .eq('user_id', userResult.data)
+      .eq('status', 'completed')
+      .neq('id', currentSessionId)
+      .returns<{ id: string }[]>()
+      .order('finished_at', { ascending: false })
+      .limit(20);
+
+    if (sessionsError) {
+      return { data: [], error: this.formatError(sessionsError) };
+    }
+
+    for (const session of sessions ?? []) {
+      const { data: workoutExercises, error: exercisesError } = await this.supabase
+        .from('workout_exercises')
+        .select('id')
+        .eq('workout_session_id', session.id)
+        .eq('exercise_id', exerciseId)
+        .returns<{ id: string }[]>()
+        .order('sort_order', { ascending: true });
+
+      if (exercisesError) {
+        return { data: [], error: this.formatError(exercisesError) };
+      }
+
+      for (const workoutExercise of workoutExercises ?? []) {
+        const setsResult = await this.getWorkoutSets(workoutExercise.id);
+
+        if (setsResult.error) {
+          return { data: [], error: setsResult.error };
+        }
+
+        const previousSets = setsResult.data
+          .filter((set) => set.reps !== null || set.weightKg !== null || set.notes)
+          .map((set, index) => ({
+            setNumber: index + 1,
+            reps: set.reps,
+            weightKg: set.weightKg,
+            notes: set.notes,
+            source: 'LAST_WORKOUT' as const,
+          }));
+
+        if (previousSets.length > 0) {
+          return { data: previousSets, error: null };
+        }
+      }
+    }
+
+    return { data: [], error: null };
+  }
+
+  private async getTemplatePreFillSets(
+    templateBlockExerciseId: string,
+  ): Promise<LiveWorkoutServiceResult<LiveWorkoutPreFillSet[]>> {
+    const { data, error } = await this.supabase
+      .from('workout_template_block_exercises')
+      .select(TEMPLATE_TARGET_SELECT)
+      .eq('id', templateBlockExerciseId)
+      .returns<TemplateTargetRow>()
+      .maybeSingle();
+
+    if (error) {
+      return { data: [], error: this.formatError(error) };
+    }
+
+    if (!data) {
+      return { data: [], error: null };
+    }
+
+    const targetRow = data as TemplateTargetRow;
+    const reps = parseTargetReps(targetRow.target_reps);
+    const weightKg = toNullableNumber(targetRow.target_weight_kg);
+    const count = targetRow.target_sets ?? (reps !== null || weightKg !== null || targetRow.notes ? 1 : 0);
+
+    return {
+      data: Array.from({ length: count }, (_, index) => ({
+        setNumber: index + 1,
+        reps,
+        weightKg,
+        notes: targetRow.notes,
+        source: 'TEMPLATE' as const,
+      })),
+      error: null,
+    };
   }
 
   private async createWorkoutSession(
@@ -566,6 +745,10 @@ export class LiveWorkoutService {
 
     return [error.message, error.details, error.hint].filter(Boolean).join(' ');
   }
+
+  private isMissingColumnError(error: string | null): boolean {
+    return error?.toLowerCase().includes('column') === true;
+  }
 }
 
 function mapWorkoutSession(row: WorkoutSessionRow): WorkoutSession {
@@ -691,4 +874,14 @@ function toNullableNumber(value: number | string | null): number | null {
   }
 
   return typeof value === 'number' ? value : Number(value);
+}
+
+function parseTargetReps(value: string | null): number | null {
+  if (!value) {
+    return null;
+  }
+
+  const match = value.match(/\d+/);
+
+  return match ? Number(match[0]) : null;
 }

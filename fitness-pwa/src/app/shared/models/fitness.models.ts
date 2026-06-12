@@ -1,8 +1,11 @@
+export type PreFillMode = 'LAST_WORKOUT' | 'TEMPLATE' | 'EMPTY';
+
 export interface Profile {
   id: string;
   email: string;
   displayName: string | null;
   avatarUrl: string | null;
+  preFillMode: PreFillMode;
   createdAt: string;
   updatedAt: string;
 }

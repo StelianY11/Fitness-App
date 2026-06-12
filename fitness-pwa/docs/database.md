@@ -13,15 +13,16 @@ Run SQL in this order:
 5. `supabase/migrations/004_workout_template_engine.sql`
 6. `supabase/migrations/005_add_circuit_template_block_type.sql`
 7. `supabase/migrations/006_live_workout_foundation.sql`
-8. `supabase/seed/001_exercises_seed.sql`
-9. `supabase/seed/002_exercise_variants_seed.sql`
-10. `supabase/seed/003_canonical_exercises_seed.sql`
+8. `supabase/migrations/007_profile_prefill_mode.sql`
+9. `supabase/seed/001_exercises_seed.sql`
+10. `supabase/seed/002_exercise_variants_seed.sql`
+11. `supabase/seed/003_canonical_exercises_seed.sql`
 
-The first file sets up the auth profile foundation and allowlist. The first migration creates the fitness tables and RLS policies. The second migration extends exercises for future Gym, Calisthenics, and Street Workout support. The third migration adds exercise variants. The fourth migration adds the block-based workout template engine. The fifth migration adds circuit blocks. The sixth migration adds the live workout logging foundation. The seeds insert builtin exercise categories, starter exercises, exercise variants, and canonical imported exercise data.
+The first file sets up the auth profile foundation and allowlist. The first migration creates the fitness tables and RLS policies. The second migration extends exercises for future Gym, Calisthenics, and Street Workout support. The third migration adds exercise variants. The fourth migration adds the block-based workout template engine. The fifth migration adds circuit blocks. The sixth migration adds the live workout logging foundation. The seventh migration adds the live workout pre-fill preference foundation. The seeds insert builtin exercise categories, starter exercises, exercise variants, and canonical imported exercise data.
 
 ## Tables
 
-`profiles` stores one profile row per authenticated user. It is private to that user.
+`profiles` stores one profile row per authenticated user. It is private to that user. The optional `pre_fill_mode` preference controls live workout defaults: `LAST_WORKOUT`, `TEMPLATE`, or `EMPTY`.
 
 `exercise_categories` groups exercises by category. Builtin rows have `is_builtin = true` and `owner_id = null`; user-created rows have `owner_id` set to the user.
 

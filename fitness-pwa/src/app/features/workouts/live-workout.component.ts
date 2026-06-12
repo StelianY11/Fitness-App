@@ -2,7 +2,10 @@ import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ExerciseService } from '../../core/services/exercise.service';
-import { LiveWorkoutService } from '../../core/services/live-workout.service';
+import {
+  LiveWorkoutPreFillSet,
+  LiveWorkoutService,
+} from '../../core/services/live-workout.service';
 import {
   Exercise,
   WorkoutExercise,
@@ -14,6 +17,12 @@ interface SetForm {
   reps: string | number | null;
   weightKg: string | number | null;
   notes: string;
+}
+
+interface QuickSetForm extends SetForm {
+  key: string;
+  setNumber: number;
+  source: LiveWorkoutPreFillSet['source'];
 }
 
 @Component({
@@ -123,7 +132,71 @@ interface SetForm {
                   </button>
                 </div>
 
-                @if (getSets(workoutExercise.id).length === 0) {
+                @if (getSets(workoutExercise.id).length === 0 && getQuickSetForms(workoutExercise.id).length > 0) {
+                  <div class="mt-4 space-y-3 rounded-md border border-green-100 bg-green-50 p-3">
+                    <div>
+                      <p class="text-sm font-semibold text-green-900">
+                        Pre-filled from {{ getPreFillSourceLabel(getQuickSetForms(workoutExercise.id)[0].source) }}
+                      </p>
+                      <p class="mt-1 text-xs text-green-800">
+                        Edit a row or press Save to log it for today.
+                      </p>
+                    </div>
+
+                    @for (quickSet of getQuickSetForms(workoutExercise.id); track quickSet.key) {
+                      <form
+                        class="space-y-3 rounded-md bg-white p-3"
+                        (ngSubmit)="submitQuickSet(workoutExercise, quickSet)"
+                      >
+                        <div class="flex items-center justify-between gap-3">
+                          <p class="font-semibold text-slate-950">Set {{ quickSet.setNumber }}</p>
+                          <button
+                            type="submit"
+                            [disabled]="savingSetExerciseId === quickSet.key"
+                            class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                          >
+                            {{ savingSetExerciseId === quickSet.key ? 'Saving...' : 'Save' }}
+                          </button>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                          <label class="block">
+                            <span class="text-sm font-medium text-slate-700">Reps</span>
+                            <input
+                              type="number"
+                              min="0"
+                              [name]="'quickReps' + quickSet.key"
+                              [(ngModel)]="quickSet.reps"
+                              class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                            />
+                          </label>
+
+                          <label class="block">
+                            <span class="text-sm font-medium text-slate-700">Weight</span>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.5"
+                              [name]="'quickWeight' + quickSet.key"
+                              [(ngModel)]="quickSet.weightKg"
+                              class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                            />
+                          </label>
+                        </div>
+
+                        <label class="block">
+                          <span class="text-sm font-medium text-slate-700">Notes</span>
+                          <textarea
+                            [name]="'quickNotes' + quickSet.key"
+                            [(ngModel)]="quickSet.notes"
+                            rows="2"
+                            class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                          ></textarea>
+                        </label>
+                      </form>
+                    }
+                  </div>
+                } @else if (getSets(workoutExercise.id).length === 0) {
                   <div class="mt-4 rounded-md bg-slate-50 p-3 text-sm text-slate-600">
                     No sets logged yet.
                   </div>
@@ -242,6 +315,7 @@ export class LiveWorkoutComponent {
   session: WorkoutSession | null = null;
   workoutExercises: WorkoutExercise[] = [];
   setsByExercise: Record<string, WorkoutSet[]> = {};
+  quickSetFormsByExercise: Record<string, QuickSetForm[]> = {};
   exerciseNames: Record<string, string> = {};
   activeSetFormExerciseId: string | null = null;
   setForm: SetForm = createEmptySetForm();
@@ -308,10 +382,12 @@ export class LiveWorkoutComponent {
       this.workoutExercises = exercisesResult.data;
       this.setsByExercise = nextSetsByExercise;
       await this.loadExerciseNames();
+      await this.loadPreFillForms(exercisesResult.data, nextSetsByExercise);
     } catch (error) {
       this.session = null;
       this.workoutExercises = [];
       this.setsByExercise = {};
+      this.quickSetFormsByExercise = {};
       this.errorMessage = getErrorMessage(error, 'Unable to load workout.');
       console.error('Live workout load failed:', error);
     } finally {
@@ -395,6 +471,75 @@ export class LiveWorkoutComponent {
     }
   }
 
+  async submitQuickSet(
+    workoutExercise: WorkoutExercise,
+    quickSet: QuickSetForm,
+  ): Promise<void> {
+    if (this.savingSetExerciseId || this.session?.status !== 'active') {
+      return;
+    }
+
+    const reps = parseNullableNumber(quickSet.reps, 'Reps');
+    const weightKg = parseNullableNumber(quickSet.weightKg, 'Weight');
+
+    if (typeof reps === 'string') {
+      this.errorMessage = reps;
+      return;
+    }
+
+    if (typeof weightKg === 'string') {
+      this.errorMessage = weightKg;
+      return;
+    }
+
+    const notes = quickSet.notes.trim();
+
+    if (reps === null && weightKg === null && !notes) {
+      this.errorMessage = 'Add reps, weight, or notes before saving a set.';
+      return;
+    }
+
+    this.savingSetExerciseId = quickSet.key;
+    this.errorMessage = '';
+    this.statusMessage = '';
+
+    try {
+      const result = await this.liveWorkoutService.addSet(workoutExercise.id, {
+        reps,
+        weightKg,
+        notes: notes || null,
+      });
+
+      if (result.error || !result.data) {
+        throw new Error(result.error ?? 'Unable to save set.');
+      }
+
+      this.setsByExercise = {
+        ...this.setsByExercise,
+        [workoutExercise.id]: [...this.getSets(workoutExercise.id), result.data].sort(
+          (a, b) => a.setNumber - b.setNumber,
+        ),
+      };
+      this.quickSetFormsByExercise = {
+        ...this.quickSetFormsByExercise,
+        [workoutExercise.id]: this.getQuickSetForms(workoutExercise.id).filter(
+          (currentQuickSet) => currentQuickSet.key !== quickSet.key,
+        ),
+      };
+      this.statusMessage = 'Set saved.';
+    } catch (error) {
+      this.errorMessage = getErrorMessage(error, 'Unable to save set.');
+      console.error('Live workout quick set save failed:', {
+        workoutExerciseId: workoutExercise.id,
+        quickSet,
+        error,
+      });
+    } finally {
+      this.savingSetExerciseId = null;
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
   async finishWorkout(): Promise<void> {
     if (!this.session || this.isFinishing) {
       return;
@@ -449,8 +594,24 @@ export class LiveWorkoutComponent {
     return this.setsByExercise[workoutExerciseId] ?? [];
   }
 
+  getQuickSetForms(workoutExerciseId: string): QuickSetForm[] {
+    return this.quickSetFormsByExercise[workoutExerciseId] ?? [];
+  }
+
   getExerciseName(exerciseId: string): string {
     return this.exerciseNames[exerciseId] ?? 'Exercise';
+  }
+
+  getPreFillSourceLabel(source: LiveWorkoutPreFillSet['source']): string {
+    if (source === 'LAST_WORKOUT') {
+      return 'last workout';
+    }
+
+    if (source === 'TEMPLATE') {
+      return 'template targets';
+    }
+
+    return 'empty defaults';
   }
 
   formatSetSummary(set: WorkoutSet): string {
@@ -485,6 +646,46 @@ export class LiveWorkoutComponent {
       console.error('Live workout exercise metadata load failed:', error);
     }
   }
+
+  private async loadPreFillForms(
+    workoutExercises: WorkoutExercise[],
+    setsByExercise: Record<string, WorkoutSet[]>,
+  ): Promise<void> {
+    const modeResult = await this.liveWorkoutService.getPreFillMode();
+
+    if (modeResult.error) {
+      console.error('Live workout pre-fill mode load error:', modeResult.error);
+    }
+
+    const nextQuickSetForms: Record<string, QuickSetForm[]> = {};
+
+    for (const workoutExercise of workoutExercises) {
+      if ((setsByExercise[workoutExercise.id] ?? []).length > 0) {
+        nextQuickSetForms[workoutExercise.id] = [];
+        continue;
+      }
+
+      const preFillResult = await this.liveWorkoutService.getPreFillSetsForWorkoutExercise(
+        workoutExercise,
+        modeResult.data,
+      );
+
+      if (preFillResult.error) {
+        console.error('Live workout pre-fill load error:', {
+          workoutExerciseId: workoutExercise.id,
+          exerciseId: workoutExercise.exerciseId,
+          error: preFillResult.error,
+        });
+      }
+
+      nextQuickSetForms[workoutExercise.id] = createQuickSetForms(
+        workoutExercise.id,
+        preFillResult.data,
+      );
+    }
+
+    this.quickSetFormsByExercise = nextQuickSetForms;
+  }
 }
 
 function createEmptySetForm(): SetForm {
@@ -493,6 +694,30 @@ function createEmptySetForm(): SetForm {
     weightKg: '',
     notes: '',
   };
+}
+
+function createQuickSetForms(
+  workoutExerciseId: string,
+  preFillSets: LiveWorkoutPreFillSet[],
+): QuickSetForm[] {
+  const sourceSets = preFillSets.length > 0
+    ? preFillSets
+    : [{
+        setNumber: 1,
+        reps: null,
+        weightKg: null,
+        notes: null,
+        source: 'EMPTY' as const,
+      }];
+
+  return sourceSets.map((set, index) => ({
+    key: `${workoutExerciseId}-${set.source}-${index + 1}`,
+    setNumber: set.setNumber,
+    reps: set.reps,
+    weightKg: set.weightKg,
+    notes: set.notes ?? '',
+    source: set.source,
+  }));
 }
 
 function parseNullableNumber(
