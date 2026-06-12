@@ -1,7 +1,8 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ExerciseService } from '../../../core/services/exercise.service';
+import { LiveWorkoutService } from '../../../core/services/live-workout.service';
 import { WorkoutTemplateService } from '../../../core/services/workout-template.service';
 import {
   Exercise,
@@ -41,12 +42,24 @@ interface CustomExerciseForm {
           }
         </div>
 
-        <a
-          routerLink="/templates"
-          class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
-        >
-          Back
-        </a>
+        <div class="flex shrink-0 flex-col gap-2">
+          @if (template) {
+            <button
+              type="button"
+              (click)="startWorkout()"
+              [disabled]="isStartingWorkout || isSaving"
+              class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+            >
+              {{ isStartingWorkout ? 'Starting...' : 'Start Workout' }}
+            </button>
+          }
+          <a
+            routerLink="/templates"
+            class="rounded-md border border-slate-300 px-3 py-2 text-center text-sm font-semibold text-slate-700"
+          >
+            Back
+          </a>
+        </div>
       </div>
 
       @if (template?.isBuiltin) {
@@ -449,8 +462,10 @@ interface CustomExerciseForm {
 })
 export class TemplateEditorComponent {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly workoutTemplateService = inject(WorkoutTemplateService);
   private readonly exerciseService = inject(ExerciseService);
+  private readonly liveWorkoutService = inject(LiveWorkoutService);
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
 
   readonly loadingCards = [1, 2, 3];
@@ -479,6 +494,7 @@ export class TemplateEditorComponent {
   customExercise: CustomExerciseForm = createEmptyCustomExerciseForm();
   isLoading = true;
   isSaving = false;
+  isStartingWorkout = false;
   isSearchingExercises = false;
   isCreatingCustomExercise = false;
   errorMessage = '';
@@ -499,6 +515,33 @@ export class TemplateEditorComponent {
   constructor() {
     void this.reloadTemplate();
     void this.loadExerciseMetadata();
+  }
+
+  async startWorkout(): Promise<void> {
+    if (!this.template || this.isStartingWorkout) {
+      return;
+    }
+
+    this.isStartingWorkout = true;
+    this.errorMessage = '';
+    this.statusMessage = '';
+
+    try {
+      const result = await this.liveWorkoutService.startWorkoutFromTemplate(this.template.id);
+
+      if (result.error || !result.data) {
+        this.errorMessage = result.error ?? 'Unable to start workout.';
+        return;
+      }
+
+      await this.router.navigate(['/workout/live', result.data.id]);
+    } catch (error) {
+      this.errorMessage = getErrorMessage(error, 'Unable to start workout.');
+      console.error('Template editor start workout failed:', error);
+    } finally {
+      this.isStartingWorkout = false;
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   async addBlock(): Promise<void> {

@@ -30,6 +30,22 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'workout/live/:sessionId',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/workouts/live-workout.component').then(
+        (m) => m.LiveWorkoutComponent,
+      ),
+  },
+  {
+    path: 'workout/summary/:sessionId',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/workouts/workout-summary.component').then(
+        (m) => m.WorkoutSummaryComponent,
+      ),
+  },
+  {
     path: 'templates/:id',
     canActivate: [authGuard],
     loadComponent: () =>

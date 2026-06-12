@@ -297,6 +297,34 @@ export class LiveWorkoutService {
     };
   }
 
+  async getWorkoutExercises(sessionId: string): Promise<LiveWorkoutServiceResult<WorkoutExercise[]>> {
+    const { data, error } = await this.supabase
+      .from('workout_exercises')
+      .select(WORKOUT_EXERCISE_SELECT)
+      .eq('workout_session_id', sessionId)
+      .returns<WorkoutExerciseRow[]>()
+      .order('sort_order', { ascending: true });
+
+    return {
+      data: (data ?? []).map(mapWorkoutExercise),
+      error: this.formatError(error),
+    };
+  }
+
+  async getWorkoutSets(workoutExerciseId: string): Promise<LiveWorkoutServiceResult<WorkoutSet[]>> {
+    const { data, error } = await this.supabase
+      .from('workout_sets')
+      .select(SET_SELECT)
+      .eq('workout_exercise_id', workoutExerciseId)
+      .returns<WorkoutSetRow[]>()
+      .order('set_number', { ascending: true });
+
+    return {
+      data: (data ?? []).map(mapWorkoutSet),
+      error: this.formatError(error),
+    };
+  }
+
   async addSet(
     workoutExerciseId: string,
     input: AddWorkoutSetInput,
@@ -532,7 +560,11 @@ export class LiveWorkoutService {
   }
 
   private formatError(error: PostgrestError | null): string | null {
-    return error?.message ?? null;
+    if (!error) {
+      return null;
+    }
+
+    return [error.message, error.details, error.hint].filter(Boolean).join(' ');
   }
 }
 

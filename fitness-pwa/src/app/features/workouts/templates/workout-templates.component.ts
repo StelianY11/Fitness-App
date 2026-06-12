@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { LiveWorkoutService } from '../../../core/services/live-workout.service';
 import { WorkoutTemplateService } from '../../../core/services/workout-template.service';
 import { WorkoutTemplate } from '../../../shared/models/fitness.models';
 
@@ -141,7 +142,15 @@ import { WorkoutTemplate } from '../../../shared/models/fitness.models';
                 </div>
               </div>
 
-              <div class="mt-4 grid gap-2 sm:grid-cols-3">
+              <div class="mt-4 grid gap-2 sm:grid-cols-4">
+                <button
+                  type="button"
+                  (click)="startWorkout(template)"
+                  [disabled]="processingTemplateId === template.id"
+                  class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                >
+                  {{ processingTemplateId === template.id ? 'Starting...' : 'Start Workout' }}
+                </button>
                 <a
                   [routerLink]="['/templates', template.id]"
                   class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800"
@@ -176,6 +185,8 @@ import { WorkoutTemplate } from '../../../shared/models/fitness.models';
 })
 export class WorkoutTemplatesComponent {
   private readonly workoutTemplateService = inject(WorkoutTemplateService);
+  private readonly liveWorkoutService = inject(LiveWorkoutService);
+  private readonly router = inject(Router);
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
 
   readonly loadingCards = [1, 2, 3];
@@ -258,6 +269,32 @@ export class WorkoutTemplatesComponent {
       await this.loadTemplates();
     } catch (error) {
       this.errorMessage = getErrorMessage(error, 'Unable to duplicate template.');
+    } finally {
+      this.processingTemplateId = null;
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  async startWorkout(template: WorkoutTemplate): Promise<void> {
+    if (this.processingTemplateId) {
+      return;
+    }
+
+    this.processingTemplateId = template.id;
+    this.errorMessage = '';
+    this.statusMessage = '';
+
+    try {
+      const result = await this.liveWorkoutService.startWorkoutFromTemplate(template.id);
+
+      if (result.error || !result.data) {
+        this.errorMessage = result.error ?? 'Unable to start workout.';
+        return;
+      }
+
+      await this.router.navigate(['/workout/live', result.data.id]);
+    } catch (error) {
+      this.errorMessage = getErrorMessage(error, 'Unable to start workout.');
     } finally {
       this.processingTemplateId = null;
       this.changeDetectorRef.detectChanges();
