@@ -67,6 +67,12 @@ interface CustomExerciseForm {
         </p>
       }
 
+      @if (isSaving && actionMessage) {
+        <p class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+          {{ actionMessage }}
+        </p>
+      }
+
       @if (isLoading) {
         <div class="space-y-3">
           @for (item of loadingCards; track item) {
@@ -160,7 +166,10 @@ interface CustomExerciseForm {
                       <button
                         type="button"
                         (click)="removeBlock(block)"
+                        [disabled]="isSaving"
                         class="rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-700"
+                        [class.cursor-not-allowed]="isSaving"
+                        [class.opacity-60]="isSaving"
                       >
                         Remove
                       </button>
@@ -395,7 +404,10 @@ interface CustomExerciseForm {
                               <button
                                 type="button"
                                 (click)="removeExercise(templateExercise)"
+                                [disabled]="isSaving"
                                 class="rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-700"
+                                [class.cursor-not-allowed]="isSaving"
+                                [class.opacity-60]="isSaving"
                               >
                                 Remove
                               </button>
@@ -471,6 +483,7 @@ export class TemplateEditorComponent {
   isCreatingCustomExercise = false;
   errorMessage = '';
   statusMessage = '';
+  actionMessage = '';
   private readonly addingExerciseKeys = new Set<string>();
   private readonly templateId = this.route.snapshot.paramMap.get('id');
   private mainLoadId = 0;
@@ -489,11 +502,11 @@ export class TemplateEditorComponent {
   }
 
   async addBlock(): Promise<void> {
-    if (!this.template || !this.canEdit) {
+    if (!this.template || !this.canEdit || this.isSaving) {
       return;
     }
 
-    this.isSaving = true;
+    this.beginAction('Adding block...');
     this.errorMessage = '';
     this.statusMessage = '';
 
@@ -523,7 +536,7 @@ export class TemplateEditorComponent {
       this.errorMessage = getErrorMessage(error, 'Unable to add block.');
       console.error('Template editor add block failed:', error);
     } finally {
-      this.isSaving = false;
+      this.finishAction();
       this.changeDetectorRef.detectChanges();
     }
   }
@@ -537,35 +550,39 @@ export class TemplateEditorComponent {
   }
 
   async removeBlock(block: WorkoutTemplateBlock): Promise<void> {
-    if (!this.canEdit || !confirm(`Remove "${block.title || 'this block'}"?`)) {
+    if (!this.canEdit || this.isSaving || !confirm(`Remove "${block.title || 'this block'}"?`)) {
       return;
     }
 
-    this.isSaving = true;
+    this.beginAction('Removing block...');
     this.errorMessage = '';
     this.statusMessage = '';
+    const previousBlocks = this.blocks;
+    const previousBlockExercises = this.blockExercises;
 
     try {
-      const result = await this.workoutTemplateService.deleteBlock(block.id);
-
-      if (result.error) {
-        this.errorMessage = result.error;
-        return;
-      }
-
-      this.statusMessage = 'Block removed.';
       this.blocks = this.blocks
         .filter((currentBlock) => currentBlock.id !== block.id)
         .map((currentBlock, index) => ({ ...currentBlock, sortOrder: index + 1 }));
       const { [block.id]: _removed, ...remainingExercises } = this.blockExercises;
       this.blockExercises = remainingExercises;
+      this.changeDetectorRef.detectChanges();
+
+      const result = await this.workoutTemplateService.deleteBlock(block.id);
+
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
       await this.saveBlockOrder();
+      this.statusMessage = 'Block removed.';
     } catch (error) {
+      this.blocks = previousBlocks;
+      this.blockExercises = previousBlockExercises;
       this.errorMessage = getErrorMessage(error, 'Unable to remove block.');
       console.error('Template editor remove block failed:', error);
-      await this.reloadTemplate({ showLoading: false });
     } finally {
-      this.isSaving = false;
+      this.finishAction();
       this.changeDetectorRef.detectChanges();
     }
   }
@@ -582,7 +599,7 @@ export class TemplateEditorComponent {
     }
 
     const previousBlocks = this.blocks;
-    this.isSaving = true;
+    this.beginAction('Reordering blocks...');
     this.errorMessage = '';
 
     try {
@@ -603,7 +620,7 @@ export class TemplateEditorComponent {
       this.errorMessage = getErrorMessage(error, 'Unable to reorder blocks.');
       console.error('Template editor block reorder failed:', error);
     } finally {
-      this.isSaving = false;
+      this.finishAction();
       this.changeDetectorRef.detectChanges();
     }
   }
@@ -660,7 +677,7 @@ export class TemplateEditorComponent {
   }
 
   async addExercise(block: WorkoutTemplateBlock, exercise: Exercise): Promise<void> {
-    if (!this.canEdit) {
+    if (!this.canEdit || this.isSaving) {
       return;
     }
 
@@ -673,24 +690,66 @@ export class TemplateEditorComponent {
     this.errorMessage = '';
     this.statusMessage = '';
     this.changeDetectorRef.detectChanges();
+    let optimisticExercise: WorkoutTemplateBlockExercise | null = null;
 
     try {
       const existingExercises = this.getBlockExercises(block.id);
+      optimisticExercise = {
+        id: `pending-${block.id}-${exercise.id}-${Date.now()}`,
+        workoutTemplateBlockId: block.id,
+        exerciseId: exercise.id,
+        exerciseVariantId: null,
+        sortOrder: existingExercises.length + 1,
+        setType: getDefaultSetType(block.blockType),
+        targetSets: null,
+        targetReps: null,
+        targetWeightKg: null,
+        targetDurationSeconds: null,
+        targetDistanceMeters: null,
+        restSeconds: null,
+        tempo: null,
+        rir: null,
+        notes: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      this.blockExercises = {
+        ...this.blockExercises,
+        [block.id]: [...existingExercises, optimisticExercise],
+      };
+      this.changeDetectorRef.detectChanges();
+
       const result = await this.workoutTemplateService.addExerciseToBlock({
         workoutTemplateBlockId: block.id,
         exerciseId: exercise.id,
-        sortOrder: existingExercises.length + 1,
-        setType: getDefaultSetType(block.blockType),
+        sortOrder: optimisticExercise.sortOrder,
+        setType: optimisticExercise.setType,
       });
 
-      if (result.error) {
-        this.errorMessage = result.error;
-        return;
+      if (result.error || !result.data) {
+        throw new Error(result.error ?? 'Unable to add exercise.');
       }
 
       this.statusMessage = 'Exercise added.';
-      await this.reloadBlockExercises(block.id);
+      const optimisticExerciseId = optimisticExercise.id;
+      this.blockExercises = {
+        ...this.blockExercises,
+        [block.id]: this.getBlockExercises(block.id).map((templateExercise) =>
+          templateExercise.id === optimisticExerciseId ? result.data as WorkoutTemplateBlockExercise : templateExercise,
+        ).sort(
+          (a, b) => a.sortOrder - b.sortOrder,
+        ),
+      };
     } catch (error) {
+      if (optimisticExercise) {
+        this.blockExercises = {
+          ...this.blockExercises,
+          [block.id]: this.getBlockExercises(block.id).filter(
+            (templateExercise) => templateExercise.id !== optimisticExercise?.id,
+          ),
+        };
+      }
       this.errorMessage = getErrorMessage(error, 'Unable to add exercise.');
     } finally {
       this.addingExerciseKeys.delete(addKey);
@@ -758,32 +817,38 @@ export class TemplateEditorComponent {
       return;
     }
 
-    this.isSaving = true;
+    this.beginAction('Removing exercise...');
     this.errorMessage = '';
     this.statusMessage = '';
+    const blockId = templateExercise.workoutTemplateBlockId;
+    const previousExercises = this.getBlockExercises(blockId);
 
     try {
+      this.blockExercises = {
+        ...this.blockExercises,
+        [blockId]: previousExercises
+          .filter((exercise) => exercise.id !== templateExercise.id)
+          .map((exercise, index) => ({ ...exercise, sortOrder: index + 1 })),
+      };
+      this.changeDetectorRef.detectChanges();
+
       const result = await this.workoutTemplateService.deleteTemplateExercise(templateExercise.id);
 
       if (result.error) {
         throw new Error(result.error);
       }
 
+      await this.saveExerciseOrder(blockId);
       this.statusMessage = 'Exercise removed.';
-      const blockId = templateExercise.workoutTemplateBlockId;
+    } catch (error) {
       this.blockExercises = {
         ...this.blockExercises,
-        [blockId]: this.getBlockExercises(blockId)
-          .filter((exercise) => exercise.id !== templateExercise.id)
-          .map((exercise, index) => ({ ...exercise, sortOrder: index + 1 })),
+        [blockId]: previousExercises,
       };
-      await this.saveExerciseOrder(blockId);
-    } catch (error) {
       this.errorMessage = getErrorMessage(error, 'Unable to remove exercise.');
       console.error('Template editor remove exercise failed:', error);
-      await this.reloadBlockExercises(templateExercise.workoutTemplateBlockId);
     } finally {
-      this.isSaving = false;
+      this.finishAction();
       this.changeDetectorRef.detectChanges();
     }
   }
@@ -801,7 +866,7 @@ export class TemplateEditorComponent {
     }
 
     const previousExercises = this.getBlockExercises(blockId);
-    this.isSaving = true;
+    this.beginAction('Reordering exercises...');
     this.errorMessage = '';
 
     try {
@@ -817,7 +882,7 @@ export class TemplateEditorComponent {
       this.errorMessage = getErrorMessage(error, 'Unable to reorder exercises.');
       console.error('Template editor exercise reorder failed:', error);
     } finally {
-      this.isSaving = false;
+      this.finishAction();
       this.changeDetectorRef.detectChanges();
     }
   }
@@ -1013,10 +1078,11 @@ export class TemplateEditorComponent {
     block: WorkoutTemplateBlock,
     input: { title?: string | null; blockType?: WorkoutTemplateBlockType },
   ): Promise<void> {
-    if (!this.canEdit) {
+    if (!this.canEdit || this.isSaving) {
       return;
     }
 
+    this.beginAction('Saving block...');
     this.errorMessage = '';
 
     try {
@@ -1035,12 +1101,23 @@ export class TemplateEditorComponent {
       console.error('Template editor update block failed:', error);
       await this.reloadTemplate({ showLoading: false });
     } finally {
+      this.finishAction();
       this.changeDetectorRef.detectChanges();
     }
   }
 
   private getAddingExerciseKey(blockId: string, exerciseId: string): string {
     return `${blockId}:${exerciseId}`;
+  }
+
+  private beginAction(message: string): void {
+    this.isSaving = true;
+    this.actionMessage = message;
+  }
+
+  private finishAction(): void {
+    this.isSaving = false;
+    this.actionMessage = '';
   }
 
   private startMainLoadingSafetyTimer(loadId: number): void {
