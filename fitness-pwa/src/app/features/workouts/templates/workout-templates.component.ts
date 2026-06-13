@@ -22,7 +22,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
 
         <a
           routerLink="/dashboard"
-          class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
+          class="app-button app-button-secondary min-h-11 w-auto px-3 py-2"
         >
           {{ t('back') }}
         </a>
@@ -31,18 +31,18 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
       <button
         type="button"
         (click)="openCreateForm()"
-        class="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
+        class="app-button app-button-primary"
       >
         {{ t('newTemplate') }}
       </button>
 
       @if (showCreateForm) {
         <form
-          class="space-y-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+          class="app-card space-y-4"
           (ngSubmit)="createTemplate()"
         >
           <div>
-            <h3 class="text-lg font-bold text-slate-950">{{ t('newTemplate') }}</h3>
+            <h3 class="app-section-title">{{ t('newTemplate') }}</h3>
             <p class="mt-1 text-sm text-slate-600">{{ t('description') }}</p>
           </div>
 
@@ -53,7 +53,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
               name="templateName"
               [(ngModel)]="newTemplateName"
               required
-              class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+              class="app-input mt-2"
             />
           </label>
 
@@ -63,7 +63,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
               name="templateDescription"
               [(ngModel)]="newTemplateDescription"
               rows="3"
-              class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+              class="app-input mt-2"
             ></textarea>
           </label>
 
@@ -71,14 +71,14 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
             <button
               type="button"
               (click)="closeCreateForm()"
-              class="rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
+              class="app-button app-button-secondary"
             >
               {{ t('cancel') }}
             </button>
             <button
               type="submit"
               [disabled]="isSaving || !newTemplateName.trim()"
-              class="rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+              class="app-button app-button-primary"
             >
               {{ isSaving ? t('loading') : t('create') }}
             </button>
@@ -102,7 +102,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
             <button
               type="button"
               (click)="resumeActiveWorkout()"
-              class="rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
+              class="app-button app-button-primary"
             >
               {{ t('resume') }}
             </button>
@@ -110,14 +110,14 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
               type="button"
               (click)="cancelCurrentAndStartNew()"
               [disabled]="processingTemplateId === pendingStartTemplate?.id"
-              class="rounded-md border border-red-200 bg-white px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100"
+              class="app-button app-button-danger"
             >
               {{ t('cancelWorkout') }}
             </button>
             <button
               type="button"
               (click)="closeActiveWorkoutPrompt()"
-              class="rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
+              class="app-button app-button-secondary"
             >
               {{ t('cancel') }}
             </button>
@@ -138,20 +138,20 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
           <button
             type="button"
             (click)="loadTemplates()"
-            class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
+            class="app-button app-button-danger mt-4 min-h-11 w-auto px-4 py-2"
           >
             {{ t('retry') }}
           </button>
         </div>
       } @else if (templates.length === 0) {
-        <div class="rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
+        <div class="app-card bg-slate-50 p-5 text-center shadow-none">
           <p class="font-semibold text-slate-800">{{ t('noTemplatesYet') }}</p>
           <p class="mt-1 text-sm text-slate-600">{{ t('newTemplate') }}</p>
         </div>
       } @else {
         <div class="space-y-3">
           @for (template of templates; track template.id) {
-            <article class="rounded-lg border border-slate-200 p-4 shadow-sm">
+            <article class="app-card">
               <div class="flex items-start justify-between gap-3">
                 <div>
                   <h3 class="text-lg font-bold text-slate-950">{{ template.name }}</h3>
@@ -160,7 +160,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                   }
                 </div>
                 <span
-                  class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
+                  class="app-badge shrink-0"
                   [class.bg-green-100]="template.isBuiltin"
                   [class.text-green-800]="template.isBuiltin"
                   [class.bg-slate-100]="!template.isBuiltin"
@@ -188,13 +188,13 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                   type="button"
                   (click)="startWorkout(template)"
                   [disabled]="processingTemplateId === template.id"
-                  class="inline-flex min-h-11 items-center justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                  class="app-button app-button-primary min-h-11 px-3 py-2"
                 >
                   {{ processingTemplateId === template.id ? t('loading') : t('startWorkout') }}
                 </button>
                 <a
                   [routerLink]="['/templates', template.id]"
-                  class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800"
+                  class="app-button app-button-secondary min-h-11 px-3 py-2"
                 >
                   {{ t('edit') }}
                 </a>
@@ -202,7 +202,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                   type="button"
                   (click)="duplicateTemplate(template)"
                   [disabled]="processingTemplateId === template.id"
-                  class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
+                  class="app-button app-button-secondary min-h-11 px-3 py-2"
                 >
                   {{ processingTemplateId === template.id ? t('loading') : t('duplicate') }}
                 </button>
@@ -211,7 +211,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                     type="button"
                     (click)="deleteTemplate(template)"
                     [disabled]="processingTemplateId === template.id"
-                    class="inline-flex min-h-11 items-center justify-center rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100"
+                    class="app-button app-button-danger min-h-11 px-3 py-2"
                   >
                     {{ t('delete') }}
                   </button>

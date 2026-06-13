@@ -126,6 +126,130 @@ textarea:focus {
     0 1px 2px rgb(15 23 42 / 0.04);
 }
 
+.app-card {
+  border: 1px solid var(--app-border);
+  border-radius: 0.85rem;
+  background: var(--app-surface);
+  padding: 1rem;
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 0.04),
+    0 10px 24px rgb(15 23 42 / 0.035);
+}
+
+.app-card.bg-slate-50 {
+  background: var(--app-surface-soft);
+}
+
+.app-card.bg-green-50 {
+  border-color: color-mix(in srgb, var(--app-accent) 42%, #cbd5e1);
+  background: color-mix(in srgb, var(--app-accent) 10%, #ffffff);
+}
+
+.app-button {
+  display: inline-flex;
+  min-height: 3rem;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.65rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+}
+
+.app-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.app-button.w-auto {
+  width: auto;
+}
+
+.app-button.justify-between {
+  justify-content: space-between;
+}
+
+.app-button-primary {
+  border: 1px solid var(--app-accent-strong);
+  background: var(--app-accent-strong);
+  color: #ffffff;
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 0.04),
+    0 10px 24px rgb(15 23 42 / 0.035);
+}
+
+.app-button-secondary {
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: #1e293b;
+}
+
+.app-button-secondary.border-green-600 {
+  border-color: color-mix(in srgb, var(--app-accent) 42%, #cbd5e1);
+}
+
+.app-button-secondary.text-green-700 {
+  color: color-mix(in srgb, var(--app-accent) 82%, #0f172a);
+}
+
+.app-button-danger {
+  border: 1px solid #fecaca;
+  background: var(--app-surface);
+  color: #b91c1c;
+}
+
+.app-input {
+  width: 100%;
+  border: 1px solid var(--app-border);
+  border-radius: 0.65rem;
+  background: var(--app-surface);
+  padding: 0.75rem 0.875rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  outline: none;
+}
+
+.app-input.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.app-input:focus {
+  border-color: var(--app-accent);
+  box-shadow:
+    0 0 0 3px var(--app-accent-soft),
+    0 1px 2px rgb(15 23 42 / 0.04);
+}
+
+.app-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1rem;
+  color: #334155;
+}
+
+.app-badge.bg-green-100 {
+  background: color-mix(in srgb, var(--app-accent) 14%, #ffffff);
+}
+
+.app-badge.text-green-800 {
+  color: color-mix(in srgb, var(--app-accent) 82%, #0f172a);
+}
+
+.app-section-title {
+  font-size: 1.125rem;
+  font-weight: 800;
+  line-height: 1.75rem;
+  color: #020617;
+}
+
 html.dark body {
   background:
     radial-gradient(circle at top, color-mix(in srgb, var(--app-accent) 10%, transparent), transparent 30rem),
@@ -196,4 +320,61 @@ html.dark .animate-pulse {
     #111827 100%
   );
   border-color: #263244;
+}
+
+html.dark .app-card {
+  border-color: #263244;
+  background: #111827;
+}
+
+html.dark .app-card.bg-slate-50 {
+  background: #111827;
+}
+
+html.dark .app-card.bg-green-50 {
+  border-color: color-mix(in srgb, var(--app-accent) 36%, #263244);
+  background: color-mix(in srgb, var(--app-accent) 16%, #111827);
+}
+
+html.dark .app-button-secondary {
+  border-color: #263244;
+  background: #111827;
+  color: #f8fafc;
+}
+
+html.dark .app-button-danger {
+  border-color: #7f1d1d;
+  background: #111827;
+  color: #fca5a5;
+}
+
+html.dark .app-button-secondary.border-green-600 {
+  border-color: color-mix(in srgb, var(--app-accent) 36%, #263244);
+}
+
+html.dark .app-button-secondary.text-green-700 {
+  color: color-mix(in srgb, var(--app-accent) 72%, #e5edf6);
+}
+
+html.dark .app-input {
+  border-color: #263244;
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+html.dark .app-badge {
+  background: #1f2937;
+  color: #dbeafe;
+}
+
+html.dark .app-badge.bg-green-100 {
+  background: color-mix(in srgb, var(--app-accent) 16%, #111827);
+}
+
+html.dark .app-badge.text-green-800 {
+  color: color-mix(in srgb, var(--app-accent) 72%, #e5edf6);
+}
+
+html.dark .app-section-title {
+  color: #f8fafc;
 }

@@ -20,15 +20,15 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
 
         <a
           routerLink="/dashboard"
-          class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
+          class="app-button app-button-secondary min-h-11 w-auto px-3 py-2"
         >
           {{ t('dashboard') }}
         </a>
       </div>
 
-      <section class="space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <section class="app-card space-y-3">
         <div>
-          <h3 class="text-lg font-bold text-slate-950">{{ t('language') }}</h3>
+          <h3 class="app-section-title">{{ t('language') }}</h3>
           <p class="mt-1 text-sm text-slate-600">{{ t('settingsDescription') }}</p>
         </div>
 
@@ -36,7 +36,7 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
           <button
             type="button"
             (click)="setLanguage('en')"
-            class="min-h-12 rounded-md border px-4 py-3 text-sm font-semibold"
+            class="app-button border"
             [class.border-green-600]="settings().language === 'en'"
             [class.bg-green-600]="settings().language === 'en'"
             [class.text-white]="settings().language === 'en'"
@@ -48,7 +48,7 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
           <button
             type="button"
             (click)="setLanguage('bg')"
-            class="min-h-12 rounded-md border px-4 py-3 text-sm font-semibold"
+            class="app-button border"
             [class.border-green-600]="settings().language === 'bg'"
             [class.bg-green-600]="settings().language === 'bg'"
             [class.text-white]="settings().language === 'bg'"
@@ -60,9 +60,9 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
         </div>
       </section>
 
-      <section class="space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <section class="app-card space-y-3">
         <div>
-          <h3 class="text-lg font-bold text-slate-950">{{ t('theme') }}</h3>
+          <h3 class="app-section-title">{{ t('theme') }}</h3>
           <p class="mt-1 text-sm text-slate-600">{{ t('systemThemeDescription') }}</p>
         </div>
 
@@ -71,7 +71,7 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
             <button
               type="button"
               (click)="setTheme(theme)"
-              class="min-h-12 rounded-md border px-3 py-3 text-sm font-semibold"
+              class="app-button border px-3"
               [class.border-green-600]="settings().theme === theme"
               [class.bg-green-600]="settings().theme === theme"
               [class.text-white]="settings().theme === theme"
@@ -84,9 +84,9 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
         </div>
       </section>
 
-      <section class="space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <section class="app-card space-y-3">
         <div>
-          <h3 class="text-lg font-bold text-slate-950">{{ t('accentColor') }}</h3>
+          <h3 class="app-section-title">{{ t('accentColor') }}</h3>
           <p class="mt-1 text-sm text-slate-600">{{ t('accentDescription') }}</p>
         </div>
 
@@ -95,7 +95,7 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
             <button
               type="button"
               (click)="setAccentColor(color.value)"
-              class="flex min-h-12 items-center justify-between rounded-md border px-4 py-3 text-left text-sm font-semibold"
+              class="app-button app-button-secondary justify-between text-left"
               [class.border-green-600]="settings().accentColor === color.value"
               [class.border-slate-300]="settings().accentColor !== color.value"
             >

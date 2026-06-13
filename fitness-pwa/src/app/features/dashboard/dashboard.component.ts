@@ -20,7 +20,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
       </div>
 
       @if (activeWorkout) {
-        <section class="rounded-lg border border-green-200 bg-green-50 p-4 shadow-sm">
+        <section class="app-card border-green-200 bg-green-50">
           <p class="text-sm font-semibold text-green-700">{{ t('activeWorkout') }}</p>
           <h3 class="mt-2 text-2xl font-bold leading-tight text-slate-950">{{ activeWorkoutName }}</h3>
           <div class="mt-4 grid grid-cols-2 gap-2.5 text-sm">
@@ -45,7 +45,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
             <button
               type="button"
               (click)="resumeWorkout()"
-              class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
+              class="app-button app-button-primary"
             >
               {{ t('resumeWorkout') }}
             </button>
@@ -53,7 +53,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
               type="button"
               (click)="cancelActiveWorkout()"
               [disabled]="isCancellingActiveWorkout"
-              class="min-h-12 rounded-md border border-red-200 bg-white px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100"
+              class="app-button app-button-danger"
             >
               {{ isCancellingActiveWorkout ? t('loading') : t('cancelWorkout') }}
             </button>
@@ -64,28 +64,28 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
       <div class="grid gap-3">
         <a
           routerLink="/exercises"
-          class="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white shadow-sm"
+          class="app-button app-button-primary"
         >
           {{ t('exerciseLibrary') }}
         </a>
 
         <a
           routerLink="/templates"
-          class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-green-600 bg-white px-4 py-3 text-sm font-semibold text-green-700"
+          class="app-button app-button-secondary border-green-600 text-green-700"
         >
           {{ t('workoutTemplates') }}
         </a>
 
         <a
           routerLink="/history"
-          class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
+          class="app-button app-button-secondary"
         >
           {{ t('history') }}
         </a>
 
         <a
           routerLink="/settings"
-          class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
+          class="app-button app-button-secondary"
         >
           {{ t('settings') }}
         </a>
@@ -101,7 +101,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
         type="button"
         (click)="logout()"
         [disabled]="isLoading"
-        class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
+        class="app-button app-button-secondary"
       >
         {{ isLoading ? t('loading') : t('logout') }}
       </button>

@@ -44,7 +44,7 @@ interface QuickSetForm extends SetForm {
 
         <a
           routerLink="/templates"
-          class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
+          class="app-button app-button-secondary min-h-11 w-auto px-3 py-2"
         >
           {{ t('templates') }}
         </a>
@@ -115,14 +115,14 @@ interface QuickSetForm extends SetForm {
                 type="button"
                 (click)="saveAllSuggestedSetsAndFinish()"
                 [disabled]="isSavingSuggestedSets || isFinishing"
-                class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                class="app-button app-button-primary"
               >
                 {{ isSavingSuggestedSets ? t('saving') : t('saveAllAndFinish') }}
               </button>
               <button
                 type="button"
                 (click)="closeUnsavedPrefillWarning()"
-                class="min-h-12 rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
+                class="app-button app-button-secondary"
               >
                 {{ t('continueEditing') }}
               </button>
@@ -165,7 +165,7 @@ interface QuickSetForm extends SetForm {
                 type="button"
                 (click)="confirmFinishWorkout()"
                 [disabled]="isFinishing"
-                class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                class="app-button app-button-primary"
               >
                 {{ isFinishing ? t('finishing') : t('finishWorkout') }}
               </button>
@@ -173,7 +173,7 @@ interface QuickSetForm extends SetForm {
                 type="button"
                 (click)="closeFinishConfirmation()"
                 [disabled]="isFinishing"
-                class="min-h-12 rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
+                class="app-button app-button-secondary"
               >
                 {{ t('continueEditing') }}
               </button>
@@ -195,20 +195,20 @@ interface QuickSetForm extends SetForm {
           <button
             type="button"
             (click)="loadLiveWorkout()"
-            class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
+            class="app-button app-button-danger mt-4 min-h-11 w-auto px-4 py-2"
           >
             {{ t('retry') }}
           </button>
         </div>
       } @else {
-        <section class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <section class="app-card">
           <div class="flex items-center justify-between gap-3">
             <div>
               <p class="text-xs font-medium text-slate-500">{{ t('status') }}</p>
               <p class="mt-1 text-lg font-bold capitalize text-slate-950">{{ session.status }}</p>
             </div>
             <span
-              class="rounded-full px-3 py-1 text-xs font-semibold"
+              class="app-badge"
               [class.bg-green-100]="session.status === 'active'"
               [class.text-green-800]="session.status === 'active'"
               [class.bg-slate-100]="session.status !== 'active'"
@@ -220,7 +220,7 @@ interface QuickSetForm extends SetForm {
         </section>
 
         @if (workoutExercises.length === 0) {
-          <div class="rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
+          <div class="app-card bg-slate-50 p-5 text-center shadow-none">
             <p class="font-semibold text-slate-800">{{ t('noExercisesFound') }}</p>
             <p class="mt-1 text-sm text-slate-600">
               {{ t('noTemplateExercises') }}
@@ -229,7 +229,7 @@ interface QuickSetForm extends SetForm {
         } @else {
           <div class="space-y-4">
             @for (workoutExercise of workoutExercises; track workoutExercise.id; let exerciseIndex = $index) {
-              <article class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+              <article class="app-card">
                 <div class="flex items-start justify-between gap-3">
                   <div>
                     <p class="text-xs font-semibold uppercase tracking-wide text-green-700">
@@ -246,7 +246,7 @@ interface QuickSetForm extends SetForm {
                     type="button"
                     (click)="openSetForm(workoutExercise.id)"
                     [disabled]="session.status !== 'active' || savingSetExerciseId === workoutExercise.id"
-                    class="inline-flex min-h-11 items-center justify-center rounded-md border border-green-600 px-3 py-2 text-sm font-semibold text-green-700 disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-400"
+                    class="app-button app-button-secondary min-h-11 w-auto border-green-600 px-3 py-2 text-green-700 disabled:border-slate-300 disabled:text-slate-400"
                   >
                     {{ t('addSet') }}
                   </button>
@@ -254,7 +254,7 @@ interface QuickSetForm extends SetForm {
 
                 <a
                   [routerLink]="['/exercises', workoutExercise.exerciseId, 'history']"
-                  class="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800"
+                  class="app-button app-button-secondary mt-3 min-h-11 py-2"
                 >
                   {{ t('history') }}
                 </a>
@@ -330,7 +330,7 @@ interface QuickSetForm extends SetForm {
                               step="0.5"
                               [name]="'quickWeight' + quickSet.key"
                               [(ngModel)]="quickSet.weightKg"
-                              class="mt-2 w-full rounded-md border border-slate-300 px-3 py-4 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                              class="app-input mt-2 py-4"
                             />
                           </label>
 
@@ -342,7 +342,7 @@ interface QuickSetForm extends SetForm {
                               min="0"
                               [name]="'quickReps' + quickSet.key"
                               [(ngModel)]="quickSet.reps"
-                              class="mt-2 w-full rounded-md border border-slate-300 px-3 py-4 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                              class="app-input mt-2 py-4"
                             />
                           </label>
                         </div>
@@ -354,14 +354,14 @@ interface QuickSetForm extends SetForm {
                             [name]="'quickNotes' + quickSet.key"
                             [(ngModel)]="quickSet.notes"
                             rows="2"
-                            class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                            class="app-input mt-2"
                           ></textarea>
                         </label>
 
                         <button
                           type="submit"
                           [disabled]="savingSetExerciseId === quickSet.key || isSavingSuggestedSets"
-                          class="min-h-12 w-full rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                          class="app-button app-button-primary"
                         >
                           {{ savingSetExerciseId === quickSet.key ? t('saving') : t('save') }}
                         </button>
@@ -395,7 +395,7 @@ interface QuickSetForm extends SetForm {
                           step="0.5"
                           [name]="'weightKg' + workoutExercise.id"
                           [(ngModel)]="setForm.weightKg"
-                          class="mt-2 w-full rounded-md border border-slate-300 px-3 py-4 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                          class="app-input mt-2 py-4"
                         />
                       </label>
 
@@ -407,7 +407,7 @@ interface QuickSetForm extends SetForm {
                           min="0"
                           [name]="'reps' + workoutExercise.id"
                           [(ngModel)]="setForm.reps"
-                          class="mt-2 w-full rounded-md border border-slate-300 px-3 py-4 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                          class="app-input mt-2 py-4"
                         />
                       </label>
                     </div>
@@ -419,7 +419,7 @@ interface QuickSetForm extends SetForm {
                         [name]="'setNotes' + workoutExercise.id"
                         [(ngModel)]="setForm.notes"
                         rows="2"
-                        class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                        class="app-input mt-2"
                       ></textarea>
                     </label>
 
@@ -427,14 +427,14 @@ interface QuickSetForm extends SetForm {
                       <button
                         type="button"
                         (click)="closeSetForm()"
-                        class="min-h-12 rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
+                        class="app-button app-button-secondary"
                       >
                         {{ t('cancel') }}
                       </button>
                       <button
                         type="submit"
                         [disabled]="savingSetExerciseId === workoutExercise.id"
-                        class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                        class="app-button app-button-primary"
                       >
                         {{ savingSetExerciseId === workoutExercise.id ? t('saving') : t('save') }}
                       </button>
@@ -451,7 +451,7 @@ interface QuickSetForm extends SetForm {
             type="button"
             (click)="cancelWorkout()"
             [disabled]="isCancelling || isFinishing || session.status !== 'active'"
-            class="min-h-12 rounded-md border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+            class="app-button app-button-danger"
           >
             {{ isCancelling ? t('cancelling') : t('cancelWorkout') }}
           </button>
@@ -459,7 +459,7 @@ interface QuickSetForm extends SetForm {
             type="button"
             (click)="finishWorkout()"
             [disabled]="isFinishing || isCancelling || session.status !== 'active'"
-            class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+            class="app-button app-button-primary"
           >
             {{ isFinishing ? t('finishing') : t('finishWorkout') }}
           </button>
