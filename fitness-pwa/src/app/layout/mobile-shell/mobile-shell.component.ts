@@ -27,7 +27,7 @@ import { LiveWorkoutService } from '../../core/services/live-workout.service';
               <button
                 type="button"
                 (click)="resumeActiveWorkout()"
-                class="shrink-0 rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white"
+                class="inline-flex min-h-11 shrink-0 items-center justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white"
               >
                 Resume
               </button>
@@ -39,7 +39,7 @@ import { LiveWorkoutService } from '../../core/services/live-workout.service';
           <router-outlet />
         </section>
 
-        <nav class="grid grid-cols-3 border-t border-slate-200 bg-white text-sm font-medium">
+        <nav class="grid grid-cols-3 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] text-sm font-medium">
           <a
             routerLink="/login"
             routerLinkActive="text-green-700"
