@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { PostgrestError } from '@supabase/supabase-js';
 import { SupabaseService } from '../supabase/supabase.service';
 import {
+  ExerciseHistoryWorkout,
   PreFillMode,
   WorkoutExercise,
   WorkoutSession,
@@ -244,6 +245,16 @@ interface WorkoutSetUpdateRow {
   set_type?: WorkoutSetType;
   completed_at?: string | null;
   notes?: string | null;
+}
+
+interface ExerciseNameRow {
+  id: string;
+  name: string;
+}
+
+interface WorkoutTemplateNameRow {
+  id: string;
+  name: string;
 }
 
 @Injectable({
@@ -609,6 +620,147 @@ export class LiveWorkoutService {
     return {
       data: null,
       error: this.formatError(error),
+    };
+  }
+
+  async getExerciseHistory(exerciseId: string): Promise<LiveWorkoutServiceResult<ExerciseHistoryWorkout[]>> {
+    const userResult = await this.getCurrentUserId();
+
+    if (userResult.error || !userResult.data) {
+      return { data: [], error: userResult.error ?? 'No authenticated user.' };
+    }
+
+    const { data: sessionRows, error: sessionsError } = await this.supabase
+      .from('workout_sessions')
+      .select(SESSION_SELECT)
+      .eq('user_id', userResult.data)
+      .eq('status', 'completed')
+      .returns<WorkoutSessionRow[]>()
+      .order('finished_at', { ascending: false });
+
+    if (sessionsError) {
+      return { data: [], error: this.formatError(sessionsError) };
+    }
+
+    const sessions = (sessionRows ?? []).map(mapWorkoutSession);
+    const sessionIds = sessions.map((session) => session.id);
+
+    if (sessionIds.length === 0) {
+      return { data: [], error: null };
+    }
+
+    const { data: workoutExerciseRows, error: workoutExercisesError } = await this.supabase
+      .from('workout_exercises')
+      .select(WORKOUT_EXERCISE_SELECT)
+      .in('workout_session_id', sessionIds)
+      .eq('exercise_id', exerciseId)
+      .returns<WorkoutExerciseRow[]>()
+      .order('sort_order', { ascending: true });
+
+    if (workoutExercisesError) {
+      return { data: [], error: this.formatError(workoutExercisesError) };
+    }
+
+    const workoutExercises = (workoutExerciseRows ?? []).map(mapWorkoutExercise);
+    const workoutExerciseIds = workoutExercises.map((workoutExercise) => workoutExercise.id);
+
+    if (workoutExerciseIds.length === 0) {
+      return { data: [], error: null };
+    }
+
+    const { data: setRows, error: setsError } = await this.supabase
+      .from('workout_sets')
+      .select(SET_SELECT)
+      .in('workout_exercise_id', workoutExerciseIds)
+      .returns<WorkoutSetRow[]>()
+      .order('set_number', { ascending: true });
+
+    if (setsError) {
+      return { data: [], error: this.formatError(setsError) };
+    }
+
+    const { data: exerciseData, error: exerciseError } = await this.supabase
+      .from('exercises')
+      .select('id, name')
+      .eq('id', exerciseId)
+      .maybeSingle();
+
+    if (exerciseError) {
+      return { data: [], error: this.formatError(exerciseError) };
+    }
+
+    const templateIds = [...new Set(
+      sessions
+        .map((session) => session.workoutTemplateId)
+        .filter((templateId): templateId is string => templateId !== null),
+    )];
+    const templateNames = new Map<string, string>();
+
+    if (templateIds.length > 0) {
+      const { data: templateRows, error: templatesError } = await this.supabase
+        .from('workout_templates')
+        .select('id, name')
+        .in('id', templateIds)
+        .returns<WorkoutTemplateNameRow[]>();
+
+      if (templatesError) {
+        return { data: [], error: this.formatError(templatesError) };
+      }
+
+      for (const template of templateRows ?? []) {
+        templateNames.set(template.id, template.name);
+      }
+    }
+
+    const setsByWorkoutExerciseId = (setRows ?? [])
+      .map(mapWorkoutSet)
+      .reduce<Record<string, WorkoutSet[]>>((setsById, set) => {
+        if (!set.workoutExerciseId) {
+          return setsById;
+        }
+
+        return {
+          ...setsById,
+          [set.workoutExerciseId]: [...(setsById[set.workoutExerciseId] ?? []), set],
+        };
+      }, {});
+    const sessionsById = new Map(sessions.map((session) => [session.id, session]));
+    const exerciseRow = exerciseData as ExerciseNameRow | null;
+    const exerciseName = exerciseRow?.name ?? 'Exercise';
+
+    return {
+      data: workoutExercises
+        .map((workoutExercise) => {
+          const session = sessionsById.get(workoutExercise.workoutSessionId);
+
+          if (!session) {
+            return null;
+          }
+
+          return {
+            workoutSessionId: session.id,
+            workoutDate: session.finishedAt ?? session.startedAt,
+            workoutTemplateId: session.workoutTemplateId,
+            workoutName: session.workoutTemplateId
+              ? templateNames.get(session.workoutTemplateId) ?? 'Template Workout'
+              : 'Workout',
+            exerciseId,
+            exerciseName,
+            sets: (setsByWorkoutExerciseId[workoutExercise.id] ?? []).map((set) => ({
+              id: set.id,
+              setNumber: set.setNumber,
+              reps: set.reps,
+              weightKg: set.weightKg,
+              assistanceKg: set.assistanceKg,
+              assistanceType: set.assistanceType,
+              durationSeconds: set.durationSeconds,
+              notes: set.notes,
+            })),
+          };
+        })
+        .filter((history): history is ExerciseHistoryWorkout => history !== null)
+        .sort((a, b) => b.workoutDate.localeCompare(a.workoutDate)),
+      error: null,
     };
   }
 

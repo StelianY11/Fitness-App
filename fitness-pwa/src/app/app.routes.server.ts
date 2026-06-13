@@ -14,6 +14,10 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client,
   },
   {
+    path: 'exercises/:exerciseId/history',
+    renderMode: RenderMode.Client,
+  },
+  {
     path: 'templates/:id',
     renderMode: RenderMode.Client,
   },

@@ -116,6 +116,13 @@ import {
                   <p class="mt-1 font-semibold text-slate-900">{{ exercise.equipment || 'None' }}</p>
                 </div>
               </div>
+
+              <a
+                [routerLink]="['/exercises', exercise.id, 'history']"
+                class="mt-4 inline-flex w-full justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
+              >
+                History
+              </a>
             </article>
           }
         </div>

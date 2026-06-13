@@ -30,6 +30,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'exercises/:exerciseId/history',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/exercises/exercise-history.component').then(
+        (m) => m.ExerciseHistoryComponent,
+      ),
+  },
+  {
     path: 'workout/live/:sessionId',
     canActivate: [authGuard],
     loadComponent: () =>

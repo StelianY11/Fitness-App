@@ -251,6 +251,13 @@ interface QuickSetForm extends SetForm {
                   </button>
                 </div>
 
+                <a
+                  [routerLink]="['/exercises', workoutExercise.exerciseId, 'history']"
+                  class="mt-3 inline-flex w-full justify-center rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800"
+                >
+                  History
+                </a>
+
                 @if (getSets(workoutExercise.id).length > 0) {
                   <div class="mt-4 space-y-2">
                     @for (set of getSets(workoutExercise.id); track set.id) {

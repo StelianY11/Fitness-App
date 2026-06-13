@@ -196,6 +196,27 @@ export interface WorkoutSet {
   updatedAt: string;
 }
 
+export interface ExerciseHistorySet {
+  id: string;
+  setNumber: number;
+  reps: number | null;
+  weightKg: number | null;
+  assistanceKg: number | null;
+  assistanceType: string | null;
+  durationSeconds: number | null;
+  notes: string | null;
+}
+
+export interface ExerciseHistoryWorkout {
+  workoutSessionId: string;
+  workoutDate: string;
+  workoutTemplateId: string | null;
+  workoutName: string;
+  exerciseId: string;
+  exerciseName: string;
+  sets: ExerciseHistorySet[];
+}
+
 export interface BodyWeightHistory {
   id: string;
   userId: string;
