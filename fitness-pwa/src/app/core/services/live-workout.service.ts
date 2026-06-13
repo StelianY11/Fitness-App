@@ -322,6 +322,30 @@ export class LiveWorkoutService {
     };
   }
 
+  async getCompletedWorkoutSessions(
+    range: { from: number; to: number } = { from: 0, to: 29 },
+  ): Promise<LiveWorkoutServiceResult<WorkoutSession[]>> {
+    const userResult = await this.getCurrentUserId();
+
+    if (userResult.error || !userResult.data) {
+      return { data: [], error: userResult.error ?? 'No authenticated user.' };
+    }
+
+    const { data, error } = await this.supabase
+      .from('workout_sessions')
+      .select(SESSION_SELECT)
+      .eq('user_id', userResult.data)
+      .eq('status', 'completed')
+      .returns<WorkoutSessionRow[]>()
+      .order('finished_at', { ascending: false })
+      .range(range.from, range.to);
+
+    return {
+      data: (data ?? []).map(mapWorkoutSession),
+      error: this.formatError(error),
+    };
+  }
+
   async getWorkoutExercises(sessionId: string): Promise<LiveWorkoutServiceResult<WorkoutExercise[]>> {
     const { data, error } = await this.supabase
       .from('workout_exercises')
@@ -493,6 +517,44 @@ export class LiveWorkoutService {
 
   async cancelWorkout(sessionId: string): Promise<LiveWorkoutServiceResult<WorkoutSession | null>> {
     return this.updateWorkoutSessionStatus(sessionId, 'cancelled');
+  }
+
+  async deleteWorkoutSession(sessionId: string): Promise<LiveWorkoutServiceResult<null>> {
+    const userResult = await this.getCurrentUserId();
+
+    if (userResult.error || !userResult.data) {
+      return { data: null, error: userResult.error ?? 'No authenticated user.' };
+    }
+
+    const { error } = await this.supabase
+      .from('workout_sessions')
+      .delete()
+      .eq('id', sessionId)
+      .eq('user_id', userResult.data);
+
+    return {
+      data: null,
+      error: this.formatError(error),
+    };
+  }
+
+  async clearCompletedWorkoutHistory(): Promise<LiveWorkoutServiceResult<null>> {
+    const userResult = await this.getCurrentUserId();
+
+    if (userResult.error || !userResult.data) {
+      return { data: null, error: userResult.error ?? 'No authenticated user.' };
+    }
+
+    const { error } = await this.supabase
+      .from('workout_sessions')
+      .delete()
+      .eq('user_id', userResult.data)
+      .eq('status', 'completed');
+
+    return {
+      data: null,
+      error: this.formatError(error),
+    };
   }
 
   private async getPreviousSetsForExercise(

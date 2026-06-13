@@ -46,6 +46,22 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'history/:sessionId',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/workouts/workout-detail.component').then(
+        (m) => m.WorkoutDetailComponent,
+      ),
+  },
+  {
+    path: 'history',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/workouts/workout-history.component').then(
+        (m) => m.WorkoutHistoryComponent,
+      ),
+  },
+  {
     path: 'templates/:id',
     canActivate: [authGuard],
     loadComponent: () =>
