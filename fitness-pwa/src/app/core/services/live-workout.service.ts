@@ -532,6 +532,8 @@ export class LiveWorkoutService {
         return { data: [], error: this.formatError(exercisesError) };
       }
 
+      const sessionSets: WorkoutSet[] = [];
+
       for (const workoutExercise of workoutExercises ?? []) {
         const setsResult = await this.getWorkoutSets(workoutExercise.id);
 
@@ -539,19 +541,22 @@ export class LiveWorkoutService {
           return { data: [], error: setsResult.error };
         }
 
-        const previousSets = setsResult.data
-          .filter((set) => set.reps !== null || set.weightKg !== null || set.notes)
-          .map((set, index) => ({
-            setNumber: index + 1,
-            reps: set.reps,
-            weightKg: set.weightKg,
-            notes: set.notes,
-            source: 'LAST_WORKOUT' as const,
-          }));
+        sessionSets.push(...setsResult.data);
+      }
 
-        if (previousSets.length > 0) {
-          return { data: previousSets, error: null };
-        }
+      const previousSets = sessionSets
+        .filter((set) => set.reps !== null || set.weightKg !== null || set.notes)
+        .sort(compareWorkoutSetsForPreFill)
+        .map((set, index) => ({
+          setNumber: index + 1,
+          reps: set.reps,
+          weightKg: set.weightKg,
+          notes: set.notes,
+          source: 'LAST_WORKOUT' as const,
+        }));
+
+      if (previousSets.length > 0) {
+        return { data: previousSets, error: null };
       }
     }
 
@@ -884,4 +889,12 @@ function parseTargetReps(value: string | null): number | null {
   const match = value.match(/\d+/);
 
   return match ? Number(match[0]) : null;
+}
+
+function compareWorkoutSetsForPreFill(a: WorkoutSet, b: WorkoutSet): number {
+  if (a.setNumber !== b.setNumber) {
+    return a.setNumber - b.setNumber;
+  }
+
+  return (a.completedAt ?? a.createdAt).localeCompare(b.completedAt ?? b.createdAt);
 }

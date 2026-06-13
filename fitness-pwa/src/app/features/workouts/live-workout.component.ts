@@ -132,7 +132,25 @@ interface QuickSetForm extends SetForm {
                   </button>
                 </div>
 
-                @if (getSets(workoutExercise.id).length === 0 && getQuickSetForms(workoutExercise.id).length > 0) {
+                @if (getSets(workoutExercise.id).length > 0) {
+                  <div class="mt-4 space-y-2">
+                    @for (set of getSets(workoutExercise.id); track set.id) {
+                      <div class="rounded-md border border-slate-200 p-3">
+                        <div class="flex items-center justify-between gap-3">
+                          <p class="font-semibold text-slate-950">Set {{ set.setNumber }}</p>
+                          <p class="text-sm text-slate-600">
+                            {{ formatSetSummary(set) }}
+                          </p>
+                        </div>
+                        @if (set.notes) {
+                          <p class="mt-2 text-sm text-slate-600">{{ set.notes }}</p>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+
+                @if (getQuickSetForms(workoutExercise.id).length > 0) {
                   <div class="mt-4 space-y-3 rounded-md border border-green-100 bg-green-50 p-3">
                     <div>
                       <p class="text-sm font-semibold text-green-900">
@@ -199,22 +217,6 @@ interface QuickSetForm extends SetForm {
                 } @else if (getSets(workoutExercise.id).length === 0) {
                   <div class="mt-4 rounded-md bg-slate-50 p-3 text-sm text-slate-600">
                     No sets logged yet.
-                  </div>
-                } @else {
-                  <div class="mt-4 space-y-2">
-                    @for (set of getSets(workoutExercise.id); track set.id) {
-                      <div class="rounded-md border border-slate-200 p-3">
-                        <div class="flex items-center justify-between gap-3">
-                          <p class="font-semibold text-slate-950">Set {{ set.setNumber }}</p>
-                          <p class="text-sm text-slate-600">
-                            {{ formatSetSummary(set) }}
-                          </p>
-                        </div>
-                        @if (set.notes) {
-                          <p class="mt-2 text-sm text-slate-600">{{ set.notes }}</p>
-                        }
-                      </div>
-                    }
                   </div>
                 }
 
