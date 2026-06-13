@@ -1,10 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, Injector, OnInit, effect, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
-import { AuthService } from '../../core/services/auth.service';
 import { AppSettingsService } from '../../core/services/app-settings.service';
-import { LiveWorkoutService } from '../../core/services/live-workout.service';
 import { TranslationService } from '../../core/services/translation.service';
+import type { Session } from '@supabase/supabase-js';
+import type { WorkoutSession } from '../../shared/models/fitness.models';
 
 @Component({
   selector: 'app-mobile-shell',
@@ -97,15 +97,16 @@ import { TranslationService } from '../../core/services/translation.service';
   `,
 })
 export class MobileShellComponent implements OnInit {
-  private readonly authService = inject(AuthService);
+  private readonly injector = inject(Injector);
   private readonly appSettingsService = inject(AppSettingsService);
-  private readonly liveWorkoutService = inject(LiveWorkoutService);
   private readonly translationService = inject(TranslationService);
   private readonly router = inject(Router);
 
-  readonly activeWorkout = this.liveWorkoutService.activeWorkout;
-  readonly currentSession = this.authService.currentSession;
+  readonly activeWorkout = signal<WorkoutSession | null>(null);
+  readonly currentSession = signal<Session | null>(null);
   readonly settings = this.appSettingsService.settings;
+  private isAuthSynced = false;
+  private isActiveWorkoutSynced = false;
 
   ngOnInit(): void {
     void this.refreshActiveWorkout();
@@ -143,13 +144,49 @@ export class MobileShellComponent implements OnInit {
   }
 
   private async refreshActiveWorkout(): Promise<void> {
-    const session = await this.authService.getSession();
+    const { AuthService } = await import('../../core/services/auth.service');
+    const authService = this.injector.get(AuthService);
+    this.syncAuthState(authService);
+    const session = await authService.getSession();
+
+    this.currentSession.set(session);
 
     if (!session) {
-      this.liveWorkoutService.activeWorkout.set(null);
+      this.activeWorkout.set(null);
       return;
     }
 
-    await this.liveWorkoutService.refreshActiveWorkout();
+    const { LiveWorkoutService } = await import('../../core/services/live-workout.service');
+    const liveWorkoutService = this.injector.get(LiveWorkoutService);
+    this.syncActiveWorkoutState(liveWorkoutService);
+    const result = await liveWorkoutService.refreshActiveWorkout();
+
+    if (!result.error) {
+      this.activeWorkout.set(result.data);
+    }
+  }
+
+  private syncAuthState(authService: InstanceType<typeof import('../../core/services/auth.service').AuthService>): void {
+    if (this.isAuthSynced) {
+      return;
+    }
+
+    this.isAuthSynced = true;
+    effect(() => this.currentSession.set(authService.currentSession()), {
+      injector: this.injector,
+    });
+  }
+
+  private syncActiveWorkoutState(
+    liveWorkoutService: InstanceType<typeof import('../../core/services/live-workout.service').LiveWorkoutService>,
+  ): void {
+    if (this.isActiveWorkoutSynced) {
+      return;
+    }
+
+    this.isActiveWorkoutSynced = true;
+    effect(() => this.activeWorkout.set(liveWorkoutService.activeWorkout()), {
+      injector: this.injector,
+    });
   }
 }

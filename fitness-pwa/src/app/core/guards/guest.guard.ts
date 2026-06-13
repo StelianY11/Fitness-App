@@ -1,10 +1,11 @@
-import { inject } from '@angular/core';
+import { Injector, inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
 
 export const guestGuard: CanActivateFn = async () => {
-  const authService = inject(AuthService);
+  const injector = inject(Injector);
   const router = inject(Router);
+  const { AuthService } = await import('../services/auth.service');
+  const authService = injector.get(AuthService);
   const session = await authService.getSession();
 
   return session ? router.createUrlTree(['/dashboard']) : true;
