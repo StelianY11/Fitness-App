@@ -21,9 +21,9 @@ import { TranslationService } from '../../core/services/translation.service';
           <section class="border-b border-green-200 bg-green-50 px-5 py-3">
             <div class="flex items-center justify-between gap-3">
               <div>
-                <p class="text-sm font-bold text-green-900">Active workout in progress</p>
+                <p class="text-sm font-bold text-green-900">{{ t('activeWorkout') }}</p>
                 <p class="mt-1 text-xs text-green-800">
-                  Started {{ formatTime(activeWorkout()?.startedAt) }}
+                  {{ t('started') }} {{ formatTime(activeWorkout()?.startedAt) }}
                 </p>
               </div>
               <button
@@ -31,7 +31,7 @@ import { TranslationService } from '../../core/services/translation.service';
                 (click)="resumeActiveWorkout()"
                 class="inline-flex min-h-11 shrink-0 items-center justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white"
               >
-                Resume
+                {{ t('resume') }}
               </button>
             </div>
           </section>
@@ -41,35 +41,56 @@ import { TranslationService } from '../../core/services/translation.service';
           <router-outlet />
         </section>
 
-        <nav class="grid grid-cols-4 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] text-sm font-medium">
-          <a
-            routerLink="/login"
-            routerLinkActive="text-green-700"
-            class="px-3 py-4 text-center text-slate-600"
-          >
-            Login
-          </a>
-          <a
-            routerLink="/register"
-            routerLinkActive="text-green-700"
-            class="px-3 py-4 text-center text-slate-600"
-          >
-            Register
-          </a>
-          <a
-            routerLink="/dashboard"
-            routerLinkActive="text-green-700"
-            class="px-3 py-4 text-center text-slate-600"
-          >
-            {{ t('dashboard') }}
-          </a>
-          <a
-            routerLink="/settings"
-            routerLinkActive="text-green-700"
-            class="px-3 py-4 text-center text-slate-600"
-          >
-            {{ t('settings') }}
-          </a>
+        <nav
+          class="grid border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] text-sm font-medium"
+          [class.grid-cols-2]="!currentSession()"
+          [class.grid-cols-4]="currentSession()"
+        >
+          @if (!currentSession()) {
+            <a
+              routerLink="/login"
+              routerLinkActive="text-green-700"
+              class="px-3 py-4 text-center text-slate-600"
+            >
+              {{ t('login') }}
+            </a>
+            <a
+              routerLink="/register"
+              routerLinkActive="text-green-700"
+              class="px-3 py-4 text-center text-slate-600"
+            >
+              {{ t('register') }}
+            </a>
+          } @else {
+            <a
+              routerLink="/dashboard"
+              routerLinkActive="text-green-700"
+              class="px-3 py-4 text-center text-slate-600"
+            >
+              {{ t('dashboard') }}
+            </a>
+            <a
+              routerLink="/templates"
+              routerLinkActive="text-green-700"
+              class="px-3 py-4 text-center text-slate-600"
+            >
+              {{ t('templates') }}
+            </a>
+            <a
+              routerLink="/history"
+              routerLinkActive="text-green-700"
+              class="px-3 py-4 text-center text-slate-600"
+            >
+              {{ t('history') }}
+            </a>
+            <a
+              routerLink="/settings"
+              routerLinkActive="text-green-700"
+              class="px-3 py-4 text-center text-slate-600"
+            >
+              {{ t('settings') }}
+            </a>
+          }
         </nav>
       </div>
     </main>
@@ -83,6 +104,7 @@ export class MobileShellComponent implements OnInit {
   private readonly router = inject(Router);
 
   readonly activeWorkout = this.liveWorkoutService.activeWorkout;
+  readonly currentSession = this.authService.currentSession;
   readonly settings = this.appSettingsService.settings;
 
   ngOnInit(): void {

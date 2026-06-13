@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { LiveWorkoutService } from '../../core/services/live-workout.service';
+import { TranslationService } from '../../core/services/translation.service';
 import { WorkoutTemplateService } from '../../core/services/workout-template.service';
 import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.models';
 
@@ -23,8 +24,8 @@ interface WorkoutHistoryGroup {
     <div class="space-y-5">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <p class="text-sm font-semibold text-green-700">Training Log</p>
-          <h2 class="mt-2 text-3xl font-bold">Workout History</h2>
+          <p class="text-sm font-semibold text-green-700">{{ t('history') }}</p>
+          <h2 class="mt-2 text-3xl font-bold">{{ t('history') }}</h2>
           <p class="mt-2 text-sm text-slate-600">
             Review completed sessions and open the details behind each workout.
           </p>
@@ -34,7 +35,7 @@ interface WorkoutHistoryGroup {
           routerLink="/dashboard"
           class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
         >
-          Back
+          {{ t('back') }}
         </a>
       </div>
 
@@ -133,6 +134,7 @@ export class WorkoutHistoryComponent {
   private readonly liveWorkoutService = inject(LiveWorkoutService);
   private readonly workoutTemplateService = inject(WorkoutTemplateService);
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
+  private readonly translationService = inject(TranslationService);
 
   readonly loadingCards = [1, 2, 3, 4];
   private readonly pageSize = 30;
@@ -148,6 +150,10 @@ export class WorkoutHistoryComponent {
 
   constructor() {
     void this.loadHistory();
+  }
+
+  t(key: Parameters<TranslationService['translate']>[0]): string {
+    return this.translationService.translate(key);
   }
 
   async loadHistory(): Promise<void> {

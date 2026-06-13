@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ExerciseService } from '../../core/services/exercise.service';
+import { TranslationService } from '../../core/services/translation.service';
 import {
   Exercise,
   ExerciseCategory,
@@ -14,8 +15,8 @@ import {
     <div class="space-y-5">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <p class="text-sm font-semibold text-green-700">Library</p>
-          <h2 class="mt-2 text-3xl font-bold">Exercises</h2>
+          <p class="text-sm font-semibold text-green-700">{{ t('exerciseLibrary') }}</p>
+          <h2 class="mt-2 text-3xl font-bold">{{ t('exerciseLibrary') }}</h2>
           <p class="mt-2 text-sm text-slate-600">Browse seeded movements by muscle, equipment, or category.</p>
         </div>
 
@@ -23,7 +24,7 @@ import {
           routerLink="/dashboard"
           class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
         >
-          Back
+          {{ t('back') }}
         </a>
       </div>
 
@@ -140,6 +141,7 @@ import {
 export class ExerciseLibraryComponent {
   private readonly exerciseService = inject(ExerciseService);
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
+  private readonly translationService = inject(TranslationService);
 
   readonly loadingCards = [1, 2, 3];
 
@@ -153,6 +155,10 @@ export class ExerciseLibraryComponent {
 
   constructor() {
     void this.loadExerciseLibrary();
+  }
+
+  t(key: Parameters<TranslationService['translate']>[0]): string {
+    return this.translationService.translate(key);
   }
 
   onSearchChange(query: string): void {

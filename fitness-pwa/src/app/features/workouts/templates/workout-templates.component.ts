@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { LiveWorkoutService } from '../../../core/services/live-workout.service';
+import { TranslationService } from '../../../core/services/translation.service';
 import { WorkoutTemplateService } from '../../../core/services/workout-template.service';
 import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.models';
 
@@ -12,8 +13,8 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
     <div class="space-y-5">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <p class="text-sm font-semibold text-green-700">Workouts</p>
-          <h2 class="mt-2 text-3xl font-bold">My Templates</h2>
+          <p class="text-sm font-semibold text-green-700">{{ t('workoutTemplates') }}</p>
+          <h2 class="mt-2 text-3xl font-bold">{{ t('workoutTemplates') }}</h2>
           <p class="mt-2 text-sm text-slate-600">
             Create reusable plans now. Exercise editing comes in a later phase.
           </p>
@@ -23,7 +24,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
           routerLink="/dashboard"
           class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
         >
-          Back
+          {{ t('back') }}
         </a>
       </div>
 
@@ -228,6 +229,7 @@ export class WorkoutTemplatesComponent {
   private readonly liveWorkoutService = inject(LiveWorkoutService);
   private readonly router = inject(Router);
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
+  private readonly translationService = inject(TranslationService);
 
   readonly loadingCards = [1, 2, 3];
 
@@ -248,6 +250,10 @@ export class WorkoutTemplatesComponent {
 
   constructor() {
     void this.loadTemplates();
+  }
+
+  t(key: Parameters<TranslationService['translate']>[0]): string {
+    return this.translationService.translate(key);
   }
 
   openCreateForm(): void {

@@ -12,7 +12,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
   template: `
     <div class="space-y-5">
       <div>
-        <p class="text-sm font-semibold text-green-700">Welcome</p>
+        <p class="text-sm font-semibold text-green-700">{{ t('welcome') }}</p>
         <h2 class="mt-2 text-3xl font-bold">{{ t('dashboard') }}</h2>
         <p class="mt-2 text-sm text-slate-600">
           {{ userEmail || 'Your account is ready.' }}
@@ -23,11 +23,11 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
         <div class="h-40 animate-pulse rounded-lg border border-slate-200 bg-slate-100"></div>
       } @else if (activeWorkout) {
         <section class="rounded-lg border border-green-200 bg-green-50 p-4 shadow-sm">
-          <p class="text-sm font-semibold text-green-700">Active Workout</p>
+          <p class="text-sm font-semibold text-green-700">{{ t('activeWorkout') }}</p>
           <h3 class="mt-2 text-2xl font-bold text-slate-950">{{ activeWorkoutName }}</h3>
           <div class="mt-4 grid grid-cols-2 gap-2 text-sm">
             <div class="rounded-md bg-white p-3">
-              <p class="text-xs font-medium text-slate-500">Started</p>
+              <p class="text-xs font-medium text-slate-500">{{ t('started') }}</p>
               <p class="mt-1 font-semibold text-slate-950">{{ formatTime(activeWorkout.startedAt) }}</p>
             </div>
             <div class="rounded-md bg-white p-3">
@@ -49,7 +49,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
               (click)="resumeWorkout()"
               class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
             >
-              Resume Workout
+              {{ t('resumeWorkout') }}
             </button>
             <button
               type="button"
@@ -57,22 +57,11 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
               [disabled]="isCancellingActiveWorkout"
               class="min-h-12 rounded-md border border-red-200 bg-white px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100"
             >
-              {{ isCancellingActiveWorkout ? 'Cancelling...' : 'Cancel Workout' }}
+              {{ isCancellingActiveWorkout ? 'Cancelling...' : t('cancelWorkout') }}
             </button>
           </div>
         </section>
       }
-
-      <div class="grid gap-3">
-        <div class="rounded-lg border border-slate-200 p-4">
-          <p class="text-sm text-slate-500">Auth</p>
-          <p class="mt-1 font-semibold">Supabase session is active</p>
-        </div>
-        <div class="rounded-lg border border-slate-200 p-4">
-          <p class="text-sm text-slate-500">Next step</p>
-          <p class="mt-1 font-semibold">Add profile setup after database policies are applied</p>
-        </div>
-      </div>
 
       <a
         routerLink="/exercises"
@@ -85,7 +74,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
         routerLink="/templates"
         class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-green-600 px-4 py-3 text-sm font-semibold text-green-700"
       >
-        {{ t('templates') }}
+        {{ t('workoutTemplates') }}
       </a>
 
       <a

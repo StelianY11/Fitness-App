@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ExerciseService } from '../../core/services/exercise.service';
+import { TranslationService } from '../../core/services/translation.service';
 import {
   LiveWorkoutPreFillSet,
   LiveWorkoutService,
@@ -32,11 +33,11 @@ interface QuickSetForm extends SetForm {
     <div class="space-y-5">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <p class="text-sm font-semibold text-green-700">Live Workout</p>
-          <h2 class="mt-2 text-3xl font-bold">Workout Session</h2>
+          <p class="text-sm font-semibold text-green-700">{{ t('liveWorkout') }}</p>
+          <h2 class="mt-2 text-3xl font-bold">{{ t('workoutSession') }}</h2>
           @if (session) {
             <p class="mt-2 text-sm text-slate-600">
-              Started {{ formatDate(session.startedAt) }}
+              {{ t('started') }} {{ formatDate(session.startedAt) }}
             </p>
           }
         </div>
@@ -45,7 +46,7 @@ interface QuickSetForm extends SetForm {
           routerLink="/templates"
           class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
         >
-          Templates
+          {{ t('templates') }}
         </a>
       </div>
 
@@ -116,14 +117,14 @@ interface QuickSetForm extends SetForm {
                 [disabled]="isSavingSuggestedSets || isFinishing"
                 class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
               >
-                {{ isSavingSuggestedSets ? 'Saving...' : 'Save all and finish' }}
+                {{ isSavingSuggestedSets ? 'Saving...' : t('saveAllAndFinish') }}
               </button>
               <button
                 type="button"
                 (click)="closeUnsavedPrefillWarning()"
                 class="min-h-12 rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
               >
-                Cancel and continue editing
+                {{ t('continueEditing') }}
               </button>
             </div>
           </div>
@@ -166,7 +167,7 @@ interface QuickSetForm extends SetForm {
                 [disabled]="isFinishing"
                 class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
               >
-                {{ isFinishing ? 'Finishing...' : 'Finish Workout' }}
+                {{ isFinishing ? 'Finishing...' : t('finishWorkout') }}
               </button>
               <button
                 type="button"
@@ -174,7 +175,7 @@ interface QuickSetForm extends SetForm {
                 [disabled]="isFinishing"
                 class="min-h-12 rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
               >
-                Continue editing
+                {{ t('continueEditing') }}
               </button>
             </div>
           </div>
@@ -362,7 +363,7 @@ interface QuickSetForm extends SetForm {
                           [disabled]="savingSetExerciseId === quickSet.key || isSavingSuggestedSets"
                           class="min-h-12 w-full rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
                         >
-                          {{ savingSetExerciseId === quickSet.key ? 'Saving...' : 'Save Set' }}
+                          {{ savingSetExerciseId === quickSet.key ? 'Saving...' : t('save') }}
                         </button>
                       </form>
                     }
@@ -428,14 +429,14 @@ interface QuickSetForm extends SetForm {
                         (click)="closeSetForm()"
                         class="min-h-12 rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
                       >
-                        Cancel
+                        {{ t('cancel') }}
                       </button>
                       <button
                         type="submit"
                         [disabled]="savingSetExerciseId === workoutExercise.id"
                         class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
                       >
-                        {{ savingSetExerciseId === workoutExercise.id ? 'Saving...' : 'Save Set' }}
+                        {{ savingSetExerciseId === workoutExercise.id ? 'Saving...' : t('save') }}
                       </button>
                     </div>
                   </form>
@@ -452,7 +453,7 @@ interface QuickSetForm extends SetForm {
             [disabled]="isCancelling || isFinishing || session.status !== 'active'"
             class="min-h-12 rounded-md border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
           >
-            {{ isCancelling ? 'Cancelling...' : 'Cancel Workout' }}
+            {{ isCancelling ? 'Cancelling...' : t('cancelWorkout') }}
           </button>
           <button
             type="button"
@@ -460,7 +461,7 @@ interface QuickSetForm extends SetForm {
             [disabled]="isFinishing || isCancelling || session.status !== 'active'"
             class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
           >
-            {{ isFinishing ? 'Finishing...' : 'Finish Workout' }}
+            {{ isFinishing ? 'Finishing...' : t('finishWorkout') }}
           </button>
         </div>
       }
@@ -468,6 +469,7 @@ interface QuickSetForm extends SetForm {
   `,
 })
 export class LiveWorkoutComponent {
+  private readonly translationService = inject(TranslationService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly liveWorkoutService = inject(LiveWorkoutService);
@@ -503,6 +505,10 @@ export class LiveWorkoutComponent {
 
   constructor() {
     void this.loadLiveWorkout();
+  }
+
+  t(key: Parameters<TranslationService['translate']>[0]): string {
+    return this.translationService.translate(key);
   }
 
   async loadLiveWorkout(): Promise<void> {
