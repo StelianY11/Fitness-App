@@ -145,6 +145,14 @@ textarea:focus {
   background: color-mix(in srgb, var(--app-accent) 10%, #ffffff);
 }
 
+.app-card.p-5 {
+  padding: 1.25rem;
+}
+
+.app-card.shadow-none {
+  box-shadow: none;
+}
+
 .app-button {
   display: inline-flex;
   min-height: 3rem;
@@ -167,8 +175,34 @@ textarea:focus {
   width: auto;
 }
 
+.app-button.min-h-0 {
+  min-height: 0;
+}
+
+.app-button.min-h-11 {
+  min-height: 2.75rem;
+}
+
+.app-button.p-3 {
+  padding: 0.75rem;
+}
+
+.app-button.px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.app-button.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
 .app-button.justify-between {
   justify-content: space-between;
+}
+
+.app-button.text-left {
+  text-align: left;
 }
 
 .app-button-primary {
@@ -214,6 +248,11 @@ textarea:focus {
 .app-input.py-4 {
   padding-top: 1rem;
   padding-bottom: 1rem;
+}
+
+.app-input.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 .app-input:focus {

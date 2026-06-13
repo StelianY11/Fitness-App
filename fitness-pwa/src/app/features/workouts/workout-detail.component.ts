@@ -30,7 +30,7 @@ import {
 
         <a
           routerLink="/history"
-          class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
+          class="app-button app-button-secondary min-h-11 w-auto px-3 py-2"
         >
           {{ t('back') }}
         </a>
@@ -49,13 +49,13 @@ import {
           <button
             type="button"
             (click)="loadWorkout()"
-            class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
+            class="app-button app-button-danger mt-4 min-h-11 w-auto px-4 py-2"
           >
             {{ t('retry') }}
           </button>
         </div>
       } @else if (session) {
-        <section class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <section class="app-card">
           <div class="grid grid-cols-2 gap-2 text-sm">
             <div class="rounded-md bg-slate-50 p-3">
               <p class="text-xs font-medium text-slate-500">{{ t('started') }}</p>
@@ -82,19 +82,19 @@ import {
           <button
             type="button"
             disabled
-            class="min-h-12 rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-400"
+            class="app-button app-button-secondary text-slate-400"
           >
             {{ t('resumeWorkout') }}
           </button>
           @if (session.workoutTemplateId) {
             <a
               [routerLink]="['/templates', session.workoutTemplateId]"
-              class="inline-flex min-h-12 items-center justify-center rounded-md bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white"
+              class="app-button app-button-primary"
             >
               {{ t('templates') }}
             </a>
           } @else {
-            <span class="inline-flex min-h-12 items-center justify-center rounded-md bg-slate-100 px-4 py-3 text-center text-sm font-semibold text-slate-400">
+            <span class="app-button app-button-secondary text-slate-400">
               No Template
             </span>
           }
@@ -104,20 +104,20 @@ import {
           type="button"
           (click)="deleteWorkout()"
           [disabled]="isDeleting"
-          class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+          class="app-button app-button-danger"
         >
           {{ isDeleting ? t('loading') : t('deleteWorkout') }}
         </button>
 
         @if (workoutExercises.length === 0) {
-          <div class="rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
+          <div class="app-card bg-slate-50 p-5 text-center shadow-none">
             <p class="font-semibold text-slate-800">{{ t('noExercisesFound') }}</p>
             <p class="mt-1 text-sm text-slate-600">{{ t('noExercisesFound') }}</p>
           </div>
         } @else {
           <div class="space-y-4">
             @for (workoutExercise of workoutExercises; track workoutExercise.id; let exerciseIndex = $index) {
-              <article class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+              <article class="app-card">
                 <div class="flex items-start justify-between gap-3">
                   <div>
                     <p class="text-xs font-semibold uppercase tracking-wide text-green-700">
@@ -127,7 +127,7 @@ import {
                       {{ getExerciseName(workoutExercise.exerciseId) }}
                     </h3>
                   </div>
-                  <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                  <span class="app-badge">
                     {{ getSets(workoutExercise.id).length }} {{ t('sets') }}
                   </span>
                 </div>

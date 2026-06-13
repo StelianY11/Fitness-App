@@ -50,14 +50,14 @@ interface CustomExerciseForm {
               type="button"
               (click)="startWorkout()"
               [disabled]="isStartingWorkout || isSaving"
-              class="inline-flex min-h-11 items-center justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+              class="app-button app-button-primary min-h-11 w-auto px-3 py-2"
             >
               {{ isStartingWorkout ? t('loading') : t('startWorkout') }}
             </button>
           }
           <a
             routerLink="/templates"
-            class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-center text-sm font-semibold text-slate-700"
+            class="app-button app-button-secondary min-h-11 w-auto px-3 py-2"
           >
             {{ t('back') }}
           </a>
@@ -98,7 +98,7 @@ interface CustomExerciseForm {
             <button
               type="button"
               (click)="resumeActiveWorkout()"
-              class="rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
+              class="app-button app-button-primary"
             >
               {{ t('resume') }}
             </button>
@@ -106,14 +106,14 @@ interface CustomExerciseForm {
               type="button"
               (click)="cancelCurrentAndStartNew()"
               [disabled]="isStartingWorkout"
-              class="rounded-md border border-red-200 bg-white px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100"
+              class="app-button app-button-danger"
             >
               {{ t('cancelWorkout') }}
             </button>
             <button
               type="button"
               (click)="closeActiveWorkoutPrompt()"
-              class="rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
+              class="app-button app-button-secondary"
             >
               {{ t('cancel') }}
             </button>
@@ -134,7 +134,7 @@ interface CustomExerciseForm {
           <button
             type="button"
             (click)="reloadTemplate()"
-            class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
+            class="app-button app-button-danger mt-4 min-h-11 w-auto px-4 py-2"
           >
             {{ t('retry') }}
           </button>
@@ -142,10 +142,10 @@ interface CustomExerciseForm {
       } @else {
         @if (canEdit) {
           <form
-            class="space-y-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+            class="app-card space-y-4"
             (ngSubmit)="addBlock()"
           >
-            <h3 class="text-lg font-bold text-slate-950">{{ t('addBlock') }}</h3>
+            <h3 class="app-section-title">{{ t('addBlock') }}</h3>
             <label class="block">
               <span class="text-sm font-medium text-slate-700">{{ t('blockTitle') }}</span>
               <input
@@ -153,7 +153,7 @@ interface CustomExerciseForm {
                 name="newBlockTitle"
                 [(ngModel)]="newBlockTitle"
                 [placeholder]="t('blockTitlePlaceholder')"
-                class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                class="app-input mt-2"
               />
             </label>
 
@@ -162,7 +162,7 @@ interface CustomExerciseForm {
               <select
                 name="newBlockType"
                 [(ngModel)]="newBlockType"
-                class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                class="app-input mt-2"
               >
                 @for (type of blockTypes; track type.value) {
                   <option [ngValue]="type.value">{{ type.label }}</option>
@@ -173,7 +173,7 @@ interface CustomExerciseForm {
             <button
               type="submit"
               [disabled]="isSaving"
-              class="inline-flex w-full justify-center rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+              class="app-button app-button-primary"
             >
               {{ isSaving ? t('loading') : t('addBlock') }}
             </button>
@@ -181,14 +181,14 @@ interface CustomExerciseForm {
         }
 
         @if (blocks.length === 0) {
-          <div class="rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
+          <div class="app-card bg-slate-50 p-5 text-center shadow-none">
             <p class="font-semibold text-slate-800">{{ t('noTemplatesYet') }}</p>
             <p class="mt-1 text-sm text-slate-600">{{ t('addBlock') }}</p>
           </div>
         } @else {
           <div class="space-y-4">
             @for (block of blocks; track block.id; let blockIndex = $index) {
-              <article class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+              <article class="app-card">
                 <div class="space-y-3">
                   <div class="flex items-start justify-between gap-3">
                     <div>
@@ -201,7 +201,7 @@ interface CustomExerciseForm {
                           [name]="'blockTitle' + block.id"
                           [(ngModel)]="block.title"
                           (blur)="renameBlock(block)"
-                          class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-lg font-bold text-slate-950 outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                          class="app-input mt-1 py-2 text-lg font-bold text-slate-950"
                         />
                       } @else {
                         <h3 class="mt-1 text-lg font-bold text-slate-950">
@@ -215,7 +215,7 @@ interface CustomExerciseForm {
                         type="button"
                         (click)="removeBlock(block)"
                         [disabled]="isSaving"
-                        class="inline-flex min-h-11 items-center justify-center rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-700"
+                        class="app-button app-button-danger min-h-11 w-auto px-3 py-2"
                         [class.cursor-not-allowed]="isSaving"
                         [class.opacity-60]="isSaving"
                       >
@@ -230,7 +230,7 @@ interface CustomExerciseForm {
                         [name]="'blockType' + block.id"
                         [(ngModel)]="block.blockType"
                         (ngModelChange)="updateBlockType(block)"
-                        class="col-span-3 rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                        class="app-input col-span-3 py-2 text-sm"
                       >
                         @for (type of blockTypes; track type.value) {
                           <option [ngValue]="type.value">{{ type.label }}</option>
@@ -240,7 +240,7 @@ interface CustomExerciseForm {
                         type="button"
                         (click)="moveBlock(blockIndex, -1)"
                         [disabled]="blockIndex === 0 || isSaving"
-                        class="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
+                        class="app-button app-button-secondary min-h-11 px-3 py-2"
                       >
                         {{ t('up') }}
                       </button>
@@ -248,14 +248,14 @@ interface CustomExerciseForm {
                         type="button"
                         (click)="moveBlock(blockIndex, 1)"
                         [disabled]="blockIndex === blocks.length - 1 || isSaving"
-                        class="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
+                        class="app-button app-button-secondary min-h-11 px-3 py-2"
                       >
                         {{ t('down') }}
                       </button>
                       <button
                         type="button"
                         (click)="openExerciseSearch(block.id)"
-                        class="min-h-11 rounded-md border border-green-600 px-3 py-2 text-sm font-semibold text-green-700"
+                        class="app-button app-button-secondary min-h-11 border-green-600 px-3 py-2 text-green-700"
                       >
                         {{ t('addExercise') }}
                       </button>
@@ -272,7 +272,7 @@ interface CustomExerciseForm {
                           [(ngModel)]="exerciseSearchQuery"
                           (ngModelChange)="searchExercises($event)"
                           [placeholder]="t('searchByExerciseName')"
-                          class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                          class="app-input mt-2"
                         />
                       </label>
 
@@ -290,7 +290,7 @@ interface CustomExerciseForm {
                             <button
                               type="button"
                               (click)="openCustomExerciseForm(block.id)"
-                              class="inline-flex min-h-11 items-center justify-center rounded-md border border-green-600 px-3 py-2 text-sm font-semibold text-green-700"
+                              class="app-button app-button-secondary min-h-11 w-auto border-green-600 px-3 py-2 text-green-700"
                             >
                               + {{ t('createCustomExercise') }}
                             </button>
@@ -305,7 +305,7 @@ interface CustomExerciseForm {
                               type="button"
                               (click)="addExercise(block, exercise)"
                               [disabled]="isAddingExercise(exercise.id) || isExerciseAlreadyInBlock(block.id, exercise.id)"
-                              class="flex w-full items-start justify-between gap-3 rounded-md border border-slate-200 bg-white p-3 text-left"
+                              class="app-button app-button-secondary min-h-0 justify-between gap-3 p-3 text-left"
                               [class.cursor-not-allowed]="isAddingExercise(exercise.id) || isExerciseAlreadyInBlock(block.id, exercise.id)"
                               [class.opacity-60]="isAddingExercise(exercise.id) || isExerciseAlreadyInBlock(block.id, exercise.id)"
                             >
@@ -331,7 +331,7 @@ interface CustomExerciseForm {
 
                       @if (customExerciseBlockId === block.id) {
                         <form
-                          class="space-y-3 rounded-md border border-slate-200 bg-white p-4"
+                          class="app-card space-y-3 shadow-none"
                           (ngSubmit)="createCustomExercise(block)"
                         >
                           <div>
@@ -346,7 +346,7 @@ interface CustomExerciseForm {
                               name="customExerciseName"
                               [(ngModel)]="customExercise.name"
                               required
-                              class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                              class="app-input mt-2"
                             />
                           </label>
 
@@ -355,7 +355,7 @@ interface CustomExerciseForm {
                             <select
                               name="customExerciseCategory"
                               [(ngModel)]="customExercise.categoryId"
-                              class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                              class="app-input mt-2"
                             >
                               <option [ngValue]="null">{{ t('noCategory') }}</option>
                               @for (category of categories; track category.id) {
@@ -372,7 +372,7 @@ interface CustomExerciseForm {
                                 name="customExerciseTrainingType"
                                 [(ngModel)]="customExercise.trainingType"
                                 placeholder="gym, calisthenics"
-                                class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                                class="app-input mt-2"
                               />
                             </label>
 
@@ -383,7 +383,7 @@ interface CustomExerciseForm {
                                 name="customExerciseExerciseType"
                                 [(ngModel)]="customExercise.exerciseType"
                                 placeholder="bodyweight, gym"
-                                class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                                class="app-input mt-2"
                               />
                             </label>
                           </div>
@@ -395,7 +395,7 @@ interface CustomExerciseForm {
                               name="customExerciseEquipment"
                               [(ngModel)]="customExercise.equipment"
                               placeholder="Dumbbells, bodyweight, machine"
-                              class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                              class="app-input mt-2"
                             />
                           </label>
 
@@ -405,7 +405,7 @@ interface CustomExerciseForm {
                               name="customExerciseDescription"
                               [(ngModel)]="customExercise.description"
                               rows="3"
-                              class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+                              class="app-input mt-2"
                             ></textarea>
                           </label>
 
@@ -413,14 +413,14 @@ interface CustomExerciseForm {
                             <button
                               type="button"
                               (click)="closeCustomExerciseForm()"
-                              class="min-h-11 rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
+                              class="app-button app-button-secondary min-h-11"
                             >
                               {{ t('cancel') }}
                             </button>
                             <button
                               type="submit"
                               [disabled]="isCreatingCustomExercise || !customExercise.name.trim()"
-                              class="min-h-11 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                              class="app-button app-button-primary min-h-11"
                             >
                               {{ isCreatingCustomExercise ? t('loading') : t('create') }}
                             </button>
@@ -453,7 +453,7 @@ interface CustomExerciseForm {
                                 type="button"
                                 (click)="removeExercise(templateExercise)"
                                 [disabled]="isSaving"
-                                class="inline-flex min-h-11 items-center justify-center rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-700"
+                                class="app-button app-button-danger min-h-11 w-auto px-3 py-2"
                                 [class.cursor-not-allowed]="isSaving"
                                 [class.opacity-60]="isSaving"
                               >
@@ -468,7 +468,7 @@ interface CustomExerciseForm {
                                 type="button"
                                 (click)="moveExercise(block.id, exerciseIndex, -1)"
                                 [disabled]="exerciseIndex === 0 || isSaving"
-                                class="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
+                                class="app-button app-button-secondary min-h-11 px-3 py-2"
                               >
                                 Up
                               </button>
@@ -476,7 +476,7 @@ interface CustomExerciseForm {
                                 type="button"
                                 (click)="moveExercise(block.id, exerciseIndex, 1)"
                                 [disabled]="exerciseIndex === getBlockExercises(block.id).length - 1 || isSaving"
-                                class="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
+                                class="app-button app-button-secondary min-h-11 px-3 py-2"
                               >
                                 Down
                               </button>

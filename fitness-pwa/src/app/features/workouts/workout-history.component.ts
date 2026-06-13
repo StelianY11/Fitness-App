@@ -31,7 +31,7 @@ interface WorkoutHistoryGroup {
 
         <a
           routerLink="/dashboard"
-          class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
+          class="app-button app-button-secondary min-h-11 w-auto px-3 py-2"
         >
           {{ t('back') }}
         </a>
@@ -42,7 +42,7 @@ interface WorkoutHistoryGroup {
           type="button"
           (click)="clearAllHistory()"
           [disabled]="isClearing"
-          class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+          class="app-button app-button-danger"
         >
           {{ isClearing ? t('loading') : t('clearAllHistory') }}
         </button>
@@ -61,13 +61,13 @@ interface WorkoutHistoryGroup {
           <button
             type="button"
             (click)="loadHistory()"
-            class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
+            class="app-button app-button-danger mt-4 min-h-11 w-auto px-4 py-2"
           >
             {{ t('retry') }}
           </button>
         </div>
       } @else if (historyItems.length === 0) {
-        <div class="rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
+        <div class="app-card bg-slate-50 p-5 text-center shadow-none">
           <p class="font-semibold text-slate-800">{{ t('noHistory') }}</p>
           <p class="mt-1 text-sm text-slate-600">{{ t('workoutHistory') }}</p>
         </div>
@@ -83,7 +83,7 @@ interface WorkoutHistoryGroup {
                 @for (item of group.items; track item.session.id) {
                   <a
                     [routerLink]="['/history', item.session.id]"
-                    class="block rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+                    class="app-card block"
                   >
                     <div class="flex items-start justify-between gap-3">
                       <div>
@@ -92,7 +92,7 @@ interface WorkoutHistoryGroup {
                           {{ formatTime(item.session.startedAt) }} - {{ item.session.finishedAt ? formatTime(item.session.finishedAt) : 'Open' }}
                         </p>
                       </div>
-                      <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
+                      <span class="app-badge bg-green-100 text-green-800">
                         {{ formatDuration(item.session) }}
                       </span>
                     </div>
@@ -118,7 +118,7 @@ interface WorkoutHistoryGroup {
               type="button"
               (click)="loadMore()"
               [disabled]="isLoadingMore"
-              class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
+              class="app-button app-button-secondary"
             >
               {{ isLoadingMore ? t('loading') : t('loadMore') }}
             </button>

@@ -22,7 +22,7 @@ import { TranslationService } from '../../core/services/translation.service';
             type="email"
             formControlName="email"
             autocomplete="email"
-            class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+            class="app-input mt-2"
           />
           @if (showEmailRequiredError) {
             <span class="mt-1 block text-sm text-red-700">{{ t('emailRequired') }}</span>
@@ -37,7 +37,7 @@ import { TranslationService } from '../../core/services/translation.service';
             type="password"
             formControlName="password"
             autocomplete="current-password"
-            class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
+            class="app-input mt-2"
           />
           @if (showPasswordRequiredError) {
             <span class="mt-1 block text-sm text-red-700">{{ t('passwordRequired') }}</span>
@@ -54,7 +54,7 @@ import { TranslationService } from '../../core/services/translation.service';
       <button
         type="submit"
         [disabled]="form.invalid || isLoading"
-        class="inline-flex w-full justify-center rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+        class="app-button app-button-primary"
       >
         {{ isLoading ? t('loading') : t('login') }}
       </button>

@@ -28,7 +28,7 @@ import {
 
         <a
           routerLink="/dashboard"
-          class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
+          class="app-button app-button-secondary min-h-11 w-auto px-3 py-2"
         >
           {{ t('dashboard') }}
         </a>
@@ -47,19 +47,19 @@ import {
           <button
             type="button"
             (click)="loadSummary()"
-            class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
+            class="app-button app-button-danger mt-4 min-h-11 w-auto px-4 py-2"
           >
             {{ t('retry') }}
           </button>
         </div>
       } @else if (session) {
-        <section class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <section class="app-card">
           <div class="flex items-center justify-between gap-3">
             <div>
               <p class="text-xs font-medium text-slate-500">{{ t('status') }}</p>
               <p class="mt-1 text-lg font-bold capitalize text-slate-950">{{ session.status }}</p>
             </div>
-            <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
+            <span class="app-badge bg-green-100 text-green-800">
               {{ totalSets }} {{ t('sets') }}
             </span>
           </div>
@@ -81,14 +81,14 @@ import {
         </section>
 
         @if (workoutExercises.length === 0) {
-          <div class="rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
+          <div class="app-card bg-slate-50 p-5 text-center shadow-none">
             <p class="font-semibold text-slate-800">{{ t('noExercisesFound') }}</p>
             <p class="mt-1 text-sm text-slate-600">{{ t('noCopiedExercises') }}</p>
           </div>
         } @else {
           <div class="space-y-4">
             @for (workoutExercise of workoutExercises; track workoutExercise.id; let exerciseIndex = $index) {
-              <article class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+              <article class="app-card">
                 <div class="flex items-start justify-between gap-3">
                   <div>
                     <p class="text-xs font-semibold uppercase tracking-wide text-green-700">
@@ -98,7 +98,7 @@ import {
                       {{ getExerciseName(workoutExercise.exerciseId) }}
                     </h3>
                   </div>
-                  <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                  <span class="app-badge">
                     {{ getSets(workoutExercise.id).length }} {{ t('sets') }}
                   </span>
                 </div>
@@ -130,13 +130,13 @@ import {
         <div class="grid grid-cols-2 gap-3">
           <a
             routerLink="/templates"
-            class="inline-flex min-h-12 items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-slate-800"
+            class="app-button app-button-secondary"
           >
             {{ t('templates') }}
           </a>
           <a
             routerLink="/dashboard"
-            class="inline-flex min-h-12 items-center justify-center rounded-md bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white"
+            class="app-button app-button-primary"
           >
             {{ t('dashboard') }}
           </a>
