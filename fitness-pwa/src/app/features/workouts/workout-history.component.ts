@@ -32,7 +32,7 @@ interface WorkoutHistoryGroup {
 
         <a
           routerLink="/dashboard"
-          class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
+          class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
         >
           Back
         </a>
@@ -43,7 +43,7 @@ interface WorkoutHistoryGroup {
           type="button"
           (click)="clearAllHistory()"
           [disabled]="isClearing"
-          class="inline-flex w-full justify-center rounded-md border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+          class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
         >
           {{ isClearing ? 'Clearing history...' : 'Clear All History' }}
         </button>
@@ -62,7 +62,7 @@ interface WorkoutHistoryGroup {
           <button
             type="button"
             (click)="loadHistory()"
-            class="mt-4 rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
+            class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
           >
             Retry
           </button>
@@ -119,7 +119,7 @@ interface WorkoutHistoryGroup {
               type="button"
               (click)="loadMore()"
               [disabled]="isLoadingMore"
-              class="inline-flex w-full justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
+              class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
             >
               {{ isLoadingMore ? 'Loading...' : 'Load more' }}
             </button>

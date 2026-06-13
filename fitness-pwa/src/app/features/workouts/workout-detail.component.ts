@@ -29,7 +29,7 @@ import {
 
         <a
           routerLink="/history"
-          class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
+          class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
         >
           Back
         </a>
@@ -48,7 +48,7 @@ import {
           <button
             type="button"
             (click)="loadWorkout()"
-            class="mt-4 rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
+            class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
           >
             Retry
           </button>
@@ -81,19 +81,19 @@ import {
           <button
             type="button"
             disabled
-            class="rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-400"
+            class="min-h-12 rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-400"
           >
             Repeat Workout
           </button>
           @if (session.workoutTemplateId) {
             <a
               [routerLink]="['/templates', session.workoutTemplateId]"
-              class="rounded-md bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white"
+              class="inline-flex min-h-12 items-center justify-center rounded-md bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white"
             >
               Open Template
             </a>
           } @else {
-            <span class="rounded-md bg-slate-100 px-4 py-3 text-center text-sm font-semibold text-slate-400">
+            <span class="inline-flex min-h-12 items-center justify-center rounded-md bg-slate-100 px-4 py-3 text-center text-sm font-semibold text-slate-400">
               No Template
             </span>
           }
@@ -103,7 +103,7 @@ import {
           type="button"
           (click)="deleteWorkout()"
           [disabled]="isDeleting"
-          class="inline-flex w-full justify-center rounded-md border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+          class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
         >
           {{ isDeleting ? 'Deleting...' : 'Delete Workout' }}
         </button>

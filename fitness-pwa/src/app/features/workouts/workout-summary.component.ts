@@ -27,7 +27,7 @@ import {
 
         <a
           routerLink="/dashboard"
-          class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
+          class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
         >
           Dashboard
         </a>
@@ -46,7 +46,7 @@ import {
           <button
             type="button"
             (click)="loadSummary()"
-            class="mt-4 rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
+            class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
           >
             Retry
           </button>
@@ -129,13 +129,13 @@ import {
         <div class="grid grid-cols-2 gap-3">
           <a
             routerLink="/templates"
-            class="rounded-md border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-slate-800"
+            class="inline-flex min-h-12 items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-slate-800"
           >
             Templates
           </a>
           <a
             routerLink="/dashboard"
-            class="rounded-md bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white"
+            class="inline-flex min-h-12 items-center justify-center rounded-md bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white"
           >
             Done
           </a>

@@ -49,14 +49,14 @@ interface CustomExerciseForm {
               type="button"
               (click)="startWorkout()"
               [disabled]="isStartingWorkout || isSaving"
-              class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+              class="inline-flex min-h-11 items-center justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
             >
               {{ isStartingWorkout ? 'Starting...' : 'Start Workout' }}
             </button>
           }
           <a
             routerLink="/templates"
-            class="rounded-md border border-slate-300 px-3 py-2 text-center text-sm font-semibold text-slate-700"
+            class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-center text-sm font-semibold text-slate-700"
           >
             Back
           </a>
@@ -133,7 +133,7 @@ interface CustomExerciseForm {
           <button
             type="button"
             (click)="reloadTemplate()"
-            class="mt-4 rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
+            class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
           >
             Retry
           </button>
@@ -214,7 +214,7 @@ interface CustomExerciseForm {
                         type="button"
                         (click)="removeBlock(block)"
                         [disabled]="isSaving"
-                        class="rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-700"
+                        class="inline-flex min-h-11 items-center justify-center rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-700"
                         [class.cursor-not-allowed]="isSaving"
                         [class.opacity-60]="isSaving"
                       >
@@ -239,7 +239,7 @@ interface CustomExerciseForm {
                         type="button"
                         (click)="moveBlock(blockIndex, -1)"
                         [disabled]="blockIndex === 0 || isSaving"
-                        class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
+                        class="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
                       >
                         Up
                       </button>
@@ -247,14 +247,14 @@ interface CustomExerciseForm {
                         type="button"
                         (click)="moveBlock(blockIndex, 1)"
                         [disabled]="blockIndex === blocks.length - 1 || isSaving"
-                        class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
+                        class="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
                       >
                         Down
                       </button>
                       <button
                         type="button"
                         (click)="openExerciseSearch(block.id)"
-                        class="rounded-md border border-green-600 px-3 py-2 text-sm font-semibold text-green-700"
+                        class="min-h-11 rounded-md border border-green-600 px-3 py-2 text-sm font-semibold text-green-700"
                       >
                         Add Exercise
                       </button>
@@ -289,7 +289,7 @@ interface CustomExerciseForm {
                             <button
                               type="button"
                               (click)="openCustomExerciseForm(block.id)"
-                              class="rounded-md border border-green-600 px-3 py-2 text-sm font-semibold text-green-700"
+                              class="inline-flex min-h-11 items-center justify-center rounded-md border border-green-600 px-3 py-2 text-sm font-semibold text-green-700"
                             >
                               + Create custom exercise
                             </button>
@@ -412,14 +412,14 @@ interface CustomExerciseForm {
                             <button
                               type="button"
                               (click)="closeCustomExerciseForm()"
-                              class="rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
+                              class="min-h-11 rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
                             >
                               Cancel
                             </button>
                             <button
                               type="submit"
                               [disabled]="isCreatingCustomExercise || !customExercise.name.trim()"
-                              class="rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                              class="min-h-11 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
                             >
                               {{ isCreatingCustomExercise ? 'Creating...' : 'Create & Add' }}
                             </button>
@@ -452,7 +452,7 @@ interface CustomExerciseForm {
                                 type="button"
                                 (click)="removeExercise(templateExercise)"
                                 [disabled]="isSaving"
-                                class="rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-700"
+                                class="inline-flex min-h-11 items-center justify-center rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-700"
                                 [class.cursor-not-allowed]="isSaving"
                                 [class.opacity-60]="isSaving"
                               >
@@ -467,7 +467,7 @@ interface CustomExerciseForm {
                                 type="button"
                                 (click)="moveExercise(block.id, exerciseIndex, -1)"
                                 [disabled]="exerciseIndex === 0 || isSaving"
-                                class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
+                                class="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
                               >
                                 Up
                               </button>
@@ -475,7 +475,7 @@ interface CustomExerciseForm {
                                 type="button"
                                 (click)="moveExercise(block.id, exerciseIndex, 1)"
                                 [disabled]="exerciseIndex === getBlockExercises(block.id).length - 1 || isSaving"
-                                class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
+                                class="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
                               >
                                 Down
                               </button>

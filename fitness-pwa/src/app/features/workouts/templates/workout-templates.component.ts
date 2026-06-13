@@ -21,7 +21,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
 
         <a
           routerLink="/dashboard"
-          class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
+          class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
         >
           Back
         </a>
@@ -30,7 +30,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
       <button
         type="button"
         (click)="openCreateForm()"
-        class="inline-flex w-full justify-center rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
+        class="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
       >
         New Template
       </button>
@@ -134,6 +134,13 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
         <div class="rounded-lg border border-red-200 bg-red-50 p-4">
           <p class="font-semibold text-red-800">Unable to load templates</p>
           <p class="mt-1 text-sm text-red-700">{{ errorMessage }}</p>
+          <button
+            type="button"
+            (click)="loadTemplates()"
+            class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
+          >
+            Retry
+          </button>
         </div>
       } @else if (templates.length === 0) {
         <div class="rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
@@ -180,13 +187,13 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                   type="button"
                   (click)="startWorkout(template)"
                   [disabled]="processingTemplateId === template.id"
-                  class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                  class="inline-flex min-h-11 items-center justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
                 >
                   {{ processingTemplateId === template.id ? 'Starting...' : 'Start Workout' }}
                 </button>
                 <a
                   [routerLink]="['/templates', template.id]"
-                  class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800"
+                  class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800"
                 >
                   View/Edit
                 </a>
@@ -194,7 +201,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                   type="button"
                   (click)="duplicateTemplate(template)"
                   [disabled]="processingTemplateId === template.id"
-                  class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
+                  class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
                 >
                   {{ processingTemplateId === template.id ? 'Working...' : 'Duplicate' }}
                 </button>
@@ -203,7 +210,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                     type="button"
                     (click)="deleteTemplate(template)"
                     [disabled]="processingTemplateId === template.id"
-                    class="rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100"
+                    class="inline-flex min-h-11 items-center justify-center rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100"
                   >
                     Delete
                   </button>
@@ -436,7 +443,7 @@ export class WorkoutTemplatesComponent {
       : 'Not set';
   }
 
-  private async loadTemplates(): Promise<void> {
+  async loadTemplates(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = '';
 

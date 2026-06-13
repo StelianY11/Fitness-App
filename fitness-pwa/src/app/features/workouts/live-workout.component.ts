@@ -43,7 +43,7 @@ interface QuickSetForm extends SetForm {
 
         <a
           routerLink="/templates"
-          class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
+          class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
         >
           Templates
         </a>
@@ -114,14 +114,14 @@ interface QuickSetForm extends SetForm {
                 type="button"
                 (click)="saveAllSuggestedSetsAndFinish()"
                 [disabled]="isSavingSuggestedSets || isFinishing"
-                class="rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
               >
                 {{ isSavingSuggestedSets ? 'Saving...' : 'Save all and finish' }}
               </button>
               <button
                 type="button"
                 (click)="closeUnsavedPrefillWarning()"
-                class="rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
+                class="min-h-12 rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
               >
                 Cancel and continue editing
               </button>
@@ -164,7 +164,7 @@ interface QuickSetForm extends SetForm {
                 type="button"
                 (click)="confirmFinishWorkout()"
                 [disabled]="isFinishing"
-                class="rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+                class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
               >
                 {{ isFinishing ? 'Finishing...' : 'Finish Workout' }}
               </button>
@@ -172,7 +172,7 @@ interface QuickSetForm extends SetForm {
                 type="button"
                 (click)="closeFinishConfirmation()"
                 [disabled]="isFinishing"
-                class="rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
+                class="min-h-12 rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
               >
                 Continue editing
               </button>
@@ -194,7 +194,7 @@ interface QuickSetForm extends SetForm {
           <button
             type="button"
             (click)="loadLiveWorkout()"
-            class="mt-4 rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
+            class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
           >
             Retry
           </button>
@@ -245,7 +245,7 @@ interface QuickSetForm extends SetForm {
                     type="button"
                     (click)="openSetForm(workoutExercise.id)"
                     [disabled]="session.status !== 'active' || savingSetExerciseId === workoutExercise.id"
-                    class="rounded-md border border-green-600 px-3 py-2 text-sm font-semibold text-green-700 disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-400"
+                    class="inline-flex min-h-11 items-center justify-center rounded-md border border-green-600 px-3 py-2 text-sm font-semibold text-green-700 disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-400"
                   >
                     Add Set
                   </button>
@@ -253,7 +253,7 @@ interface QuickSetForm extends SetForm {
 
                 <a
                   [routerLink]="['/exercises', workoutExercise.exerciseId, 'history']"
-                  class="mt-3 inline-flex w-full justify-center rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800"
+                  class="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800"
                 >
                   History
                 </a>
@@ -450,7 +450,7 @@ interface QuickSetForm extends SetForm {
             type="button"
             (click)="cancelWorkout()"
             [disabled]="isCancelling || isFinishing || session.status !== 'active'"
-            class="rounded-md border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+            class="min-h-12 rounded-md border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
           >
             {{ isCancelling ? 'Cancelling...' : 'Cancel Workout' }}
           </button>
@@ -458,7 +458,7 @@ interface QuickSetForm extends SetForm {
             type="button"
             (click)="finishWorkout()"
             [disabled]="isFinishing || isCancelling || session.status !== 'active'"
-            class="rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+            class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
           >
             {{ isFinishing ? 'Finishing...' : 'Finish Workout' }}
           </button>

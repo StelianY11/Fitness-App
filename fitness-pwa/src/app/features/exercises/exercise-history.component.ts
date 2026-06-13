@@ -16,7 +16,7 @@ import { ExerciseHistoryWorkout } from '../../shared/models/fitness.models';
 
         <a
           routerLink="/exercises"
-          class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
+          class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
         >
           Library
         </a>
@@ -35,7 +35,7 @@ import { ExerciseHistoryWorkout } from '../../shared/models/fitness.models';
           <button
             type="button"
             (click)="loadExerciseHistory()"
-            class="mt-4 rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
+            class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
           >
             Retry
           </button>

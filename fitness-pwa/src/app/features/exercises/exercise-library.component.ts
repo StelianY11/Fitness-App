@@ -21,7 +21,7 @@ import {
 
         <a
           routerLink="/dashboard"
-          class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
+          class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
         >
           Back
         </a>
@@ -43,7 +43,7 @@ import {
           <button
             type="button"
             (click)="selectCategory(null)"
-            class="rounded-full border px-4 py-2 text-sm font-semibold"
+            class="min-h-11 rounded-full border px-4 py-2 text-sm font-semibold"
             [class.border-green-600]="selectedCategoryId === null"
             [class.bg-green-600]="selectedCategoryId === null"
             [class.text-white]="selectedCategoryId === null"
@@ -57,7 +57,7 @@ import {
             <button
               type="button"
               (click)="selectCategory(category.id)"
-              class="rounded-full border px-4 py-2 text-sm font-semibold"
+              class="min-h-11 rounded-full border px-4 py-2 text-sm font-semibold"
               [class.border-green-600]="selectedCategoryId === category.id"
               [class.bg-green-600]="selectedCategoryId === category.id"
               [class.text-white]="selectedCategoryId === category.id"
@@ -80,6 +80,13 @@ import {
         <div class="rounded-lg border border-red-200 bg-red-50 p-4">
           <p class="font-semibold text-red-800">Unable to load exercises</p>
           <p class="mt-1 text-sm text-red-700">{{ errorMessage }}</p>
+          <button
+            type="button"
+            (click)="loadExerciseLibrary()"
+            class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
+          >
+            Retry
+          </button>
         </div>
       } @else if (filteredExercises.length === 0) {
         <div class="rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
@@ -119,7 +126,7 @@ import {
 
               <a
                 [routerLink]="['/exercises', exercise.id, 'history']"
-                class="mt-4 inline-flex w-full justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
+                class="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
               >
                 History
               </a>
@@ -199,7 +206,7 @@ export class ExerciseLibraryComponent {
     return 'Intermediate';
   }
 
-  private async loadExerciseLibrary(): Promise<void> {
+  async loadExerciseLibrary(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = '';
 

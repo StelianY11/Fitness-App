@@ -46,7 +46,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
             <button
               type="button"
               (click)="resumeWorkout()"
-              class="rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
+              class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
             >
               Resume Workout
             </button>
@@ -54,7 +54,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
               type="button"
               (click)="cancelActiveWorkout()"
               [disabled]="isCancellingActiveWorkout"
-              class="rounded-md border border-red-200 bg-white px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100"
+              class="min-h-12 rounded-md border border-red-200 bg-white px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100"
             >
               {{ isCancellingActiveWorkout ? 'Cancelling...' : 'Cancel Workout' }}
             </button>
@@ -75,21 +75,21 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
 
       <a
         routerLink="/exercises"
-        class="inline-flex w-full justify-center rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
+        class="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
       >
         Open Exercise Library
       </a>
 
       <a
         routerLink="/templates"
-        class="inline-flex w-full justify-center rounded-md border border-green-600 px-4 py-3 text-sm font-semibold text-green-700"
+        class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-green-600 px-4 py-3 text-sm font-semibold text-green-700"
       >
         Open Workout Templates
       </a>
 
       <a
         routerLink="/history"
-        class="inline-flex w-full justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
+        class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
       >
         Open Workout History
       </a>
@@ -104,7 +104,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
         type="button"
         (click)="logout()"
         [disabled]="isLoading"
-        class="inline-flex w-full justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
+        class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
       >
         {{ isLoading ? 'Logging out...' : 'Log out' }}
       </button>
