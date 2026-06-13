@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { PostgrestError } from '@supabase/supabase-js';
 import { SupabaseService } from '../supabase/supabase.service';
 import {
@@ -252,6 +252,10 @@ interface WorkoutSetUpdateRow {
 export class LiveWorkoutService {
   private readonly supabase = inject(SupabaseService).client;
 
+  readonly activeWorkout = signal<WorkoutSession | null>(null);
+  readonly isActiveWorkoutLoading = signal(false);
+  readonly activeWorkoutError = signal<string | null>(null);
+
   async startWorkoutFromTemplate(
     templateId: string,
   ): Promise<LiveWorkoutServiceResult<WorkoutSession | null>> {
@@ -281,7 +285,29 @@ export class LiveWorkoutService {
       };
     }
 
+    this.activeWorkout.set(sessionResult.data);
+    this.activeWorkoutError.set(null);
+
     return sessionResult;
+  }
+
+  async refreshActiveWorkout(): Promise<LiveWorkoutServiceResult<WorkoutSession | null>> {
+    this.isActiveWorkoutLoading.set(true);
+    this.activeWorkoutError.set(null);
+
+    try {
+      const result = await this.getActiveWorkout();
+
+      if (result.error) {
+        this.activeWorkoutError.set(result.error);
+      } else {
+        this.activeWorkout.set(result.data);
+      }
+
+      return result;
+    } finally {
+      this.isActiveWorkoutLoading.set(false);
+    }
   }
 
   async getActiveWorkout(): Promise<LiveWorkoutServiceResult<WorkoutSession | null>> {
@@ -303,6 +329,19 @@ export class LiveWorkoutService {
     return {
       data: data?.[0] ? mapWorkoutSession(data[0]) : null,
       error: this.formatError(error),
+    };
+  }
+
+  async resumeWorkout(): Promise<LiveWorkoutServiceResult<WorkoutSession | null>> {
+    return this.refreshActiveWorkout();
+  }
+
+  async hasActiveWorkout(): Promise<LiveWorkoutServiceResult<boolean>> {
+    const result = await this.getActiveWorkout();
+
+    return {
+      data: result.data !== null,
+      error: result.error,
     };
   }
 
@@ -512,11 +551,23 @@ export class LiveWorkoutService {
   }
 
   async finishWorkout(sessionId: string): Promise<LiveWorkoutServiceResult<WorkoutSession | null>> {
-    return this.updateWorkoutSessionStatus(sessionId, 'completed');
+    const result = await this.updateWorkoutSessionStatus(sessionId, 'completed');
+
+    if (!result.error && this.activeWorkout()?.id === sessionId) {
+      this.activeWorkout.set(null);
+    }
+
+    return result;
   }
 
   async cancelWorkout(sessionId: string): Promise<LiveWorkoutServiceResult<WorkoutSession | null>> {
-    return this.updateWorkoutSessionStatus(sessionId, 'cancelled');
+    const result = await this.updateWorkoutSessionStatus(sessionId, 'cancelled');
+
+    if (!result.error && this.activeWorkout()?.id === sessionId) {
+      this.activeWorkout.set(null);
+    }
+
+    return result;
   }
 
   async deleteWorkoutSession(sessionId: string): Promise<LiveWorkoutServiceResult<null>> {
@@ -531,6 +582,10 @@ export class LiveWorkoutService {
       .delete()
       .eq('id', sessionId)
       .eq('user_id', userResult.data);
+
+    if (!error && this.activeWorkout()?.id === sessionId) {
+      this.activeWorkout.set(null);
+    }
 
     return {
       data: null,

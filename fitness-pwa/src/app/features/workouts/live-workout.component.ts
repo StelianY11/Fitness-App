@@ -62,6 +62,74 @@ interface QuickSetForm extends SetForm {
         </div>
       }
 
+      @if (showUnsavedPrefillWarning) {
+        <div class="fixed inset-0 z-50 flex items-end bg-slate-950/50 px-4 py-5 sm:items-center sm:justify-center">
+          <div class="max-h-[85vh] w-full overflow-y-auto rounded-lg border border-amber-200 bg-amber-50 p-4 shadow-xl sm:max-w-lg">
+            <h3 class="text-lg font-bold text-amber-950">You have unsaved suggested sets</h3>
+            <p class="mt-2 text-sm text-amber-800">
+              Save these rows before finishing, or cancel and keep editing.
+            </p>
+
+            <div class="mt-4 space-y-2">
+              @for (item of getUnsavedSuggestedSets(); track item.quickSet.key) {
+                <div class="rounded-md bg-white p-3">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <p class="font-semibold text-slate-950">
+                        {{ getExerciseName(item.workoutExercise.exerciseId) }}
+                      </p>
+                      <p class="mt-1 text-sm text-slate-600">Set {{ item.quickSet.setNumber }}</p>
+                    </div>
+                    <span class="rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">
+                      {{ getPreFillSourceLabel(item.quickSet.source) }}
+                    </span>
+                  </div>
+
+                  <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+                    <div class="rounded-md bg-slate-50 p-2">
+                      <p class="text-xs font-medium text-slate-500">Weight</p>
+                      <p class="mt-1 font-semibold text-slate-950">
+                        {{ formatQuickSetWeight(item.quickSet) }}
+                      </p>
+                    </div>
+                    <div class="rounded-md bg-slate-50 p-2">
+                      <p class="text-xs font-medium text-slate-500">Reps</p>
+                      <p class="mt-1 font-semibold text-slate-950">
+                        {{ formatQuickSetReps(item.quickSet) }}
+                      </p>
+                    </div>
+                  </div>
+
+                  @if (item.quickSet.notes.trim()) {
+                    <p class="mt-3 rounded-md bg-slate-50 p-2 text-sm text-slate-700">
+                      {{ item.quickSet.notes }}
+                    </p>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="mt-4 grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                (click)="saveAllSuggestedSetsAndFinish()"
+                [disabled]="isSavingSuggestedSets || isFinishing"
+                class="rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+              >
+                {{ isSavingSuggestedSets ? 'Saving...' : 'Save all and finish' }}
+              </button>
+              <button
+                type="button"
+                (click)="closeUnsavedPrefillWarning()"
+                class="rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
+              >
+                Cancel and continue editing
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
       @if (isLoading) {
         <div class="space-y-3">
           @for (item of loadingCards; track item) {
@@ -181,6 +249,7 @@ interface QuickSetForm extends SetForm {
                           <label class="block">
                             <span class="text-sm font-medium text-slate-700">Reps</span>
                             <input
+                              [id]="'quickReps' + quickSet.key"
                               type="number"
                               min="0"
                               [name]="'quickReps' + quickSet.key"
@@ -192,6 +261,7 @@ interface QuickSetForm extends SetForm {
                           <label class="block">
                             <span class="text-sm font-medium text-slate-700">Weight</span>
                             <input
+                              [id]="'quickWeight' + quickSet.key"
                               type="number"
                               min="0"
                               step="0.5"
@@ -205,6 +275,7 @@ interface QuickSetForm extends SetForm {
                         <label class="block">
                           <span class="text-sm font-medium text-slate-700">Notes</span>
                           <textarea
+                            [id]="'quickNotes' + quickSet.key"
                             [name]="'quickNotes' + quickSet.key"
                             [(ngModel)]="quickSet.notes"
                             rows="2"
@@ -229,9 +300,10 @@ interface QuickSetForm extends SetForm {
                       <label class="block">
                         <span class="text-sm font-medium text-slate-700">Reps</span>
                         <input
+                          [id]="'reps' + workoutExercise.id"
                           type="number"
                           min="0"
-                          name="reps"
+                          [name]="'reps' + workoutExercise.id"
                           [(ngModel)]="setForm.reps"
                           class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
                         />
@@ -240,10 +312,11 @@ interface QuickSetForm extends SetForm {
                       <label class="block">
                         <span class="text-sm font-medium text-slate-700">Weight</span>
                         <input
+                          [id]="'weightKg' + workoutExercise.id"
                           type="number"
                           min="0"
                           step="0.5"
-                          name="weightKg"
+                          [name]="'weightKg' + workoutExercise.id"
                           [(ngModel)]="setForm.weightKg"
                           class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
                         />
@@ -253,7 +326,8 @@ interface QuickSetForm extends SetForm {
                     <label class="block">
                       <span class="text-sm font-medium text-slate-700">Notes</span>
                       <textarea
-                        name="setNotes"
+                        [id]="'setNotes' + workoutExercise.id"
+                        [name]="'setNotes' + workoutExercise.id"
                         [(ngModel)]="setForm.notes"
                         rows="2"
                         class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
@@ -325,6 +399,8 @@ export class LiveWorkoutComponent {
   savingSetExerciseId: string | null = null;
   isFinishing = false;
   isCancelling = false;
+  isSavingSuggestedSets = false;
+  showUnsavedPrefillWarning = false;
   errorMessage = '';
   statusMessage = '';
 
@@ -481,68 +557,63 @@ export class LiveWorkoutComponent {
       return;
     }
 
-    const reps = parseNullableNumber(quickSet.reps, 'Reps');
-    const weightKg = parseNullableNumber(quickSet.weightKg, 'Weight');
+    const saved = await this.saveQuickSet(workoutExercise, quickSet);
 
-    if (typeof reps === 'string') {
-      this.errorMessage = reps;
-      return;
-    }
-
-    if (typeof weightKg === 'string') {
-      this.errorMessage = weightKg;
-      return;
-    }
-
-    const notes = quickSet.notes.trim();
-
-    if (reps === null && weightKg === null && !notes) {
-      this.errorMessage = 'Add reps, weight, or notes before saving a set.';
-      return;
-    }
-
-    this.savingSetExerciseId = quickSet.key;
-    this.errorMessage = '';
-    this.statusMessage = '';
-
-    try {
-      const result = await this.liveWorkoutService.addSet(workoutExercise.id, {
-        reps,
-        weightKg,
-        notes: notes || null,
-      });
-
-      if (result.error || !result.data) {
-        throw new Error(result.error ?? 'Unable to save set.');
-      }
-
-      this.setsByExercise = {
-        ...this.setsByExercise,
-        [workoutExercise.id]: [...this.getSets(workoutExercise.id), result.data].sort(
-          (a, b) => a.setNumber - b.setNumber,
-        ),
-      };
-      this.quickSetFormsByExercise = {
-        ...this.quickSetFormsByExercise,
-        [workoutExercise.id]: this.getQuickSetForms(workoutExercise.id).filter(
-          (currentQuickSet) => currentQuickSet.key !== quickSet.key,
-        ),
-      };
+    if (saved) {
       this.statusMessage = 'Set saved.';
-    } catch (error) {
-      this.errorMessage = getErrorMessage(error, 'Unable to save set.');
-      console.error('Live workout quick set save failed:', {
-        workoutExerciseId: workoutExercise.id,
-        quickSet,
-        error,
-      });
-    } finally {
-      this.savingSetExerciseId = null;
-      this.changeDetectorRef.detectChanges();
     }
   }
 
   async finishWorkout(): Promise<void> {
+    if (!this.session || this.isFinishing) {
+      return;
+    }
+
+    const unsavedSuggestedSets = this.getUnsavedSuggestedSets();
+    console.debug('Live workout unsaved suggested sets:', unsavedSuggestedSets);
+
+    if (unsavedSuggestedSets.length > 0) {
+      this.showUnsavedPrefillWarning = true;
+      this.errorMessage = '';
+      this.changeDetectorRef.detectChanges();
+      return;
+    }
+
+    await this.finishWorkoutNow();
+  }
+
+  async saveAllSuggestedSetsAndFinish(): Promise<void> {
+    if (!this.session || this.isSavingSuggestedSets || this.isFinishing) {
+      return;
+    }
+
+    this.isSavingSuggestedSets = true;
+    this.errorMessage = '';
+
+    try {
+      const unsavedSuggestedSets = this.getUnsavedSuggestedSets();
+
+      for (const { workoutExercise, quickSet } of unsavedSuggestedSets) {
+        const saved = await this.saveQuickSet(workoutExercise, quickSet);
+
+        if (!saved) {
+          return;
+        }
+      }
+
+      this.showUnsavedPrefillWarning = false;
+      await this.finishWorkoutNow();
+    } finally {
+      this.isSavingSuggestedSets = false;
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  closeUnsavedPrefillWarning(): void {
+    this.showUnsavedPrefillWarning = false;
+  }
+
+  private async finishWorkoutNow(): Promise<void> {
     if (!this.session || this.isFinishing) {
       return;
     }
@@ -616,6 +687,26 @@ export class LiveWorkoutComponent {
     return 'empty defaults';
   }
 
+  getUnsavedSuggestedSets(): Array<{ workoutExercise: WorkoutExercise; quickSet: QuickSetForm }> {
+    return this.workoutExercises.flatMap((workoutExercise) =>
+      this.getQuickSetForms(workoutExercise.id)
+        .filter(isSavableQuickSet)
+        .map((quickSet) => ({ workoutExercise, quickSet })),
+    );
+  }
+
+  formatQuickSetWeight(quickSet: QuickSetForm): string {
+    return quickSet.weightKg === null || quickSet.weightKg === ''
+      ? '-'
+      : `${quickSet.weightKg} kg`;
+  }
+
+  formatQuickSetReps(quickSet: QuickSetForm): string {
+    return quickSet.reps === null || quickSet.reps === ''
+      ? '-'
+      : `${quickSet.reps}`;
+  }
+
   formatSetSummary(set: WorkoutSet): string {
     const pieces = [
       set.reps === null ? null : `${set.reps} reps`,
@@ -627,6 +718,72 @@ export class LiveWorkoutComponent {
 
   formatDate(value: string): string {
     return new Date(value).toLocaleString();
+  }
+
+  private async saveQuickSet(
+    workoutExercise: WorkoutExercise,
+    quickSet: QuickSetForm,
+  ): Promise<boolean> {
+    const reps = parseNullableNumber(quickSet.reps, 'Reps');
+    const weightKg = parseNullableNumber(quickSet.weightKg, 'Weight');
+
+    if (typeof reps === 'string') {
+      this.errorMessage = reps;
+      return false;
+    }
+
+    if (typeof weightKg === 'string') {
+      this.errorMessage = weightKg;
+      return false;
+    }
+
+    const notes = quickSet.notes.trim();
+
+    if (reps === null && weightKg === null && !notes) {
+      this.errorMessage = 'Add reps, weight, or notes before saving a set.';
+      return false;
+    }
+
+    this.savingSetExerciseId = quickSet.key;
+    this.errorMessage = '';
+
+    try {
+      const result = await this.liveWorkoutService.addSet(workoutExercise.id, {
+        reps,
+        weightKg,
+        notes: notes || null,
+      });
+
+      if (result.error || !result.data) {
+        throw new Error(result.error ?? 'Unable to save set.');
+      }
+
+      this.setsByExercise = {
+        ...this.setsByExercise,
+        [workoutExercise.id]: [...this.getSets(workoutExercise.id), result.data].sort(
+          (a, b) => a.setNumber - b.setNumber,
+        ),
+      };
+      this.quickSetFormsByExercise = {
+        ...this.quickSetFormsByExercise,
+        [workoutExercise.id]: this.getQuickSetForms(workoutExercise.id).filter(
+          (currentQuickSet) => currentQuickSet.key !== quickSet.key,
+        ),
+      };
+
+      return true;
+    } catch (error) {
+      this.errorMessage = getErrorMessage(error, 'Unable to save set.');
+      console.error('Live workout quick set save failed:', {
+        workoutExerciseId: workoutExercise.id,
+        quickSet,
+        error,
+      });
+      return false;
+    } finally {
+      this.savingSetExerciseId = null;
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   private async loadExerciseNames(): Promise<void> {
@@ -720,6 +877,14 @@ function createQuickSetForms(
     notes: set.notes ?? '',
     source: set.source,
   }));
+}
+
+function isSavableQuickSet(quickSet: QuickSetForm): boolean {
+  return (
+    (quickSet.reps !== null && quickSet.reps !== '')
+    || (quickSet.weightKg !== null && quickSet.weightKg !== '')
+    || quickSet.notes.trim().length > 0
+  );
 }
 
 function parseNullableNumber(

@@ -7,6 +7,7 @@ import { WorkoutTemplateService } from '../../../core/services/workout-template.
 import {
   Exercise,
   ExerciseCategory,
+  WorkoutSession,
   WorkoutTemplate,
   WorkoutTemplateBlock,
   WorkoutTemplateBlockExercise,
@@ -84,6 +85,39 @@ interface CustomExerciseForm {
         <p class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
           {{ actionMessage }}
         </p>
+      }
+
+      @if (showActiveWorkoutPrompt && activeWorkout) {
+        <div class="rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <h3 class="text-lg font-bold text-amber-950">Active workout detected.</h3>
+          <p class="mt-2 text-sm text-amber-800">
+            Resume your current workout or cancel it before starting this template.
+          </p>
+          <div class="mt-4 grid gap-2 sm:grid-cols-3">
+            <button
+              type="button"
+              (click)="resumeActiveWorkout()"
+              class="rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
+            >
+              Resume
+            </button>
+            <button
+              type="button"
+              (click)="cancelCurrentAndStartNew()"
+              [disabled]="isStartingWorkout"
+              class="rounded-md border border-red-200 bg-white px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100"
+            >
+              Cancel Current & Start New
+            </button>
+            <button
+              type="button"
+              (click)="closeActiveWorkoutPrompt()"
+              class="rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
+            >
+              Stay Here
+            </button>
+          </div>
+        </div>
       }
 
       @if (isLoading) {
@@ -500,6 +534,8 @@ export class TemplateEditorComponent {
   errorMessage = '';
   statusMessage = '';
   actionMessage = '';
+  activeWorkout: WorkoutSession | null = null;
+  showActiveWorkoutPrompt = false;
   private readonly addingExerciseKeys = new Set<string>();
   private readonly templateId = this.route.snapshot.paramMap.get('id');
   private mainLoadId = 0;
@@ -522,9 +558,78 @@ export class TemplateEditorComponent {
       return;
     }
 
+    this.errorMessage = '';
+    this.statusMessage = '';
+
+    try {
+      const activeResult = await this.liveWorkoutService.resumeWorkout();
+
+      if (activeResult.error) {
+        this.errorMessage = activeResult.error;
+        return;
+      }
+
+      if (activeResult.data) {
+        this.activeWorkout = activeResult.data;
+        this.showActiveWorkoutPrompt = true;
+        return;
+      }
+
+      await this.startNewWorkout();
+    } catch (error) {
+      this.errorMessage = getErrorMessage(error, 'Unable to start workout.');
+      console.error('Template editor start workout failed:', error);
+    } finally {
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  async resumeActiveWorkout(): Promise<void> {
+    if (!this.activeWorkout) {
+      return;
+    }
+
+    await this.router.navigate(['/workout/live', this.activeWorkout.id]);
+  }
+
+  async cancelCurrentAndStartNew(): Promise<void> {
+    if (!this.activeWorkout || this.isStartingWorkout) {
+      return;
+    }
+
     this.isStartingWorkout = true;
     this.errorMessage = '';
     this.statusMessage = '';
+
+    try {
+      const cancelResult = await this.liveWorkoutService.cancelWorkout(this.activeWorkout.id);
+
+      if (cancelResult.error) {
+        this.errorMessage = cancelResult.error;
+        return;
+      }
+
+      this.closeActiveWorkoutPrompt();
+      await this.startNewWorkout();
+    } catch (error) {
+      this.errorMessage = getErrorMessage(error, 'Unable to start workout.');
+      console.error('Template editor cancel and start failed:', error);
+    } finally {
+      this.isStartingWorkout = false;
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  closeActiveWorkoutPrompt(): void {
+    this.showActiveWorkoutPrompt = false;
+  }
+
+  private async startNewWorkout(): Promise<void> {
+    if (!this.template) {
+      return;
+    }
+
+    this.isStartingWorkout = true;
 
     try {
       const result = await this.liveWorkoutService.startWorkoutFromTemplate(this.template.id);

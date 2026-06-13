@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { LiveWorkoutService } from '../../../core/services/live-workout.service';
 import { WorkoutTemplateService } from '../../../core/services/workout-template.service';
-import { WorkoutTemplate } from '../../../shared/models/fitness.models';
+import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.models';
 
 @Component({
   selector: 'app-workout-templates',
@@ -89,6 +89,39 @@ import { WorkoutTemplate } from '../../../shared/models/fitness.models';
         <p class="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">
           {{ statusMessage }}
         </p>
+      }
+
+      @if (showActiveWorkoutPrompt && activeWorkout) {
+        <div class="rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <h3 class="text-lg font-bold text-amber-950">Active workout detected.</h3>
+          <p class="mt-2 text-sm text-amber-800">
+            Resume your current workout or cancel it before starting a new one.
+          </p>
+          <div class="mt-4 grid gap-2 sm:grid-cols-3">
+            <button
+              type="button"
+              (click)="resumeActiveWorkout()"
+              class="rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
+            >
+              Resume
+            </button>
+            <button
+              type="button"
+              (click)="cancelCurrentAndStartNew()"
+              [disabled]="processingTemplateId === pendingStartTemplate?.id"
+              class="rounded-md border border-red-200 bg-white px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100"
+            >
+              Cancel Current & Start New
+            </button>
+            <button
+              type="button"
+              (click)="closeActiveWorkoutPrompt()"
+              class="rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
+            >
+              Stay Here
+            </button>
+          </div>
+        </div>
       }
 
       @if (isLoading) {
@@ -202,6 +235,9 @@ export class WorkoutTemplatesComponent {
   errorMessage = '';
   statusMessage = '';
   processingTemplateId: string | null = null;
+  activeWorkout: WorkoutSession | null = null;
+  pendingStartTemplate: WorkoutTemplate | null = null;
+  showActiveWorkoutPrompt = false;
 
   constructor() {
     void this.loadTemplates();
@@ -280,9 +316,75 @@ export class WorkoutTemplatesComponent {
       return;
     }
 
+    this.errorMessage = '';
+    this.statusMessage = '';
+
+    try {
+      const activeResult = await this.liveWorkoutService.resumeWorkout();
+
+      if (activeResult.error) {
+        this.errorMessage = activeResult.error;
+        return;
+      }
+
+      if (activeResult.data) {
+        this.activeWorkout = activeResult.data;
+        this.pendingStartTemplate = template;
+        this.showActiveWorkoutPrompt = true;
+        return;
+      }
+
+      await this.startNewWorkout(template);
+    } catch (error) {
+      this.errorMessage = getErrorMessage(error, 'Unable to start workout.');
+    } finally {
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  async resumeActiveWorkout(): Promise<void> {
+    if (!this.activeWorkout) {
+      return;
+    }
+
+    await this.router.navigate(['/workout/live', this.activeWorkout.id]);
+  }
+
+  async cancelCurrentAndStartNew(): Promise<void> {
+    if (!this.activeWorkout || !this.pendingStartTemplate || this.processingTemplateId) {
+      return;
+    }
+
+    const template = this.pendingStartTemplate;
     this.processingTemplateId = template.id;
     this.errorMessage = '';
     this.statusMessage = '';
+
+    try {
+      const cancelResult = await this.liveWorkoutService.cancelWorkout(this.activeWorkout.id);
+
+      if (cancelResult.error) {
+        this.errorMessage = cancelResult.error;
+        return;
+      }
+
+      this.closeActiveWorkoutPrompt();
+      await this.startNewWorkout(template);
+    } catch (error) {
+      this.errorMessage = getErrorMessage(error, 'Unable to start workout.');
+    } finally {
+      this.processingTemplateId = null;
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  closeActiveWorkoutPrompt(): void {
+    this.showActiveWorkoutPrompt = false;
+    this.pendingStartTemplate = null;
+  }
+
+  private async startNewWorkout(template: WorkoutTemplate): Promise<void> {
+    this.processingTemplateId = template.id;
 
     try {
       const result = await this.liveWorkoutService.startWorkoutFromTemplate(template.id);
