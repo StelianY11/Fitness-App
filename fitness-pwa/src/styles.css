@@ -1,2 +1,66 @@
 /* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
+
+:root {
+  --app-accent: #16a34a;
+  --app-accent-soft: #16a34a1a;
+}
+
+.bg-green-50 {
+  background-color: var(--app-accent-soft);
+}
+
+.bg-green-100 {
+  background-color: var(--app-accent-soft);
+}
+
+.bg-green-600 {
+  background-color: var(--app-accent);
+}
+
+.border-green-200,
+.border-green-600 {
+  border-color: var(--app-accent);
+}
+
+.text-green-700,
+.text-green-800,
+.text-green-900 {
+  color: var(--app-accent);
+}
+
+.focus\:border-green-600:focus {
+  border-color: var(--app-accent);
+}
+
+.focus\:ring-green-100:focus {
+  --tw-ring-color: var(--app-accent-soft);
+}
+
+html.dark body {
+  background: #020617;
+  color: #e2e8f0;
+}
+
+html.dark .bg-white,
+html.dark .bg-slate-50,
+html.dark .bg-slate-100 {
+  background-color: #0f172a;
+}
+
+html.dark .border-slate-200,
+html.dark .border-slate-300 {
+  border-color: #334155;
+}
+
+html.dark .text-slate-950,
+html.dark .text-slate-900,
+html.dark .text-slate-800 {
+  color: #f8fafc;
+}
+
+html.dark .text-slate-700,
+html.dark .text-slate-600,
+html.dark .text-slate-500 {
+  color: #cbd5e1;
+}

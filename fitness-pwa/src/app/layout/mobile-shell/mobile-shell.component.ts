@@ -2,7 +2,9 @@ import { Component, OnInit, inject } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
+import { AppSettingsService } from '../../core/services/app-settings.service';
 import { LiveWorkoutService } from '../../core/services/live-workout.service';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-mobile-shell',
@@ -39,7 +41,7 @@ import { LiveWorkoutService } from '../../core/services/live-workout.service';
           <router-outlet />
         </section>
 
-        <nav class="grid grid-cols-3 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] text-sm font-medium">
+        <nav class="grid grid-cols-4 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] text-sm font-medium">
           <a
             routerLink="/login"
             routerLinkActive="text-green-700"
@@ -59,7 +61,14 @@ import { LiveWorkoutService } from '../../core/services/live-workout.service';
             routerLinkActive="text-green-700"
             class="px-3 py-4 text-center text-slate-600"
           >
-            Dashboard
+            {{ t('dashboard') }}
+          </a>
+          <a
+            routerLink="/settings"
+            routerLinkActive="text-green-700"
+            class="px-3 py-4 text-center text-slate-600"
+          >
+            {{ t('settings') }}
           </a>
         </nav>
       </div>
@@ -68,10 +77,13 @@ import { LiveWorkoutService } from '../../core/services/live-workout.service';
 })
 export class MobileShellComponent implements OnInit {
   private readonly authService = inject(AuthService);
+  private readonly appSettingsService = inject(AppSettingsService);
   private readonly liveWorkoutService = inject(LiveWorkoutService);
+  private readonly translationService = inject(TranslationService);
   private readonly router = inject(Router);
 
   readonly activeWorkout = this.liveWorkoutService.activeWorkout;
+  readonly settings = this.appSettingsService.settings;
 
   ngOnInit(): void {
     void this.refreshActiveWorkout();
@@ -102,6 +114,10 @@ export class MobileShellComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit',
     });
+  }
+
+  t(key: Parameters<TranslationService['translate']>[0]): string {
+    return this.translationService.translate(key);
   }
 
   private async refreshActiveWorkout(): Promise<void> {

@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { LiveWorkoutService } from '../../core/services/live-workout.service';
+import { TranslationService } from '../../core/services/translation.service';
 import { WorkoutTemplateService } from '../../core/services/workout-template.service';
 import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.models';
 
@@ -12,7 +13,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
     <div class="space-y-5">
       <div>
         <p class="text-sm font-semibold text-green-700">Welcome</p>
-        <h2 class="mt-2 text-3xl font-bold">Dashboard</h2>
+        <h2 class="mt-2 text-3xl font-bold">{{ t('dashboard') }}</h2>
         <p class="mt-2 text-sm text-slate-600">
           {{ userEmail || 'Your account is ready.' }}
         </p>
@@ -77,21 +78,28 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
         routerLink="/exercises"
         class="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
       >
-        Open Exercise Library
+        {{ t('exerciseLibrary') }}
       </a>
 
       <a
         routerLink="/templates"
         class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-green-600 px-4 py-3 text-sm font-semibold text-green-700"
       >
-        Open Workout Templates
+        {{ t('templates') }}
       </a>
 
       <a
         routerLink="/history"
         class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
       >
-        Open Workout History
+        {{ t('history') }}
+      </a>
+
+      <a
+        routerLink="/settings"
+        class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
+      >
+        {{ t('settings') }}
       </a>
 
       @if (errorMessage) {
@@ -106,7 +114,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
         [disabled]="isLoading"
         class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
       >
-        {{ isLoading ? 'Logging out...' : 'Log out' }}
+        {{ isLoading ? 'Logging out...' : t('logout') }}
       </button>
     </div>
   `,
@@ -115,6 +123,7 @@ export class DashboardComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly liveWorkoutService = inject(LiveWorkoutService);
   private readonly workoutTemplateService = inject(WorkoutTemplateService);
+  private readonly translationService = inject(TranslationService);
   private readonly router = inject(Router);
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
 
@@ -132,6 +141,10 @@ export class DashboardComponent implements OnInit {
     this.authService.getCurrentUser().then((user) => {
       this.userEmail = user?.email ?? '';
     });
+  }
+
+  t(key: Parameters<TranslationService['translate']>[0]): string {
+    return this.translationService.translate(key);
   }
 
   ngOnInit(): void {
