@@ -17,7 +17,7 @@ import {
         <div>
           <p class="text-sm font-semibold text-green-700">{{ t('exerciseLibrary') }}</p>
           <h2 class="mt-2 text-3xl font-bold">{{ t('exerciseLibrary') }}</h2>
-          <p class="mt-2 text-sm text-slate-600">Browse seeded movements by muscle, equipment, or category.</p>
+          <p class="mt-2 text-sm text-slate-600">{{ t('exerciseLibraryDescription') }}</p>
         </div>
 
         <a
@@ -29,12 +29,12 @@ import {
       </div>
 
       <label class="block">
-        <span class="text-sm font-medium text-slate-700">Search</span>
+        <span class="text-sm font-medium text-slate-700">{{ t('search') }}</span>
         <input
           type="search"
           [(ngModel)]="searchQuery"
           (ngModelChange)="onSearchChange($event)"
-          placeholder="Search exercises"
+          [placeholder]="t('searchExercises')"
           class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
         />
       </label>
@@ -51,7 +51,7 @@ import {
             [class.border-slate-200]="selectedCategoryId !== null"
             [class.text-slate-700]="selectedCategoryId !== null"
           >
-            All
+            {{ t('all') }}
           </button>
 
           @for (category of categories; track category.id) {
@@ -79,20 +79,20 @@ import {
         </div>
       } @else if (errorMessage) {
         <div class="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p class="font-semibold text-red-800">Unable to load exercises</p>
+          <p class="font-semibold text-red-800">{{ t('unableToLoadExercises') }}</p>
           <p class="mt-1 text-sm text-red-700">{{ errorMessage }}</p>
           <button
             type="button"
             (click)="loadExerciseLibrary()"
             class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
           >
-            Retry
+            {{ t('retry') }}
           </button>
         </div>
       } @else if (filteredExercises.length === 0) {
         <div class="rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
-          <p class="font-semibold text-slate-800">No exercises found</p>
-          <p class="mt-1 text-sm text-slate-600">Try a different search or category.</p>
+          <p class="font-semibold text-slate-800">{{ t('noExercisesFound') }}</p>
+          <p class="mt-1 text-sm text-slate-600">{{ t('search') }}</p>
         </div>
       } @else {
         <div class="space-y-3">
@@ -111,17 +111,17 @@ import {
               </div>
 
               <p class="mt-3 text-sm text-slate-600">
-                {{ exercise.description || 'No description available yet.' }}
+                {{ exercise.description || t('noDescription') }}
               </p>
 
               <div class="mt-4 grid grid-cols-2 gap-2 text-sm">
                 <div class="rounded-md bg-slate-50 p-3">
-                  <p class="text-xs font-medium text-slate-500">Primary muscle</p>
+                  <p class="text-xs font-medium text-slate-500">{{ t('primaryMuscle') }}</p>
                   <p class="mt-1 font-semibold text-slate-900">{{ getPrimaryMuscle(exercise) }}</p>
                 </div>
                 <div class="rounded-md bg-slate-50 p-3">
-                  <p class="text-xs font-medium text-slate-500">Equipment</p>
-                  <p class="mt-1 font-semibold text-slate-900">{{ exercise.equipment || 'None' }}</p>
+                  <p class="text-xs font-medium text-slate-500">{{ t('equipment') }}</p>
+                  <p class="mt-1 font-semibold text-slate-900">{{ exercise.equipment || t('noEquipment') }}</p>
                 </div>
               </div>
 
@@ -129,7 +129,7 @@ import {
                 [routerLink]="['/exercises', exercise.id, 'history']"
                 class="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
               >
-                History
+                {{ t('history') }}
               </a>
             </article>
           }
@@ -191,25 +191,25 @@ export class ExerciseLibraryComponent {
   }
 
   getCategoryName(categoryId: string | null): string {
-    return this.categories.find((category) => category.id === categoryId)?.name ?? 'General';
+    return this.categories.find((category) => category.id === categoryId)?.name ?? this.t('general');
   }
 
   getPrimaryMuscle(exercise: Exercise): string {
-    return exercise.muscleGroups[0] ?? 'General';
+    return exercise.muscleGroups[0] ?? this.t('general');
   }
 
   getDifficulty(exercise: Exercise): string {
     const equipment = exercise.equipment?.toLowerCase() ?? '';
 
     if (equipment === 'bodyweight' || equipment === 'none') {
-      return 'Beginner';
+      return this.t('beginner');
     }
 
     if (equipment.includes('barbell') || equipment.includes('pull-up')) {
-      return 'Advanced';
+      return this.t('advanced');
     }
 
-    return 'Intermediate';
+    return this.t('intermediate');
   }
 
   async loadExerciseLibrary(): Promise<void> {

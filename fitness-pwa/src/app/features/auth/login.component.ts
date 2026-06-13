@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-login',
@@ -9,14 +10,14 @@ import { AuthService } from '../../core/services/auth.service';
   template: `
     <form class="space-y-5" [formGroup]="form" (ngSubmit)="submit()">
       <div>
-        <p class="text-sm font-semibold text-green-700">Welcome back</p>
-        <h2 class="mt-2 text-3xl font-bold">Log in</h2>
-        <p class="mt-2 text-sm text-slate-600">Sign in to continue to your fitness dashboard.</p>
+        <p class="text-sm font-semibold text-green-700">{{ t('welcomeBack') }}</p>
+        <h2 class="mt-2 text-3xl font-bold">{{ t('login') }}</h2>
+        <p class="mt-2 text-sm text-slate-600">{{ t('signInDescription') }}</p>
       </div>
 
       <div class="space-y-4">
         <label class="block">
-          <span class="text-sm font-medium text-slate-700">Email</span>
+          <span class="text-sm font-medium text-slate-700">{{ t('email') }}</span>
           <input
             type="email"
             formControlName="email"
@@ -24,14 +25,14 @@ import { AuthService } from '../../core/services/auth.service';
             class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
           />
           @if (showEmailRequiredError) {
-            <span class="mt-1 block text-sm text-red-700">Email is required.</span>
+            <span class="mt-1 block text-sm text-red-700">{{ t('emailRequired') }}</span>
           } @else if (showEmailFormatError) {
-            <span class="mt-1 block text-sm text-red-700">Enter a valid email address.</span>
+            <span class="mt-1 block text-sm text-red-700">{{ t('validEmailRequired') }}</span>
           }
         </label>
 
         <label class="block">
-          <span class="text-sm font-medium text-slate-700">Password</span>
+          <span class="text-sm font-medium text-slate-700">{{ t('password') }}</span>
           <input
             type="password"
             formControlName="password"
@@ -39,7 +40,7 @@ import { AuthService } from '../../core/services/auth.service';
             class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
           />
           @if (showPasswordRequiredError) {
-            <span class="mt-1 block text-sm text-red-700">Password is required.</span>
+            <span class="mt-1 block text-sm text-red-700">{{ t('passwordRequired') }}</span>
           }
         </label>
       </div>
@@ -55,12 +56,12 @@ import { AuthService } from '../../core/services/auth.service';
         [disabled]="form.invalid || isLoading"
         class="inline-flex w-full justify-center rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
       >
-        {{ isLoading ? 'Signing in...' : 'Log in' }}
+        {{ isLoading ? t('loading') : t('login') }}
       </button>
 
       <p class="text-center text-sm text-slate-600">
-        No account yet?
-        <a routerLink="/register" class="font-semibold text-green-700">Register</a>
+        {{ t('noAccountYet') }}
+        <a routerLink="/register" class="font-semibold text-green-700">{{ t('register') }}</a>
       </p>
     </form>
   `,
@@ -69,6 +70,7 @@ export class LoginComponent {
   private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly translationService = inject(TranslationService);
 
   readonly form = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -77,6 +79,10 @@ export class LoginComponent {
 
   isLoading = false;
   errorMessage = '';
+
+  t(key: string): string {
+    return this.translationService.translate(key);
+  }
 
   get showEmailRequiredError(): boolean {
     const email = this.form.controls.email;

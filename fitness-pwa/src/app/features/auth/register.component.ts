@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-register',
@@ -15,14 +16,14 @@ import { AuthService } from '../../core/services/auth.service';
   template: `
     <form class="space-y-5" [formGroup]="form" (ngSubmit)="submit()">
       <div>
-        <p class="text-sm font-semibold text-green-700">Start strong</p>
-        <h2 class="mt-2 text-3xl font-bold">Register</h2>
-        <p class="mt-2 text-sm text-slate-600">Create your account with Supabase Auth.</p>
+        <p class="text-sm font-semibold text-green-700">{{ t('startStrong') }}</p>
+        <h2 class="mt-2 text-3xl font-bold">{{ t('register') }}</h2>
+        <p class="mt-2 text-sm text-slate-600">{{ t('register') }}</p>
       </div>
 
       <div class="space-y-4">
         <label class="block">
-          <span class="text-sm font-medium text-slate-700">Email</span>
+          <span class="text-sm font-medium text-slate-700">{{ t('email') }}</span>
           <input
             type="email"
             formControlName="email"
@@ -30,14 +31,14 @@ import { AuthService } from '../../core/services/auth.service';
             class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
           />
           @if (showEmailRequiredError) {
-            <span class="mt-1 block text-sm text-red-700">Email is required.</span>
+            <span class="mt-1 block text-sm text-red-700">{{ t('emailRequired') }}</span>
           } @else if (showEmailFormatError) {
-            <span class="mt-1 block text-sm text-red-700">Enter a valid email address.</span>
+            <span class="mt-1 block text-sm text-red-700">{{ t('validEmailRequired') }}</span>
           }
         </label>
 
         <label class="block">
-          <span class="text-sm font-medium text-slate-700">Password</span>
+          <span class="text-sm font-medium text-slate-700">{{ t('password') }}</span>
           <input
             type="password"
             formControlName="password"
@@ -45,14 +46,14 @@ import { AuthService } from '../../core/services/auth.service';
             class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
           />
           @if (showPasswordRequiredError) {
-            <span class="mt-1 block text-sm text-red-700">Password is required.</span>
+            <span class="mt-1 block text-sm text-red-700">{{ t('passwordRequired') }}</span>
           } @else if (showPasswordLengthError) {
-            <span class="mt-1 block text-sm text-red-700">Password must be at least 6 characters.</span>
+            <span class="mt-1 block text-sm text-red-700">{{ t('passwordMinLength') }}</span>
           }
         </label>
 
         <label class="block">
-          <span class="text-sm font-medium text-slate-700">Confirm password</span>
+          <span class="text-sm font-medium text-slate-700">{{ t('confirmPassword') }}</span>
           <input
             type="password"
             formControlName="confirmPassword"
@@ -60,9 +61,9 @@ import { AuthService } from '../../core/services/auth.service';
             class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
           />
           @if (showConfirmPasswordRequiredError) {
-            <span class="mt-1 block text-sm text-red-700">Confirm your password.</span>
+            <span class="mt-1 block text-sm text-red-700">{{ t('confirmPasswordRequired') }}</span>
           } @else if (showPasswordMismatchError) {
-            <span class="mt-1 block text-sm text-red-700">Passwords do not match.</span>
+            <span class="mt-1 block text-sm text-red-700">{{ t('passwordsDoNotMatch') }}</span>
           }
         </label>
       </div>
@@ -84,12 +85,12 @@ import { AuthService } from '../../core/services/auth.service';
         [disabled]="form.invalid || isLoading"
         class="inline-flex w-full justify-center rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
       >
-        {{ isLoading ? 'Creating account...' : 'Create account' }}
+        {{ isLoading ? t('loading') : t('createAccount') }}
       </button>
 
       <p class="text-center text-sm text-slate-600">
-        Already have an account?
-        <a routerLink="/login" class="font-semibold text-green-700">Log in</a>
+        {{ t('alreadyHaveAccount') }}
+        <a routerLink="/login" class="font-semibold text-green-700">{{ t('login') }}</a>
       </p>
     </form>
   `,
@@ -98,6 +99,7 @@ export class RegisterComponent {
   private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly translationService = inject(TranslationService);
 
   readonly form = this.formBuilder.nonNullable.group(
     {
@@ -111,6 +113,10 @@ export class RegisterComponent {
   isLoading = false;
   errorMessage = '';
   successMessage = '';
+
+  t(key: string): string {
+    return this.translationService.translate(key);
+  }
 
   get showEmailRequiredError(): boolean {
     const email = this.form.controls.email;

@@ -16,7 +16,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
           <p class="text-sm font-semibold text-green-700">{{ t('workoutTemplates') }}</p>
           <h2 class="mt-2 text-3xl font-bold">{{ t('workoutTemplates') }}</h2>
           <p class="mt-2 text-sm text-slate-600">
-            Create reusable plans now. Exercise editing comes in a later phase.
+            {{ t('templatesDescription') }}
           </p>
         </div>
 
@@ -33,7 +33,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
         (click)="openCreateForm()"
         class="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
       >
-        New Template
+        {{ t('newTemplate') }}
       </button>
 
       @if (showCreateForm) {
@@ -42,12 +42,12 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
           (ngSubmit)="createTemplate()"
         >
           <div>
-            <h3 class="text-lg font-bold text-slate-950">New Template</h3>
-            <p class="mt-1 text-sm text-slate-600">Start with a name and optional description.</p>
+            <h3 class="text-lg font-bold text-slate-950">{{ t('newTemplate') }}</h3>
+            <p class="mt-1 text-sm text-slate-600">{{ t('description') }}</p>
           </div>
 
           <label class="block">
-            <span class="text-sm font-medium text-slate-700">Template name</span>
+            <span class="text-sm font-medium text-slate-700">{{ t('newTemplate') }}</span>
             <input
               type="text"
               name="templateName"
@@ -58,7 +58,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
           </label>
 
           <label class="block">
-            <span class="text-sm font-medium text-slate-700">Description</span>
+            <span class="text-sm font-medium text-slate-700">{{ t('description') }}</span>
             <textarea
               name="templateDescription"
               [(ngModel)]="newTemplateDescription"
@@ -73,14 +73,14 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
               (click)="closeCreateForm()"
               class="rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
             >
-              Cancel
+              {{ t('cancel') }}
             </button>
             <button
               type="submit"
               [disabled]="isSaving || !newTemplateName.trim()"
               class="rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-              {{ isSaving ? 'Creating...' : 'Create' }}
+              {{ isSaving ? t('loading') : t('create') }}
             </button>
           </div>
         </form>
@@ -94,9 +94,9 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
 
       @if (showActiveWorkoutPrompt && activeWorkout) {
         <div class="rounded-lg border border-amber-200 bg-amber-50 p-4">
-          <h3 class="text-lg font-bold text-amber-950">Active workout detected.</h3>
+          <h3 class="text-lg font-bold text-amber-950">{{ t('activeWorkout') }}</h3>
           <p class="mt-2 text-sm text-amber-800">
-            Resume your current workout or cancel it before starting a new one.
+            {{ t('activeWorkoutNewPrompt') }}
           </p>
           <div class="mt-4 grid gap-2 sm:grid-cols-3">
             <button
@@ -104,7 +104,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
               (click)="resumeActiveWorkout()"
               class="rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
             >
-              Resume
+              {{ t('resume') }}
             </button>
             <button
               type="button"
@@ -112,14 +112,14 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
               [disabled]="processingTemplateId === pendingStartTemplate?.id"
               class="rounded-md border border-red-200 bg-white px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100"
             >
-              Cancel Current & Start New
+              {{ t('cancelWorkout') }}
             </button>
             <button
               type="button"
               (click)="closeActiveWorkoutPrompt()"
               class="rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
             >
-              Stay Here
+              {{ t('cancel') }}
             </button>
           </div>
         </div>
@@ -133,20 +133,20 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
         </div>
       } @else if (errorMessage) {
         <div class="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p class="font-semibold text-red-800">Unable to load templates</p>
+          <p class="font-semibold text-red-800">{{ t('error') }}</p>
           <p class="mt-1 text-sm text-red-700">{{ errorMessage }}</p>
           <button
             type="button"
             (click)="loadTemplates()"
             class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
           >
-            Retry
+            {{ t('retry') }}
           </button>
         </div>
       } @else if (templates.length === 0) {
         <div class="rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
-          <p class="font-semibold text-slate-800">No templates yet</p>
-          <p class="mt-1 text-sm text-slate-600">Create your first reusable workout plan.</p>
+          <p class="font-semibold text-slate-800">{{ t('noTemplatesYet') }}</p>
+          <p class="mt-1 text-sm text-slate-600">{{ t('newTemplate') }}</p>
         </div>
       } @else {
         <div class="space-y-3">
@@ -166,17 +166,17 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                   [class.bg-slate-100]="!template.isBuiltin"
                   [class.text-slate-700]="!template.isBuiltin"
                 >
-                  {{ template.isBuiltin ? 'Builtin' : 'Mine' }}
+                  {{ template.isBuiltin ? t('builtin') : t('mine') }}
                 </span>
               </div>
 
               <div class="mt-4 grid grid-cols-2 gap-2 text-sm">
                 <div class="rounded-md bg-slate-50 p-3">
-                  <p class="text-xs font-medium text-slate-500">Training type</p>
-                  <p class="mt-1 font-semibold text-slate-900">{{ template.goal || 'General' }}</p>
+                  <p class="text-xs font-medium text-slate-500">{{ t('trainingType') }}</p>
+                  <p class="mt-1 font-semibold text-slate-900">{{ template.goal || t('general') }}</p>
                 </div>
                 <div class="rounded-md bg-slate-50 p-3">
-                  <p class="text-xs font-medium text-slate-500">Duration</p>
+                  <p class="text-xs font-medium text-slate-500">{{ t('duration') }}</p>
                   <p class="mt-1 font-semibold text-slate-900">
                     {{ formatDuration(template) }}
                   </p>
@@ -190,13 +190,13 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                   [disabled]="processingTemplateId === template.id"
                   class="inline-flex min-h-11 items-center justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
                 >
-                  {{ processingTemplateId === template.id ? 'Starting...' : 'Start Workout' }}
+                  {{ processingTemplateId === template.id ? t('loading') : t('startWorkout') }}
                 </button>
                 <a
                   [routerLink]="['/templates', template.id]"
                   class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800"
                 >
-                  View/Edit
+                  {{ t('edit') }}
                 </a>
                 <button
                   type="button"
@@ -204,7 +204,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                   [disabled]="processingTemplateId === template.id"
                   class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
                 >
-                  {{ processingTemplateId === template.id ? 'Working...' : 'Duplicate' }}
+                  {{ processingTemplateId === template.id ? t('loading') : t('duplicate') }}
                 </button>
                 @if (!template.isBuiltin) {
                   <button
@@ -213,7 +213,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                     [disabled]="processingTemplateId === template.id"
                     class="inline-flex min-h-11 items-center justify-center rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100"
                   >
-                    Delete
+                    {{ t('delete') }}
                   </button>
                 }
               </div>
@@ -417,7 +417,7 @@ export class WorkoutTemplatesComponent {
   }
 
   async deleteTemplate(template: WorkoutTemplate): Promise<void> {
-    if (template.isBuiltin || !confirm(`Delete "${template.name}"?`)) {
+    if (template.isBuiltin || !confirm(`${this.t('confirmDeleteTemplate')} ${template.name}`)) {
       return;
     }
 

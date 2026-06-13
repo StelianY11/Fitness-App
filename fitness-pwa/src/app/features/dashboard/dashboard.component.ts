@@ -31,15 +31,15 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
               <p class="mt-1 font-semibold text-slate-950">{{ formatTime(activeWorkout.startedAt) }}</p>
             </div>
             <div class="rounded-md bg-white p-3">
-              <p class="text-xs font-medium text-slate-500">Elapsed</p>
+              <p class="text-xs font-medium text-slate-500">{{ t('elapsed') }}</p>
               <p class="mt-1 font-semibold text-slate-950">{{ formatElapsed(activeWorkout.startedAt) }}</p>
             </div>
             <div class="rounded-md bg-white p-3">
-              <p class="text-xs font-medium text-slate-500">Exercises</p>
+              <p class="text-xs font-medium text-slate-500">{{ t('exercises') }}</p>
               <p class="mt-1 font-semibold text-slate-950">{{ activeWorkoutExerciseCount }}</p>
             </div>
             <div class="rounded-md bg-white p-3">
-              <p class="text-xs font-medium text-slate-500">Sets</p>
+              <p class="text-xs font-medium text-slate-500">{{ t('sets') }}</p>
               <p class="mt-1 font-semibold text-slate-950">{{ activeWorkoutSetCount }}</p>
             </div>
           </div>
@@ -57,7 +57,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
               [disabled]="isCancellingActiveWorkout"
               class="min-h-12 rounded-md border border-red-200 bg-white px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100"
             >
-              {{ isCancellingActiveWorkout ? 'Cancelling...' : t('cancelWorkout') }}
+              {{ isCancellingActiveWorkout ? t('loading') : t('cancelWorkout') }}
             </button>
           </div>
         </section>
@@ -103,7 +103,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
         [disabled]="isLoading"
         class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
       >
-        {{ isLoading ? 'Logging out...' : t('logout') }}
+        {{ isLoading ? t('loading') : t('logout') }}
       </button>
     </div>
   `,
@@ -153,7 +153,7 @@ export class DashboardComponent implements OnInit {
   async cancelActiveWorkout(): Promise<void> {
     const activeWorkout = this.liveWorkoutService.activeWorkout();
 
-    if (!activeWorkout || this.isCancellingActiveWorkout || !confirm('Cancel this active workout?')) {
+    if (!activeWorkout || this.isCancellingActiveWorkout || !confirm(this.t('confirmCancelActiveWorkout'))) {
       return;
     }
 

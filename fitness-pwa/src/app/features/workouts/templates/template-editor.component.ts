@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ExerciseService } from '../../../core/services/exercise.service';
 import { LiveWorkoutService } from '../../../core/services/live-workout.service';
+import { TranslationService } from '../../../core/services/translation.service';
 import { WorkoutTemplateService } from '../../../core/services/workout-template.service';
 import {
   Exercise,
@@ -36,8 +37,8 @@ interface CustomExerciseForm {
     <div class="space-y-5">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <p class="text-sm font-semibold text-green-700">Template Builder</p>
-          <h2 class="mt-2 text-3xl font-bold">{{ template?.name || 'Template' }}</h2>
+          <p class="text-sm font-semibold text-green-700">{{ t('workoutTemplates') }}</p>
+          <h2 class="mt-2 text-3xl font-bold">{{ template?.name || t('template') }}</h2>
           @if (template?.description) {
             <p class="mt-2 text-sm text-slate-600">{{ template?.description }}</p>
           }
@@ -51,21 +52,21 @@ interface CustomExerciseForm {
               [disabled]="isStartingWorkout || isSaving"
               class="inline-flex min-h-11 items-center justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-              {{ isStartingWorkout ? 'Starting...' : 'Start Workout' }}
+              {{ isStartingWorkout ? t('loading') : t('startWorkout') }}
             </button>
           }
           <a
             routerLink="/templates"
             class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-center text-sm font-semibold text-slate-700"
           >
-            Back
+            {{ t('back') }}
           </a>
         </div>
       </div>
 
       @if (template?.isBuiltin) {
         <p class="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          Builtin templates are read-only. Duplicate one from the templates list to edit your own copy.
+          {{ t('builtinReadOnlyDescription') }}
         </p>
       }
 
@@ -89,9 +90,9 @@ interface CustomExerciseForm {
 
       @if (showActiveWorkoutPrompt && activeWorkout) {
         <div class="rounded-lg border border-amber-200 bg-amber-50 p-4">
-          <h3 class="text-lg font-bold text-amber-950">Active workout detected.</h3>
+          <h3 class="text-lg font-bold text-amber-950">{{ t('activeWorkout') }}</h3>
           <p class="mt-2 text-sm text-amber-800">
-            Resume your current workout or cancel it before starting this template.
+            {{ t('activeWorkoutStartPrompt') }}
           </p>
           <div class="mt-4 grid gap-2 sm:grid-cols-3">
             <button
@@ -99,7 +100,7 @@ interface CustomExerciseForm {
               (click)="resumeActiveWorkout()"
               class="rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
             >
-              Resume
+              {{ t('resume') }}
             </button>
             <button
               type="button"
@@ -107,14 +108,14 @@ interface CustomExerciseForm {
               [disabled]="isStartingWorkout"
               class="rounded-md border border-red-200 bg-white px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100"
             >
-              Cancel Current & Start New
+              {{ t('cancelWorkout') }}
             </button>
             <button
               type="button"
               (click)="closeActiveWorkoutPrompt()"
               class="rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
             >
-              Stay Here
+              {{ t('cancel') }}
             </button>
           </div>
         </div>
@@ -128,14 +129,14 @@ interface CustomExerciseForm {
         </div>
       } @else if (!template) {
         <div class="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p class="font-semibold text-red-800">Unable to load template</p>
-          <p class="mt-1 text-sm text-red-700">{{ errorMessage || 'Template not found.' }}</p>
+          <p class="font-semibold text-red-800">{{ t('unableToLoadTemplate') }}</p>
+          <p class="mt-1 text-sm text-red-700">{{ errorMessage || t('templateNotFound') }}</p>
           <button
             type="button"
             (click)="reloadTemplate()"
             class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
           >
-            Retry
+            {{ t('retry') }}
           </button>
         </div>
       } @else {
@@ -144,20 +145,20 @@ interface CustomExerciseForm {
             class="space-y-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
             (ngSubmit)="addBlock()"
           >
-            <h3 class="text-lg font-bold text-slate-950">Add Block</h3>
+            <h3 class="text-lg font-bold text-slate-950">{{ t('addBlock') }}</h3>
             <label class="block">
-              <span class="text-sm font-medium text-slate-700">Block title</span>
+              <span class="text-sm font-medium text-slate-700">{{ t('blockTitle') }}</span>
               <input
                 type="text"
                 name="newBlockTitle"
                 [(ngModel)]="newBlockTitle"
-                placeholder="Upper body superset"
+                [placeholder]="t('blockTitlePlaceholder')"
                 class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
               />
             </label>
 
             <label class="block">
-              <span class="text-sm font-medium text-slate-700">Block type</span>
+              <span class="text-sm font-medium text-slate-700">{{ t('blockType') }}</span>
               <select
                 name="newBlockType"
                 [(ngModel)]="newBlockType"
@@ -174,15 +175,15 @@ interface CustomExerciseForm {
               [disabled]="isSaving"
               class="inline-flex w-full justify-center rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-              {{ isSaving ? 'Saving...' : 'Add Block' }}
+              {{ isSaving ? t('loading') : t('addBlock') }}
             </button>
           </form>
         }
 
         @if (blocks.length === 0) {
           <div class="rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
-            <p class="font-semibold text-slate-800">No blocks yet</p>
-            <p class="mt-1 text-sm text-slate-600">Add warmups, normal work, supersets, circuits, or notes.</p>
+            <p class="font-semibold text-slate-800">{{ t('noTemplatesYet') }}</p>
+            <p class="mt-1 text-sm text-slate-600">{{ t('addBlock') }}</p>
           </div>
         } @else {
           <div class="space-y-4">
@@ -204,7 +205,7 @@ interface CustomExerciseForm {
                         />
                       } @else {
                         <h3 class="mt-1 text-lg font-bold text-slate-950">
-                          {{ block.title || 'Untitled block' }}
+                          {{ block.title || t('untitledBlock') }}
                         </h3>
                       }
                     </div>
@@ -218,7 +219,7 @@ interface CustomExerciseForm {
                         [class.cursor-not-allowed]="isSaving"
                         [class.opacity-60]="isSaving"
                       >
-                        Remove
+                        {{ t('delete') }}
                       </button>
                     }
                   </div>
@@ -241,7 +242,7 @@ interface CustomExerciseForm {
                         [disabled]="blockIndex === 0 || isSaving"
                         class="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
                       >
-                        Up
+                        {{ t('up') }}
                       </button>
                       <button
                         type="button"
@@ -249,14 +250,14 @@ interface CustomExerciseForm {
                         [disabled]="blockIndex === blocks.length - 1 || isSaving"
                         class="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
                       >
-                        Down
+                        {{ t('down') }}
                       </button>
                       <button
                         type="button"
                         (click)="openExerciseSearch(block.id)"
                         class="min-h-11 rounded-md border border-green-600 px-3 py-2 text-sm font-semibold text-green-700"
                       >
-                        Add Exercise
+                        {{ t('addExercise') }}
                       </button>
                     </div>
                   }
@@ -264,26 +265,26 @@ interface CustomExerciseForm {
                   @if (activeExerciseSearchBlockId === block.id) {
                     <div class="space-y-3 rounded-md bg-slate-50 p-3">
                       <label class="block">
-                        <span class="text-sm font-medium text-slate-700">Search exercises</span>
+                        <span class="text-sm font-medium text-slate-700">{{ t('search') }}</span>
                         <input
                           type="search"
                           name="exerciseSearch"
                           [(ngModel)]="exerciseSearchQuery"
                           (ngModelChange)="searchExercises($event)"
-                          placeholder="Search by exercise name"
+                          [placeholder]="t('searchByExerciseName')"
                           class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
                         />
                       </label>
 
                       @if (isSearchingExercises) {
-                        <p class="text-sm text-slate-600">Searching...</p>
+                        <p class="text-sm text-slate-600">{{ t('loading') }}</p>
                       } @else if (exerciseSearchResults.length === 0) {
                         @if (hasSearchedExercises && exerciseSearchQuery.trim()) {
                           <div class="space-y-3 rounded-md border border-dashed border-slate-300 bg-white p-4">
                             <div>
-                              <p class="font-semibold text-slate-900">Exercise not found</p>
+                              <p class="font-semibold text-slate-900">{{ t('noExercisesFound') }}</p>
                               <p class="mt-1 text-sm text-slate-600">
-                                Create a private exercise and add it to this block.
+                                {{ t('createPrivateExerciseAdd') }}
                               </p>
                             </div>
                             <button
@@ -291,11 +292,11 @@ interface CustomExerciseForm {
                               (click)="openCustomExerciseForm(block.id)"
                               class="inline-flex min-h-11 items-center justify-center rounded-md border border-green-600 px-3 py-2 text-sm font-semibold text-green-700"
                             >
-                              + Create custom exercise
+                              + {{ t('createCustomExercise') }}
                             </button>
                           </div>
                         } @else {
-                          <p class="text-sm text-slate-600">Search for an exercise to add.</p>
+                          <p class="text-sm text-slate-600">{{ t('searchExerciseToAdd') }}</p>
                         }
                       } @else {
                         <div class="space-y-2">
@@ -311,16 +312,16 @@ interface CustomExerciseForm {
                               <span>
                                 <span class="block font-semibold text-slate-950">{{ exercise.name }}</span>
                                 <span class="mt-1 block text-sm text-slate-600">
-                                  {{ exercise.equipment || 'No equipment' }}
+                                  {{ exercise.equipment || t('noEquipment') }}
                                 </span>
                               </span>
                               <span class="text-sm font-semibold text-green-700">
                                 @if (isExerciseAlreadyInBlock(block.id, exercise.id)) {
-                                  Already added
+                                  {{ t('selected') }}
                                 } @else if (isAddingExercise(exercise.id)) {
-                                  Adding...
+                                  {{ t('loading') }}
                                 } @else {
-                                  Add
+                                  {{ t('add') }}
                                 }
                               </span>
                             </button>
@@ -334,12 +335,12 @@ interface CustomExerciseForm {
                           (ngSubmit)="createCustomExercise(block)"
                         >
                           <div>
-                            <h4 class="font-bold text-slate-950">Create custom exercise</h4>
-                            <p class="mt-1 text-sm text-slate-600">This will be saved as your private exercise.</p>
+                            <h4 class="font-bold text-slate-950">{{ t('createCustomExercise') }}</h4>
+                            <p class="mt-1 text-sm text-slate-600">{{ t('privateExerciseDescription') }}</p>
                           </div>
 
                           <label class="block">
-                            <span class="text-sm font-medium text-slate-700">Name</span>
+                            <span class="text-sm font-medium text-slate-700">{{ t('newTemplate') }}</span>
                             <input
                               type="text"
                               name="customExerciseName"
@@ -350,13 +351,13 @@ interface CustomExerciseForm {
                           </label>
 
                           <label class="block">
-                            <span class="text-sm font-medium text-slate-700">Category</span>
+                            <span class="text-sm font-medium text-slate-700">{{ t('exerciseLibrary') }}</span>
                             <select
                               name="customExerciseCategory"
                               [(ngModel)]="customExercise.categoryId"
                               class="mt-2 w-full rounded-md border border-slate-300 px-3 py-3 text-base outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100"
                             >
-                              <option [ngValue]="null">No category</option>
+                              <option [ngValue]="null">{{ t('noCategory') }}</option>
                               @for (category of categories; track category.id) {
                                 <option [ngValue]="category.id">{{ category.name }}</option>
                               }
@@ -365,7 +366,7 @@ interface CustomExerciseForm {
 
                           <div class="grid gap-3 sm:grid-cols-2">
                             <label class="block">
-                              <span class="text-sm font-medium text-slate-700">Training type</span>
+                              <span class="text-sm font-medium text-slate-700">{{ t('trainingType') }}</span>
                               <input
                                 type="text"
                                 name="customExerciseTrainingType"
@@ -376,7 +377,7 @@ interface CustomExerciseForm {
                             </label>
 
                             <label class="block">
-                              <span class="text-sm font-medium text-slate-700">Exercise type</span>
+                              <span class="text-sm font-medium text-slate-700">{{ t('exerciseType') }}</span>
                               <input
                                 type="text"
                                 name="customExerciseExerciseType"
@@ -388,7 +389,7 @@ interface CustomExerciseForm {
                           </div>
 
                           <label class="block">
-                            <span class="text-sm font-medium text-slate-700">Equipment</span>
+                            <span class="text-sm font-medium text-slate-700">{{ t('equipment') }}</span>
                             <input
                               type="text"
                               name="customExerciseEquipment"
@@ -399,7 +400,7 @@ interface CustomExerciseForm {
                           </label>
 
                           <label class="block">
-                            <span class="text-sm font-medium text-slate-700">Notes</span>
+                            <span class="text-sm font-medium text-slate-700">{{ t('notes') }}</span>
                             <textarea
                               name="customExerciseDescription"
                               [(ngModel)]="customExercise.description"
@@ -414,14 +415,14 @@ interface CustomExerciseForm {
                               (click)="closeCustomExerciseForm()"
                               class="min-h-11 rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
                             >
-                              Cancel
+                              {{ t('cancel') }}
                             </button>
                             <button
                               type="submit"
                               [disabled]="isCreatingCustomExercise || !customExercise.name.trim()"
                               class="min-h-11 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
                             >
-                              {{ isCreatingCustomExercise ? 'Creating...' : 'Create & Add' }}
+                              {{ isCreatingCustomExercise ? t('loading') : t('create') }}
                             </button>
                           </div>
                         </form>
@@ -431,7 +432,7 @@ interface CustomExerciseForm {
 
                   @if (getBlockExercises(block.id).length === 0) {
                     <div class="rounded-md bg-slate-50 p-4 text-sm text-slate-600">
-                      No exercises in this block yet.
+                      {{ t('noExercisesFound') }}
                     </div>
                   } @else {
                     <div class="space-y-2">
@@ -456,7 +457,7 @@ interface CustomExerciseForm {
                                 [class.cursor-not-allowed]="isSaving"
                                 [class.opacity-60]="isSaving"
                               >
-                                Remove
+                                {{ t('delete') }}
                               </button>
                             }
                           </div>
@@ -501,6 +502,7 @@ export class TemplateEditorComponent {
   private readonly exerciseService = inject(ExerciseService);
   private readonly liveWorkoutService = inject(LiveWorkoutService);
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
+  private readonly translationService = inject(TranslationService);
 
   readonly loadingCards = [1, 2, 3];
   readonly blockTypes: BlockTypeOption[] = [
@@ -551,6 +553,10 @@ export class TemplateEditorComponent {
   constructor() {
     void this.reloadTemplate();
     void this.loadExerciseMetadata();
+  }
+
+  t(key: string): string {
+    return this.translationService.translate(key);
   }
 
   async startWorkout(): Promise<void> {
@@ -698,7 +704,7 @@ export class TemplateEditorComponent {
   }
 
   async removeBlock(block: WorkoutTemplateBlock): Promise<void> {
-    if (!this.canEdit || this.isSaving || !confirm(`Remove "${block.title || 'this block'}"?`)) {
+    if (!this.canEdit || this.isSaving || !confirm(`${this.t('confirmRemoveBlock')} ${block.title || this.t('untitledBlock')}`)) {
       return;
     }
 

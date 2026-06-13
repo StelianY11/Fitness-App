@@ -58,7 +58,7 @@ interface QuickSetForm extends SetForm {
 
       @if (errorMessage) {
         <div class="rounded-md border border-red-200 bg-red-50 px-3 py-2">
-          <p class="text-sm font-semibold text-red-800">Workout error</p>
+          <p class="text-sm font-semibold text-red-800">{{ t('error') }}</p>
           <p class="mt-1 text-sm text-red-700">{{ errorMessage }}</p>
         </div>
       }
@@ -66,9 +66,9 @@ interface QuickSetForm extends SetForm {
       @if (showUnsavedPrefillWarning) {
         <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/60 px-4 py-5">
           <div class="max-h-[85vh] w-full overflow-y-auto rounded-lg border border-amber-200 bg-amber-50 p-4 shadow-xl sm:max-w-lg">
-            <h3 class="text-lg font-bold text-amber-950">You have unsaved suggested sets</h3>
+            <h3 class="text-lg font-bold text-amber-950">{{ t('unsavedSuggestedSets') }}</h3>
             <p class="mt-2 text-sm text-amber-800">
-              Save these rows before finishing, or cancel and keep editing.
+              {{ t('saveFinishDescription') }}
             </p>
 
             <div class="mt-4 space-y-2">
@@ -79,7 +79,7 @@ interface QuickSetForm extends SetForm {
                       <p class="font-semibold text-slate-950">
                         {{ getExerciseName(item.workoutExercise.exerciseId) }}
                       </p>
-                      <p class="mt-1 text-sm text-slate-600">Set {{ item.quickSet.setNumber }}</p>
+                      <p class="mt-1 text-sm text-slate-600">{{ t('sets') }} {{ item.quickSet.setNumber }}</p>
                     </div>
                     <span class="rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">
                       {{ getPreFillSourceLabel(item.quickSet.source) }}
@@ -88,13 +88,13 @@ interface QuickSetForm extends SetForm {
 
                   <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
                     <div class="rounded-md bg-slate-50 p-2">
-                      <p class="text-xs font-medium text-slate-500">Weight</p>
+                      <p class="text-xs font-medium text-slate-500">{{ t('weight') }}</p>
                       <p class="mt-1 font-semibold text-slate-950">
                         {{ formatQuickSetWeight(item.quickSet) }}
                       </p>
                     </div>
                     <div class="rounded-md bg-slate-50 p-2">
-                      <p class="text-xs font-medium text-slate-500">Reps</p>
+                      <p class="text-xs font-medium text-slate-500">{{ t('reps') }}</p>
                       <p class="mt-1 font-semibold text-slate-950">
                         {{ formatQuickSetReps(item.quickSet) }}
                       </p>
@@ -117,7 +117,7 @@ interface QuickSetForm extends SetForm {
                 [disabled]="isSavingSuggestedSets || isFinishing"
                 class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
               >
-                {{ isSavingSuggestedSets ? 'Saving...' : t('saveAllAndFinish') }}
+                {{ isSavingSuggestedSets ? t('saving') : t('saveAllAndFinish') }}
               </button>
               <button
                 type="button"
@@ -134,28 +134,28 @@ interface QuickSetForm extends SetForm {
       @if (showFinishConfirmation) {
         <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/60 px-4 py-5">
           <div class="w-full rounded-lg border border-slate-200 bg-white p-4 shadow-xl sm:max-w-lg">
-            <h3 class="text-lg font-bold text-slate-950">Finish workout?</h3>
+            <h3 class="text-lg font-bold text-slate-950">{{ t('finishWorkout') }}</h3>
             <p class="mt-2 text-sm text-slate-600">
-              Review what has been saved before ending this session.
+              {{ t('finishReviewDescription') }}
             </p>
 
             @if (getTotalSavedSets() === 0) {
               <p class="mt-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-900">
-                This workout has no saved sets.
+                {{ t('noSavedSetsWarning') }}
               </p>
             }
 
             <div class="mt-4 grid grid-cols-3 gap-2 text-sm">
               <div class="rounded-md bg-slate-50 p-3">
-                <p class="text-xs font-medium text-slate-500">Exercises</p>
+                <p class="text-xs font-medium text-slate-500">{{ t('exercises') }}</p>
                 <p class="mt-1 text-lg font-bold text-slate-950">{{ workoutExercises.length }}</p>
               </div>
               <div class="rounded-md bg-slate-50 p-3">
-                <p class="text-xs font-medium text-slate-500">Saved sets</p>
+                <p class="text-xs font-medium text-slate-500">{{ t('sets') }}</p>
                 <p class="mt-1 text-lg font-bold text-slate-950">{{ getTotalSavedSets() }}</p>
               </div>
               <div class="rounded-md bg-slate-50 p-3">
-                <p class="text-xs font-medium text-slate-500">Total reps</p>
+                <p class="text-xs font-medium text-slate-500">{{ t('reps') }}</p>
                 <p class="mt-1 text-lg font-bold text-slate-950">{{ getTotalSavedReps() }}</p>
               </div>
             </div>
@@ -167,7 +167,7 @@ interface QuickSetForm extends SetForm {
                 [disabled]="isFinishing"
                 class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
               >
-                {{ isFinishing ? 'Finishing...' : t('finishWorkout') }}
+                {{ isFinishing ? t('finishing') : t('finishWorkout') }}
               </button>
               <button
                 type="button"
@@ -190,21 +190,21 @@ interface QuickSetForm extends SetForm {
         </div>
       } @else if (!session) {
         <div class="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p class="font-semibold text-red-800">Unable to load workout</p>
-          <p class="mt-1 text-sm text-red-700">{{ errorMessage || 'Workout session not found.' }}</p>
+          <p class="font-semibold text-red-800">{{ t('unableToLoadWorkout') }}</p>
+          <p class="mt-1 text-sm text-red-700">{{ errorMessage || t('workoutSessionNotFound') }}</p>
           <button
             type="button"
             (click)="loadLiveWorkout()"
             class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
           >
-            Retry
+            {{ t('retry') }}
           </button>
         </div>
       } @else {
         <section class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
           <div class="flex items-center justify-between gap-3">
             <div>
-              <p class="text-xs font-medium text-slate-500">Status</p>
+              <p class="text-xs font-medium text-slate-500">{{ t('status') }}</p>
               <p class="mt-1 text-lg font-bold capitalize text-slate-950">{{ session.status }}</p>
             </div>
             <span
@@ -214,16 +214,16 @@ interface QuickSetForm extends SetForm {
               [class.bg-slate-100]="session.status !== 'active'"
               [class.text-slate-700]="session.status !== 'active'"
             >
-              {{ workoutExercises.length }} exercises
+              {{ workoutExercises.length }} {{ t('exercises') }}
             </span>
           </div>
         </section>
 
         @if (workoutExercises.length === 0) {
           <div class="rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
-            <p class="font-semibold text-slate-800">No exercises copied</p>
+            <p class="font-semibold text-slate-800">{{ t('noExercisesFound') }}</p>
             <p class="mt-1 text-sm text-slate-600">
-              This template does not have exercises yet.
+              {{ t('noTemplateExercises') }}
             </p>
           </div>
         } @else {
@@ -233,7 +233,7 @@ interface QuickSetForm extends SetForm {
                 <div class="flex items-start justify-between gap-3">
                   <div>
                     <p class="text-xs font-semibold uppercase tracking-wide text-green-700">
-                      Exercise {{ exerciseIndex + 1 }}
+                      {{ t('exerciseNumber') }} {{ exerciseIndex + 1 }}
                     </p>
                     <h3 class="mt-1 text-lg font-bold text-slate-950">
                       {{ getExerciseName(workoutExercise.exerciseId) }}
@@ -248,7 +248,7 @@ interface QuickSetForm extends SetForm {
                     [disabled]="session.status !== 'active' || savingSetExerciseId === workoutExercise.id"
                     class="inline-flex min-h-11 items-center justify-center rounded-md border border-green-600 px-3 py-2 text-sm font-semibold text-green-700 disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-400"
                   >
-                    Add Set
+                    {{ t('addSet') }}
                   </button>
                 </div>
 
@@ -256,7 +256,7 @@ interface QuickSetForm extends SetForm {
                   [routerLink]="['/exercises', workoutExercise.exerciseId, 'history']"
                   class="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800"
                 >
-                  History
+                  {{ t('history') }}
                 </a>
 
                 @if (getSets(workoutExercise.id).length > 0) {
@@ -272,9 +272,9 @@ interface QuickSetForm extends SetForm {
                         <div class="flex items-center justify-between gap-3">
                           <div>
                             <p class="text-xs font-bold uppercase tracking-wide text-green-700">
-                              {{ wasRecentlySaved(set.id) ? 'Saved just now' : 'Saved' }}
+                              {{ wasRecentlySaved(set.id) ? t('savedJustNow') : t('saved') }}
                             </p>
-                            <p class="mt-1 font-semibold text-slate-950">Set {{ set.setNumber }}</p>
+                            <p class="mt-1 font-semibold text-slate-950">{{ t('sets') }} {{ set.setNumber }}</p>
                           </div>
                           <p class="text-base font-bold text-slate-950">
                             {{ formatSetSummary(set) }}
@@ -292,10 +292,10 @@ interface QuickSetForm extends SetForm {
                   <div class="mt-4 space-y-3 rounded-md border border-amber-200 bg-amber-50 p-3">
                     <div>
                       <p class="text-sm font-semibold text-amber-950">
-                        Editable suggestions from {{ getPreFillSourceLabel(getQuickSetForms(workoutExercise.id)[0].source) }}
+                        {{ t('editableSuggestionsFrom') }} {{ getPreFillSourceLabel(getQuickSetForms(workoutExercise.id)[0].source) }}
                       </p>
                       <p class="mt-1 text-xs text-amber-800">
-                        Edit a row or press Save to log it for today.
+                        {{ t('editOrSaveSuggestedSet') }}
                       </p>
                     </div>
 
@@ -306,8 +306,8 @@ interface QuickSetForm extends SetForm {
                       >
                         <div class="flex items-center justify-between gap-3">
                           <div>
-                            <p class="text-xs font-bold uppercase tracking-wide text-amber-700">Editable</p>
-                            <p class="mt-1 font-semibold text-slate-950">Set {{ quickSet.setNumber }}</p>
+                            <p class="text-xs font-bold uppercase tracking-wide text-amber-700">{{ t('editable') }}</p>
+                            <p class="mt-1 font-semibold text-slate-950">{{ t('sets') }} {{ quickSet.setNumber }}</p>
                           </div>
                           <p class="text-sm font-semibold text-slate-600">
                             {{ formatQuickSetSummary(quickSet) }}
@@ -322,7 +322,7 @@ interface QuickSetForm extends SetForm {
 
                         <div class="grid grid-cols-2 gap-3">
                           <label class="block">
-                            <span class="text-sm font-medium text-slate-700">Weight</span>
+                            <span class="text-sm font-medium text-slate-700">{{ t('weight') }}</span>
                             <input
                               [id]="'quickWeight' + quickSet.key"
                               type="number"
@@ -335,7 +335,7 @@ interface QuickSetForm extends SetForm {
                           </label>
 
                           <label class="block">
-                            <span class="text-sm font-medium text-slate-700">Reps</span>
+                            <span class="text-sm font-medium text-slate-700">{{ t('reps') }}</span>
                             <input
                               [id]="'quickReps' + quickSet.key"
                               type="number"
@@ -348,7 +348,7 @@ interface QuickSetForm extends SetForm {
                         </div>
 
                         <label class="block">
-                          <span class="text-sm font-medium text-slate-700">Notes</span>
+                          <span class="text-sm font-medium text-slate-700">{{ t('notes') }}</span>
                           <textarea
                             [id]="'quickNotes' + quickSet.key"
                             [name]="'quickNotes' + quickSet.key"
@@ -363,14 +363,14 @@ interface QuickSetForm extends SetForm {
                           [disabled]="savingSetExerciseId === quickSet.key || isSavingSuggestedSets"
                           class="min-h-12 w-full rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
                         >
-                          {{ savingSetExerciseId === quickSet.key ? 'Saving...' : t('save') }}
+                          {{ savingSetExerciseId === quickSet.key ? t('saving') : t('save') }}
                         </button>
                       </form>
                     }
                   </div>
                 } @else if (getSets(workoutExercise.id).length === 0) {
                   <div class="mt-4 rounded-md bg-slate-50 p-3 text-sm text-slate-600">
-                    No sets logged yet.
+                    {{ t('noSetsLogged') }}
                   </div>
                 }
 
@@ -387,7 +387,7 @@ interface QuickSetForm extends SetForm {
 
                     <div class="grid grid-cols-2 gap-3">
                       <label class="block">
-                        <span class="text-sm font-medium text-slate-700">Weight</span>
+                        <span class="text-sm font-medium text-slate-700">{{ t('weight') }}</span>
                         <input
                           [id]="'weightKg' + workoutExercise.id"
                           type="number"
@@ -400,7 +400,7 @@ interface QuickSetForm extends SetForm {
                       </label>
 
                       <label class="block">
-                        <span class="text-sm font-medium text-slate-700">Reps</span>
+                        <span class="text-sm font-medium text-slate-700">{{ t('reps') }}</span>
                         <input
                           [id]="'reps' + workoutExercise.id"
                           type="number"
@@ -413,7 +413,7 @@ interface QuickSetForm extends SetForm {
                     </div>
 
                     <label class="block">
-                      <span class="text-sm font-medium text-slate-700">Notes</span>
+                      <span class="text-sm font-medium text-slate-700">{{ t('notes') }}</span>
                       <textarea
                         [id]="'setNotes' + workoutExercise.id"
                         [name]="'setNotes' + workoutExercise.id"
@@ -436,7 +436,7 @@ interface QuickSetForm extends SetForm {
                         [disabled]="savingSetExerciseId === workoutExercise.id"
                         class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
                       >
-                        {{ savingSetExerciseId === workoutExercise.id ? 'Saving...' : t('save') }}
+                        {{ savingSetExerciseId === workoutExercise.id ? t('saving') : t('save') }}
                       </button>
                     </div>
                   </form>
@@ -453,7 +453,7 @@ interface QuickSetForm extends SetForm {
             [disabled]="isCancelling || isFinishing || session.status !== 'active'"
             class="min-h-12 rounded-md border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
           >
-            {{ isCancelling ? 'Cancelling...' : t('cancelWorkout') }}
+            {{ isCancelling ? t('cancelling') : t('cancelWorkout') }}
           </button>
           <button
             type="button"
@@ -461,7 +461,7 @@ interface QuickSetForm extends SetForm {
             [disabled]="isFinishing || isCancelling || session.status !== 'active'"
             class="min-h-12 rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
           >
-            {{ isFinishing ? 'Finishing...' : t('finishWorkout') }}
+            {{ isFinishing ? t('finishing') : t('finishWorkout') }}
           </button>
         </div>
       }
@@ -663,7 +663,7 @@ export class LiveWorkoutComponent {
     const notes = this.setForm.notes.trim();
 
     if (reps === null && weightKg === null && !notes) {
-      this.errorMessage = 'Add reps, weight, or notes before saving a set.';
+      this.errorMessage = this.t('addSetValidation');
       this.saveErrors = {
         ...this.saveErrors,
         [workoutExercise.id]: this.errorMessage,
@@ -815,7 +815,7 @@ export class LiveWorkoutComponent {
   }
 
   async cancelWorkout(): Promise<void> {
-    if (!this.session || this.isCancelling || !confirm('Cancel this workout?')) {
+    if (!this.session || this.isCancelling || !confirm(this.t('confirmCancelWorkout'))) {
       return;
     }
 
@@ -962,7 +962,7 @@ export class LiveWorkoutComponent {
     const notes = quickSet.notes.trim();
 
     if (reps === null && weightKg === null && !notes) {
-      this.errorMessage = 'Add reps, weight, or notes before saving a set.';
+      this.errorMessage = this.t('addSetValidation');
       this.saveErrors = {
         ...this.saveErrors,
         [quickSet.key]: this.errorMessage,

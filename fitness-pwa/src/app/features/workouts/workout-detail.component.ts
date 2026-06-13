@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ExerciseService } from '../../core/services/exercise.service';
 import { LiveWorkoutService } from '../../core/services/live-workout.service';
+import { TranslationService } from '../../core/services/translation.service';
 import { WorkoutTemplateService } from '../../core/services/workout-template.service';
 import {
   Exercise,
@@ -18,7 +19,7 @@ import {
     <div class="space-y-5">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <p class="text-sm font-semibold text-green-700">Workout Details</p>
+          <p class="text-sm font-semibold text-green-700">{{ t('workoutDetails') }}</p>
           <h2 class="mt-2 text-3xl font-bold">{{ workoutName }}</h2>
           @if (session) {
             <p class="mt-2 text-sm text-slate-600">
@@ -31,7 +32,7 @@ import {
           routerLink="/history"
           class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
         >
-          Back
+          {{ t('back') }}
         </a>
       </div>
 
@@ -43,35 +44,35 @@ import {
         </div>
       } @else if (errorMessage) {
         <div class="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p class="font-semibold text-red-800">Unable to load workout</p>
+          <p class="font-semibold text-red-800">{{ t('unableToLoadWorkout') }}</p>
           <p class="mt-1 text-sm text-red-700">{{ errorMessage }}</p>
           <button
             type="button"
             (click)="loadWorkout()"
             class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
           >
-            Retry
+            {{ t('retry') }}
           </button>
         </div>
       } @else if (session) {
         <section class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
           <div class="grid grid-cols-2 gap-2 text-sm">
             <div class="rounded-md bg-slate-50 p-3">
-              <p class="text-xs font-medium text-slate-500">Started</p>
+              <p class="text-xs font-medium text-slate-500">{{ t('started') }}</p>
               <p class="mt-1 font-semibold text-slate-950">{{ formatDateTime(session.startedAt) }}</p>
             </div>
             <div class="rounded-md bg-slate-50 p-3">
-              <p class="text-xs font-medium text-slate-500">Finished</p>
+              <p class="text-xs font-medium text-slate-500">{{ t('finished') }}</p>
               <p class="mt-1 font-semibold text-slate-950">
                 {{ session.finishedAt ? formatDateTime(session.finishedAt) : 'Open' }}
               </p>
             </div>
             <div class="rounded-md bg-slate-50 p-3">
-              <p class="text-xs font-medium text-slate-500">Duration</p>
+              <p class="text-xs font-medium text-slate-500">{{ t('duration') }}</p>
               <p class="mt-1 font-semibold text-slate-950">{{ formatDuration(session) }}</p>
             </div>
             <div class="rounded-md bg-slate-50 p-3">
-              <p class="text-xs font-medium text-slate-500">Status</p>
+              <p class="text-xs font-medium text-slate-500">{{ t('status') }}</p>
               <p class="mt-1 font-semibold capitalize text-slate-950">{{ session.status }}</p>
             </div>
           </div>
@@ -83,14 +84,14 @@ import {
             disabled
             class="min-h-12 rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-400"
           >
-            Repeat Workout
+            {{ t('resumeWorkout') }}
           </button>
           @if (session.workoutTemplateId) {
             <a
               [routerLink]="['/templates', session.workoutTemplateId]"
               class="inline-flex min-h-12 items-center justify-center rounded-md bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white"
             >
-              Open Template
+              {{ t('templates') }}
             </a>
           } @else {
             <span class="inline-flex min-h-12 items-center justify-center rounded-md bg-slate-100 px-4 py-3 text-center text-sm font-semibold text-slate-400">
@@ -105,13 +106,13 @@ import {
           [disabled]="isDeleting"
           class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
         >
-          {{ isDeleting ? 'Deleting...' : 'Delete Workout' }}
+          {{ isDeleting ? t('loading') : t('deleteWorkout') }}
         </button>
 
         @if (workoutExercises.length === 0) {
           <div class="rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
-            <p class="font-semibold text-slate-800">No exercises found</p>
-            <p class="mt-1 text-sm text-slate-600">This workout has no logged exercises.</p>
+            <p class="font-semibold text-slate-800">{{ t('noExercisesFound') }}</p>
+            <p class="mt-1 text-sm text-slate-600">{{ t('noExercisesFound') }}</p>
           </div>
         } @else {
           <div class="space-y-4">
@@ -120,27 +121,27 @@ import {
                 <div class="flex items-start justify-between gap-3">
                   <div>
                     <p class="text-xs font-semibold uppercase tracking-wide text-green-700">
-                      Exercise {{ exerciseIndex + 1 }}
+                      {{ t('exercises') }} {{ exerciseIndex + 1 }}
                     </p>
                     <h3 class="mt-1 text-lg font-bold text-slate-950">
                       {{ getExerciseName(workoutExercise.exerciseId) }}
                     </h3>
                   </div>
                   <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                    {{ getSets(workoutExercise.id).length }} sets
+                    {{ getSets(workoutExercise.id).length }} {{ t('sets') }}
                   </span>
                 </div>
 
                 @if (getSets(workoutExercise.id).length === 0) {
                   <div class="mt-4 rounded-md bg-slate-50 p-3 text-sm text-slate-600">
-                    No sets logged.
+                    {{ t('noSetsLogged') }}
                   </div>
                 } @else {
                   <div class="mt-4 space-y-2">
                     @for (set of getSets(workoutExercise.id); track set.id) {
                       <div class="rounded-md border border-slate-200 p-3">
                         <div class="flex items-center justify-between gap-3">
-                          <p class="font-semibold text-slate-950">Set {{ set.setNumber }}</p>
+                          <p class="font-semibold text-slate-950">{{ t('sets') }} {{ set.setNumber }}</p>
                           <p class="text-sm text-slate-600">{{ formatSetSummary(set) }}</p>
                         </div>
                         @if (set.notes) {
@@ -165,6 +166,7 @@ export class WorkoutDetailComponent {
   private readonly workoutTemplateService = inject(WorkoutTemplateService);
   private readonly exerciseService = inject(ExerciseService);
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
+  private readonly translationService = inject(TranslationService);
 
   readonly loadingCards = [1, 2, 3];
 
@@ -178,6 +180,10 @@ export class WorkoutDetailComponent {
   errorMessage = '';
 
   private readonly sessionId = this.route.snapshot.paramMap.get('sessionId');
+
+  t(key: string): string {
+    return this.translationService.translate(key);
+  }
 
   constructor() {
     void this.loadWorkout();
@@ -276,7 +282,7 @@ export class WorkoutDetailComponent {
   }
 
   async deleteWorkout(): Promise<void> {
-    if (!this.session || this.isDeleting || !confirm('Delete this workout? This cannot be undone.')) {
+    if (!this.session || this.isDeleting || !confirm(this.t('confirmDeleteWorkout'))) {
       return;
     }
 

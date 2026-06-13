@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ExerciseService } from '../../core/services/exercise.service';
 import { LiveWorkoutService } from '../../core/services/live-workout.service';
+import { TranslationService } from '../../core/services/translation.service';
 import {
   Exercise,
   WorkoutExercise,
@@ -16,8 +17,8 @@ import {
     <div class="space-y-5">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <p class="text-sm font-semibold text-green-700">Workout Summary</p>
-          <h2 class="mt-2 text-3xl font-bold">Session Complete</h2>
+          <p class="text-sm font-semibold text-green-700">{{ t('workoutSummary') }}</p>
+          <h2 class="mt-2 text-3xl font-bold">{{ t('workoutSummary') }}</h2>
           @if (session) {
             <p class="mt-2 text-sm text-slate-600">
               {{ formatDate(session.startedAt) }} - {{ session.finishedAt ? formatDate(session.finishedAt) : 'Not finished' }}
@@ -29,7 +30,7 @@ import {
           routerLink="/dashboard"
           class="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
         >
-          Dashboard
+          {{ t('dashboard') }}
         </a>
       </div>
 
@@ -41,48 +42,48 @@ import {
         </div>
       } @else if (errorMessage) {
         <div class="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p class="font-semibold text-red-800">Unable to load workout summary</p>
+          <p class="font-semibold text-red-800">{{ t('unableToLoadSummary') }}</p>
           <p class="mt-1 text-sm text-red-700">{{ errorMessage }}</p>
           <button
             type="button"
             (click)="loadSummary()"
             class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
           >
-            Retry
+            {{ t('retry') }}
           </button>
         </div>
       } @else if (session) {
         <section class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
           <div class="flex items-center justify-between gap-3">
             <div>
-              <p class="text-xs font-medium text-slate-500">Status</p>
+              <p class="text-xs font-medium text-slate-500">{{ t('status') }}</p>
               <p class="mt-1 text-lg font-bold capitalize text-slate-950">{{ session.status }}</p>
             </div>
             <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
-              {{ totalSets }} sets
+              {{ totalSets }} {{ t('sets') }}
             </span>
           </div>
 
           <div class="mt-4 grid grid-cols-3 gap-2 text-center">
             <div class="rounded-md bg-slate-50 p-3">
               <p class="text-xl font-bold text-slate-950">{{ workoutExercises.length }}</p>
-              <p class="mt-1 text-xs font-medium text-slate-500">Exercises</p>
+              <p class="mt-1 text-xs font-medium text-slate-500">{{ t('exercises') }}</p>
             </div>
             <div class="rounded-md bg-slate-50 p-3">
               <p class="text-xl font-bold text-slate-950">{{ totalSets }}</p>
-              <p class="mt-1 text-xs font-medium text-slate-500">Sets</p>
+              <p class="mt-1 text-xs font-medium text-slate-500">{{ t('sets') }}</p>
             </div>
             <div class="rounded-md bg-slate-50 p-3">
               <p class="text-xl font-bold text-slate-950">{{ totalReps }}</p>
-              <p class="mt-1 text-xs font-medium text-slate-500">Reps</p>
+              <p class="mt-1 text-xs font-medium text-slate-500">{{ t('reps') }}</p>
             </div>
           </div>
         </section>
 
         @if (workoutExercises.length === 0) {
           <div class="rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
-            <p class="font-semibold text-slate-800">No exercises found</p>
-            <p class="mt-1 text-sm text-slate-600">This session did not have copied exercises.</p>
+            <p class="font-semibold text-slate-800">{{ t('noExercisesFound') }}</p>
+            <p class="mt-1 text-sm text-slate-600">{{ t('noCopiedExercises') }}</p>
           </div>
         } @else {
           <div class="space-y-4">
@@ -91,27 +92,27 @@ import {
                 <div class="flex items-start justify-between gap-3">
                   <div>
                     <p class="text-xs font-semibold uppercase tracking-wide text-green-700">
-                      Exercise {{ exerciseIndex + 1 }}
+                      {{ t('exercises') }} {{ exerciseIndex + 1 }}
                     </p>
                     <h3 class="mt-1 text-lg font-bold text-slate-950">
                       {{ getExerciseName(workoutExercise.exerciseId) }}
                     </h3>
                   </div>
                   <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                    {{ getSets(workoutExercise.id).length }} sets
+                    {{ getSets(workoutExercise.id).length }} {{ t('sets') }}
                   </span>
                 </div>
 
                 @if (getSets(workoutExercise.id).length === 0) {
                   <div class="mt-4 rounded-md bg-slate-50 p-3 text-sm text-slate-600">
-                    No sets logged.
+                    {{ t('noSetsLogged') }}
                   </div>
                 } @else {
                   <div class="mt-4 space-y-2">
                     @for (set of getSets(workoutExercise.id); track set.id) {
                       <div class="rounded-md border border-slate-200 p-3">
                         <div class="flex items-center justify-between gap-3">
-                          <p class="font-semibold text-slate-950">Set {{ set.setNumber }}</p>
+                          <p class="font-semibold text-slate-950">{{ t('sets') }} {{ set.setNumber }}</p>
                           <p class="text-sm text-slate-600">{{ formatSetSummary(set) }}</p>
                         </div>
                         @if (set.notes) {
@@ -131,13 +132,13 @@ import {
             routerLink="/templates"
             class="inline-flex min-h-12 items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-slate-800"
           >
-            Templates
+            {{ t('templates') }}
           </a>
           <a
             routerLink="/dashboard"
             class="inline-flex min-h-12 items-center justify-center rounded-md bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white"
           >
-            Done
+            {{ t('dashboard') }}
           </a>
         </div>
       }
@@ -149,6 +150,7 @@ export class WorkoutSummaryComponent {
   private readonly liveWorkoutService = inject(LiveWorkoutService);
   private readonly exerciseService = inject(ExerciseService);
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
+  private readonly translationService = inject(TranslationService);
 
   readonly loadingCards = [1, 2, 3];
 
@@ -160,6 +162,10 @@ export class WorkoutSummaryComponent {
   errorMessage = '';
 
   private readonly sessionId = this.route.snapshot.paramMap.get('sessionId');
+
+  t(key: string): string {
+    return this.translationService.translate(key);
+  }
 
   get totalSets(): number {
     return Object.values(this.setsByExercise).reduce(

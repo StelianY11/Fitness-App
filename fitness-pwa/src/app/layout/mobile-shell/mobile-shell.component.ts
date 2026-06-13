@@ -14,7 +14,7 @@ import { TranslationService } from '../../core/services/translation.service';
       <div class="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white shadow-sm">
         <header class="border-b border-slate-200 px-5 py-4">
           <p class="text-xs font-semibold uppercase tracking-wide text-green-700">Fitness Tracker</p>
-          <h1 class="mt-1 text-2xl font-bold">Train with intent</h1>
+          <h1 class="mt-1 text-2xl font-bold">{{ t('appTagline') }}</h1>
         </header>
 
         @if (activeWorkout()) {

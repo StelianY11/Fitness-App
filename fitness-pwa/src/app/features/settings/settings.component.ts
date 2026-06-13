@@ -14,7 +14,7 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
           <p class="text-sm font-semibold text-green-700">{{ t('settings') }}</p>
           <h2 class="mt-2 text-3xl font-bold">{{ t('settings') }}</h2>
           <p class="mt-2 text-sm text-slate-600">
-            Local app preferences for language, theme, and accent color.
+            {{ t('settingsDescription') }}
           </p>
         </div>
 
@@ -29,7 +29,7 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
       <section class="space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
         <div>
           <h3 class="text-lg font-bold text-slate-950">{{ t('language') }}</h3>
-          <p class="mt-1 text-sm text-slate-600">Proof-of-concept labels are translated now.</p>
+          <p class="mt-1 text-sm text-slate-600">{{ t('settingsDescription') }}</p>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
@@ -63,7 +63,7 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
       <section class="space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
         <div>
           <h3 class="text-lg font-bold text-slate-950">{{ t('theme') }}</h3>
-          <p class="mt-1 text-sm text-slate-600">System follows the device color scheme.</p>
+          <p class="mt-1 text-sm text-slate-600">{{ t('systemThemeDescription') }}</p>
         </div>
 
         <div class="grid grid-cols-3 gap-2">
@@ -87,7 +87,7 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
       <section class="space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
         <div>
           <h3 class="text-lg font-bold text-slate-950">{{ t('accentColor') }}</h3>
-          <p class="mt-1 text-sm text-slate-600">Choose the app accent used by primary actions.</p>
+          <p class="mt-1 text-sm text-slate-600">{{ t('accentDescription') }}</p>
         </div>
 
         <div class="grid gap-2">
@@ -107,7 +107,7 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
                 {{ color.name }}
               </span>
               @if (settings().accentColor === color.value) {
-                <span class="text-green-700">Selected</span>
+              <span class="text-green-700">{{ t('selected') }}</span>
               }
             </button>
           }

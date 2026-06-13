@@ -26,9 +26,7 @@ interface WorkoutHistoryGroup {
         <div>
           <p class="text-sm font-semibold text-green-700">{{ t('history') }}</p>
           <h2 class="mt-2 text-3xl font-bold">{{ t('history') }}</h2>
-          <p class="mt-2 text-sm text-slate-600">
-            Review completed sessions and open the details behind each workout.
-          </p>
+          <p class="mt-2 text-sm text-slate-600">{{ t('workoutHistory') }}</p>
         </div>
 
         <a
@@ -46,7 +44,7 @@ interface WorkoutHistoryGroup {
           [disabled]="isClearing"
           class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
         >
-          {{ isClearing ? 'Clearing history...' : 'Clear All History' }}
+          {{ isClearing ? t('loading') : t('clearAllHistory') }}
         </button>
       }
 
@@ -58,20 +56,20 @@ interface WorkoutHistoryGroup {
         </div>
       } @else if (errorMessage) {
         <div class="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p class="font-semibold text-red-800">Unable to load workout history</p>
+          <p class="font-semibold text-red-800">{{ t('unableToLoadHistory') }}</p>
           <p class="mt-1 text-sm text-red-700">{{ errorMessage }}</p>
           <button
             type="button"
             (click)="loadHistory()"
             class="mt-4 inline-flex min-h-11 items-center justify-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700"
           >
-            Retry
+            {{ t('retry') }}
           </button>
         </div>
       } @else if (historyItems.length === 0) {
         <div class="rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
-          <p class="font-semibold text-slate-800">No finished workouts yet</p>
-          <p class="mt-1 text-sm text-slate-600">Completed live workouts will appear here.</p>
+          <p class="font-semibold text-slate-800">{{ t('noHistory') }}</p>
+          <p class="mt-1 text-sm text-slate-600">{{ t('workoutHistory') }}</p>
         </div>
       } @else {
         <div class="space-y-6">
@@ -101,11 +99,11 @@ interface WorkoutHistoryGroup {
 
                     <div class="mt-4 grid grid-cols-2 gap-2 text-sm">
                       <div class="rounded-md bg-slate-50 p-3">
-                        <p class="text-xs font-medium text-slate-500">Exercises</p>
+                        <p class="text-xs font-medium text-slate-500">{{ t('exercises') }}</p>
                         <p class="mt-1 font-semibold text-slate-950">{{ item.exerciseCount }}</p>
                       </div>
                       <div class="rounded-md bg-slate-50 p-3">
-                        <p class="text-xs font-medium text-slate-500">Sets</p>
+                        <p class="text-xs font-medium text-slate-500">{{ t('sets') }}</p>
                         <p class="mt-1 font-semibold text-slate-950">{{ item.setCount }}</p>
                       </div>
                     </div>
@@ -122,7 +120,7 @@ interface WorkoutHistoryGroup {
               [disabled]="isLoadingMore"
               class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100"
             >
-              {{ isLoadingMore ? 'Loading...' : 'Load more' }}
+              {{ isLoadingMore ? t('loading') : t('loadMore') }}
             </button>
           }
         </div>
