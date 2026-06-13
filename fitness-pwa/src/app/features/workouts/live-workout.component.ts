@@ -573,24 +573,10 @@ export class LiveWorkoutComponent {
         throw new Error(exercisesResult.error);
       }
 
-      const nextSetsByExercise: Record<string, WorkoutSet[]> = {};
+      const nextSetsByExercise = await this.loadSetsByExercise(exercisesResult.data);
 
-      for (const workoutExercise of exercisesResult.data) {
-        const setsResult = await this.liveWorkoutService.getWorkoutSets(workoutExercise.id);
-
-        if (this.isStaleLoad(loadId)) {
-          return;
-        }
-
-        if (setsResult.error) {
-          console.error('Live workout sets load error:', {
-            workoutExerciseId: workoutExercise.id,
-            error: setsResult.error,
-          });
-          throw new Error(setsResult.error);
-        }
-
-        nextSetsByExercise[workoutExercise.id] = setsResult.data;
+      if (this.isStaleLoad(loadId)) {
+        return;
       }
 
       this.errorMessage = '';
@@ -1021,7 +1007,7 @@ export class LiveWorkoutComponent {
     }
   }
 
-  private async loadExerciseNames(): Promise<void> {
+  private async loadExerciseNames(): Promise<Record<string, string>> {
     try {
       const result = await this.exerciseService.getExercises();
 
@@ -1029,7 +1015,7 @@ export class LiveWorkoutComponent {
         console.error('Live workout exercise metadata load error:', result.error);
       }
 
-      this.exerciseNames = result.data.reduce<Record<string, string>>(
+      return result.data.reduce<Record<string, string>>(
         (names, exercise: Exercise) => ({
           ...names,
           [exercise.id]: exercise.name,
@@ -1038,6 +1024,7 @@ export class LiveWorkoutComponent {
       );
     } catch (error) {
       console.error('Live workout exercise metadata load failed:', error);
+      return {};
     }
   }
 
@@ -1055,19 +1042,16 @@ export class LiveWorkoutComponent {
   private async loadPreFillForms(
     workoutExercises: WorkoutExercise[],
     setsByExercise: Record<string, WorkoutSet[]>,
-  ): Promise<void> {
+  ): Promise<Record<string, QuickSetForm[]>> {
     const modeResult = await this.liveWorkoutService.getPreFillMode();
 
     if (modeResult.error) {
       console.error('Live workout pre-fill mode load error:', modeResult.error);
     }
 
-    const nextQuickSetForms: Record<string, QuickSetForm[]> = {};
-
-    for (const workoutExercise of workoutExercises) {
+    const entries = await Promise.all(workoutExercises.map(async (workoutExercise) => {
       if ((setsByExercise[workoutExercise.id] ?? []).length > 0) {
-        nextQuickSetForms[workoutExercise.id] = [];
-        continue;
+        return [workoutExercise.id, []] as const;
       }
 
       const preFillResult = await this.liveWorkoutService.getPreFillSetsForWorkoutExercise(
@@ -1083,13 +1067,13 @@ export class LiveWorkoutComponent {
         });
       }
 
-      nextQuickSetForms[workoutExercise.id] = createQuickSetForms(
+      return [workoutExercise.id, createQuickSetForms(
         workoutExercise.id,
         preFillResult.data,
-      );
-    }
+      )] as const;
+    }));
 
-    this.quickSetFormsByExercise = nextQuickSetForms;
+    return Object.fromEntries(entries);
   }
 
   private async loadSecondaryWorkoutData(
@@ -1100,18 +1084,17 @@ export class LiveWorkoutComponent {
     this.isPrefillLoading = true;
 
     try {
-      await this.loadExerciseNames();
+      const [exerciseNames, quickSetFormsByExercise] = await Promise.all([
+        this.loadExerciseNames(),
+        this.loadPreFillForms(workoutExercises, setsByExercise),
+      ]);
 
       if (this.isStaleLoad(loadId)) {
         return;
       }
 
-      await this.loadPreFillForms(workoutExercises, setsByExercise);
-
-      if (this.isStaleLoad(loadId)) {
-        return;
-      }
-
+      this.exerciseNames = exerciseNames;
+      this.quickSetFormsByExercise = quickSetFormsByExercise;
       this.changeDetectorRef.detectChanges();
     } catch (error) {
       console.error('Live workout secondary data load failed:', {
@@ -1128,6 +1111,26 @@ export class LiveWorkoutComponent {
 
   private isStaleLoad(loadId: number): boolean {
     return this.loadRunId !== loadId;
+  }
+
+  private async loadSetsByExercise(
+    workoutExercises: WorkoutExercise[],
+  ): Promise<Record<string, WorkoutSet[]>> {
+    const entries = await Promise.all(workoutExercises.map(async (workoutExercise) => {
+      const setsResult = await this.liveWorkoutService.getWorkoutSets(workoutExercise.id);
+
+      if (setsResult.error) {
+        console.error('Live workout sets load error:', {
+          workoutExerciseId: workoutExercise.id,
+          error: setsResult.error,
+        });
+        throw new Error(setsResult.error);
+      }
+
+      return [workoutExercise.id, setsResult.data] as const;
+    }));
+
+    return Object.fromEntries(entries);
   }
 
   private clearLoadingSafetyTimeout(): void {

@@ -162,6 +162,7 @@ export class WorkoutSummaryComponent {
   errorMessage = '';
 
   private readonly sessionId = this.route.snapshot.paramMap.get('sessionId');
+  private loadRunId = 0;
 
   t(key: string): string {
     return this.translationService.translate(key);
@@ -185,8 +186,13 @@ export class WorkoutSummaryComponent {
   }
 
   async loadSummary(): Promise<void> {
+    const loadId = this.loadRunId + 1;
+    this.loadRunId = loadId;
     this.isLoading = true;
     this.errorMessage = '';
+    this.session = null;
+    this.workoutExercises = [];
+    this.setsByExercise = {};
 
     try {
       if (!this.sessionId) {
@@ -205,31 +211,26 @@ export class WorkoutSummaryComponent {
         throw new Error(exercisesResult.error);
       }
 
-      const nextSetsByExercise: Record<string, WorkoutSet[]> = {};
-
-      for (const workoutExercise of exercisesResult.data) {
-        const setsResult = await this.liveWorkoutService.getWorkoutSets(workoutExercise.id);
-
-        if (setsResult.error) {
-          throw new Error(setsResult.error);
-        }
-
-        nextSetsByExercise[workoutExercise.id] = setsResult.data;
-      }
-
       this.session = sessionResult.data;
       this.workoutExercises = exercisesResult.data;
-      this.setsByExercise = nextSetsByExercise;
-      await this.loadExerciseNames();
+      this.isLoading = false;
+      this.changeDetectorRef.detectChanges();
+      void this.loadSummarySecondaryData(loadId, exercisesResult.data);
     } catch (error) {
+      if (this.isStaleLoad(loadId)) {
+        return;
+      }
+
       this.session = null;
       this.workoutExercises = [];
       this.setsByExercise = {};
       this.errorMessage = getErrorMessage(error, 'Unable to load workout summary.');
       console.error('Workout summary load failed:', error);
     } finally {
-      this.isLoading = false;
-      this.changeDetectorRef.detectChanges();
+      if (!this.isStaleLoad(loadId)) {
+        this.isLoading = false;
+        this.changeDetectorRef.detectChanges();
+      }
     }
   }
 
@@ -254,7 +255,51 @@ export class WorkoutSummaryComponent {
     return new Date(value).toLocaleString();
   }
 
-  private async loadExerciseNames(): Promise<void> {
+  private async loadSummarySecondaryData(
+    loadId: number,
+    workoutExercises: WorkoutExercise[],
+  ): Promise<void> {
+    try {
+      const [setsByExercise, exerciseNames] = await Promise.all([
+        this.loadSetsByExercise(workoutExercises),
+        this.loadExerciseNames(),
+      ]);
+
+      if (this.isStaleLoad(loadId)) {
+        return;
+      }
+
+      this.setsByExercise = setsByExercise;
+      this.exerciseNames = exerciseNames;
+      this.changeDetectorRef.detectChanges();
+    } catch (error) {
+      console.error('Workout summary secondary data load failed:', error);
+    }
+  }
+
+  private async loadSetsByExercise(
+    workoutExercises: WorkoutExercise[],
+  ): Promise<Record<string, WorkoutSet[]>> {
+    const entries = await Promise.all(
+      workoutExercises.map(async (workoutExercise) => {
+        const setsResult = await this.liveWorkoutService.getWorkoutSets(workoutExercise.id);
+
+        if (setsResult.error) {
+          console.error('Workout summary sets load error:', {
+            workoutExerciseId: workoutExercise.id,
+            error: setsResult.error,
+          });
+          return [workoutExercise.id, []] as const;
+        }
+
+        return [workoutExercise.id, setsResult.data] as const;
+      }),
+    );
+
+    return Object.fromEntries(entries);
+  }
+
+  private async loadExerciseNames(): Promise<Record<string, string>> {
     try {
       const result = await this.exerciseService.getExercises();
 
@@ -262,7 +307,7 @@ export class WorkoutSummaryComponent {
         console.error('Workout summary exercise metadata load error:', result.error);
       }
 
-      this.exerciseNames = result.data.reduce<Record<string, string>>(
+      return result.data.reduce<Record<string, string>>(
         (names, exercise: Exercise) => ({
           ...names,
           [exercise.id]: exercise.name,
@@ -271,7 +316,12 @@ export class WorkoutSummaryComponent {
       );
     } catch (error) {
       console.error('Workout summary exercise metadata load failed:', error);
+      return {};
     }
+  }
+
+  private isStaleLoad(loadId: number): boolean {
+    return this.loadRunId !== loadId;
   }
 }
 

@@ -145,6 +145,7 @@ export class WorkoutHistoryComponent {
   isClearing = false;
   hasMore = false;
   errorMessage = '';
+  private loadRunId = 0;
 
   constructor() {
     void this.loadHistory();
@@ -155,6 +156,8 @@ export class WorkoutHistoryComponent {
   }
 
   async loadHistory(): Promise<void> {
+    const loadId = this.loadRunId + 1;
+    this.loadRunId = loadId;
     this.isLoading = true;
     this.errorMessage = '';
 
@@ -162,15 +165,21 @@ export class WorkoutHistoryComponent {
       this.historyItems = [];
       this.groups = createEmptyGroups();
       this.hasMore = false;
-      await this.loadPage(0);
+      await this.loadPage(0, loadId);
     } catch (error) {
+      if (this.isStaleLoad(loadId)) {
+        return;
+      }
+
       this.historyItems = [];
       this.groups = createEmptyGroups();
       this.errorMessage = getErrorMessage(error, 'Unable to load workout history.');
       console.error('Workout history load failed:', error);
     } finally {
-      this.isLoading = false;
-      this.changeDetectorRef.detectChanges();
+      if (!this.isStaleLoad(loadId)) {
+        this.isLoading = false;
+        this.changeDetectorRef.detectChanges();
+      }
     }
   }
 
@@ -183,7 +192,7 @@ export class WorkoutHistoryComponent {
     this.errorMessage = '';
 
     try {
-      await this.loadPage(this.historyItems.length);
+      await this.loadPage(this.historyItems.length, this.loadRunId);
     } catch (error) {
       this.errorMessage = getErrorMessage(error, 'Unable to load more workouts.');
       console.error('Workout history load more failed:', error);
@@ -242,13 +251,13 @@ export class WorkoutHistoryComponent {
     return `${minutes} min`;
   }
 
-  private async loadTemplateNames(sessions: WorkoutSession[]): Promise<void> {
+  private async loadTemplateNames(sessions: WorkoutSession[]): Promise<Record<string, string>> {
     const templateIds = Array.from(
       new Set(sessions.map((session) => session.workoutTemplateId).filter(Boolean)),
     ) as string[];
     const nextTemplateNames: Record<string, string> = { ...this.templateNames };
 
-    for (const templateId of templateIds) {
+    await Promise.all(templateIds.map(async (templateId) => {
       const templateResult = await this.workoutTemplateService.getTemplateById(templateId);
 
       if (templateResult.error) {
@@ -256,7 +265,7 @@ export class WorkoutHistoryComponent {
           templateId,
           error: templateResult.error,
         });
-        continue;
+        return;
       }
 
       const template = templateResult.data as WorkoutTemplate | null;
@@ -264,12 +273,12 @@ export class WorkoutHistoryComponent {
       if (template) {
         nextTemplateNames[template.id] = template.name;
       }
-    }
+    }));
 
-    this.templateNames = nextTemplateNames;
+    return nextTemplateNames;
   }
 
-  private async loadPage(offset: number): Promise<void> {
+  private async loadPage(offset: number, loadId: number): Promise<void> {
     const sessionsResult = await this.liveWorkoutService.getCompletedWorkoutSessions({
       from: offset,
       to: offset + this.pageSize,
@@ -281,45 +290,98 @@ export class WorkoutHistoryComponent {
 
     this.hasMore = sessionsResult.data.length > this.pageSize;
     const sessions = sessionsResult.data.slice(0, this.pageSize);
-    await this.loadTemplateNames(sessions);
-
-    const newItems: WorkoutHistoryItem[] = [];
-
-    for (const session of sessions) {
-      const exercisesResult = await this.liveWorkoutService.getWorkoutExercises(session.id);
-
-      if (exercisesResult.error) {
-        throw new Error(exercisesResult.error);
-      }
-
-      let setCount = 0;
-
-      for (const workoutExercise of exercisesResult.data) {
-        const setsResult = await this.liveWorkoutService.getWorkoutSets(workoutExercise.id);
-
-        if (setsResult.error) {
-          throw new Error(setsResult.error);
-        }
-
-        setCount += setsResult.data.length;
-      }
-
-      newItems.push({
-        session,
-        workoutName: this.getWorkoutName(session),
-        exerciseCount: exercisesResult.data.length,
-        setCount,
-      });
-    }
+    const newItems: WorkoutHistoryItem[] = sessions.map((session) => ({
+      session,
+      workoutName: this.getWorkoutName(session),
+      exerciseCount: 0,
+      setCount: 0,
+    }));
 
     this.historyItems = [...this.historyItems, ...newItems];
     this.groups = groupHistoryItems(this.historyItems);
+    this.isLoading = false;
+    this.changeDetectorRef.detectChanges();
+    void this.enrichHistoryItems(loadId, sessions);
+  }
+
+  private async enrichHistoryItems(loadId: number, sessions: WorkoutSession[]): Promise<void> {
+    try {
+      const [templateNames, countsBySession] = await Promise.all([
+        this.loadTemplateNames(sessions),
+        this.loadSessionCounts(sessions),
+      ]);
+
+      if (this.isStaleLoad(loadId)) {
+        return;
+      }
+
+      this.templateNames = templateNames;
+      this.historyItems = this.historyItems.map((item) => {
+        const counts = countsBySession[item.session.id];
+
+        return {
+          ...item,
+          workoutName: this.getWorkoutName(item.session),
+          exerciseCount: counts?.exerciseCount ?? item.exerciseCount,
+          setCount: counts?.setCount ?? item.setCount,
+        };
+      });
+      this.groups = groupHistoryItems(this.historyItems);
+      this.changeDetectorRef.detectChanges();
+    } catch (error) {
+      console.error('Workout history secondary data load failed:', error);
+    }
+  }
+
+  private async loadSessionCounts(
+    sessions: WorkoutSession[],
+  ): Promise<Record<string, { exerciseCount: number; setCount: number }>> {
+    const entries = await Promise.all(sessions.map(async (session) => {
+      const exercisesResult = await this.liveWorkoutService.getWorkoutExercises(session.id);
+
+      if (exercisesResult.error) {
+        console.error('Workout history exercise count load error:', {
+          sessionId: session.id,
+          error: exercisesResult.error,
+        });
+        return [session.id, { exerciseCount: 0, setCount: 0 }] as const;
+      }
+
+      const setResults = await Promise.all(
+        exercisesResult.data.map((workoutExercise) =>
+          this.liveWorkoutService.getWorkoutSets(workoutExercise.id),
+        ),
+      );
+
+      const setCount = setResults.reduce((total, setsResult, index) => {
+        if (setsResult.error) {
+          console.error('Workout history set count load error:', {
+            workoutExerciseId: exercisesResult.data[index]?.id,
+            error: setsResult.error,
+          });
+          return total;
+        }
+
+        return total + setsResult.data.length;
+      }, 0);
+
+      return [session.id, {
+        exerciseCount: exercisesResult.data.length,
+        setCount,
+      }] as const;
+    }));
+
+    return Object.fromEntries(entries);
   }
 
   private getWorkoutName(session: WorkoutSession): string {
     return session.workoutTemplateId
       ? this.templateNames[session.workoutTemplateId] ?? 'Template Workout'
       : 'Workout';
+  }
+
+  private isStaleLoad(loadId: number): boolean {
+    return this.loadRunId !== loadId;
   }
 }
 

@@ -113,6 +113,7 @@ export class ExerciseHistoryComponent {
   errorMessage = '';
 
   private readonly exerciseId = this.route.snapshot.paramMap.get('exerciseId');
+  private loadRunId = 0;
 
   t(key: string): string {
     return this.translationService.translate(key);
@@ -123,6 +124,8 @@ export class ExerciseHistoryComponent {
   }
 
   async loadExerciseHistory(): Promise<void> {
+    const loadId = this.loadRunId + 1;
+    this.loadRunId = loadId;
     this.isLoading = true;
     this.errorMessage = '';
 
@@ -137,15 +140,25 @@ export class ExerciseHistoryComponent {
         throw new Error(result.error);
       }
 
+      if (this.isStaleLoad(loadId)) {
+        return;
+      }
+
       this.history = result.data;
       this.exerciseName = result.data[0]?.exerciseName ?? 'Exercise';
     } catch (error) {
+      if (this.isStaleLoad(loadId)) {
+        return;
+      }
+
       this.history = [];
       this.errorMessage = error instanceof Error ? error.message : 'Unable to load exercise history.';
       console.error('Exercise history load failed:', error);
     } finally {
-      this.isLoading = false;
-      this.changeDetectorRef.detectChanges();
+      if (!this.isStaleLoad(loadId)) {
+        this.isLoading = false;
+        this.changeDetectorRef.detectChanges();
+      }
     }
   }
 
@@ -163,5 +176,9 @@ export class ExerciseHistoryComponent {
     ].filter(Boolean);
 
     return pieces.length > 0 ? pieces.join(' / ') : 'Logged';
+  }
+
+  private isStaleLoad(loadId: number): boolean {
+    return this.loadRunId !== loadId;
   }
 }

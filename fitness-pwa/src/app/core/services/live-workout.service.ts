@@ -668,51 +668,52 @@ export class LiveWorkoutService {
       return { data: [], error: null };
     }
 
-    const { data: setRows, error: setsError } = await this.supabase
-      .from('workout_sets')
-      .select(SET_SELECT)
-      .in('workout_exercise_id', workoutExerciseIds)
-      .returns<WorkoutSetRow[]>()
-      .order('set_number', { ascending: true });
-
-    if (setsError) {
-      return { data: [], error: this.formatError(setsError) };
-    }
-
-    const { data: exerciseData, error: exerciseError } = await this.supabase
-      .from('exercises')
-      .select('id, name')
-      .eq('id', exerciseId)
-      .maybeSingle();
-
-    if (exerciseError) {
-      return { data: [], error: this.formatError(exerciseError) };
-    }
-
     const templateIds = [...new Set(
       sessions
         .map((session) => session.workoutTemplateId)
         .filter((templateId): templateId is string => templateId !== null),
     )];
-    const templateNames = new Map<string, string>();
 
-    if (templateIds.length > 0) {
-      const { data: templateRows, error: templatesError } = await this.supabase
-        .from('workout_templates')
+    const [setsResult, exerciseResult, templatesResult] = await Promise.all([
+      this.supabase
+        .from('workout_sets')
+        .select(SET_SELECT)
+        .in('workout_exercise_id', workoutExerciseIds)
+        .returns<WorkoutSetRow[]>()
+        .order('set_number', { ascending: true }),
+      this.supabase
+        .from('exercises')
         .select('id, name')
-        .in('id', templateIds)
-        .returns<WorkoutTemplateNameRow[]>();
+        .eq('id', exerciseId)
+        .maybeSingle(),
+      templateIds.length > 0
+        ? this.supabase
+            .from('workout_templates')
+            .select('id, name')
+            .in('id', templateIds)
+            .returns<WorkoutTemplateNameRow[]>()
+        : Promise.resolve({ data: [], error: null }),
+    ]);
 
-      if (templatesError) {
-        return { data: [], error: this.formatError(templatesError) };
-      }
-
-      for (const template of templateRows ?? []) {
-        templateNames.set(template.id, template.name);
-      }
+    if (setsResult.error) {
+      return { data: [], error: this.formatError(setsResult.error) };
     }
 
-    const setsByWorkoutExerciseId = (setRows ?? [])
+    if (exerciseResult.error) {
+      return { data: [], error: this.formatError(exerciseResult.error) };
+    }
+
+    if (templatesResult.error) {
+      return { data: [], error: this.formatError(templatesResult.error) };
+    }
+
+    const templateNames = new Map<string, string>();
+
+    for (const template of templatesResult.data ?? []) {
+      templateNames.set(template.id, template.name);
+    }
+
+    const setsByWorkoutExerciseId = (setsResult.data ?? [])
       .map(mapWorkoutSet)
       .reduce<Record<string, WorkoutSet[]>>((setsById, set) => {
         if (!set.workoutExerciseId) {
@@ -725,7 +726,7 @@ export class LiveWorkoutService {
         };
       }, {});
     const sessionsById = new Map(sessions.map((session) => [session.id, session]));
-    const exerciseRow = exerciseData as ExerciseNameRow | null;
+    const exerciseRow = exerciseResult.data as ExerciseNameRow | null;
     const exerciseName = exerciseRow?.name ?? 'Exercise';
 
     return {
