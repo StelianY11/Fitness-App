@@ -10,22 +10,20 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
   selector: 'app-dashboard',
   imports: [RouterLink],
   template: `
-    <div class="space-y-5">
+    <div class="space-y-6">
       <div>
         <p class="text-sm font-semibold text-green-700">{{ t('welcome') }}</p>
-        <h2 class="mt-2 text-3xl font-bold">{{ t('dashboard') }}</h2>
-        <p class="mt-2 text-sm text-slate-600">
+        <h2 class="mt-2 text-3xl font-bold leading-tight tracking-tight">{{ t('dashboard') }}</h2>
+        <p class="mt-2.5 text-sm leading-6 text-slate-600">
           {{ userEmail || 'Your account is ready.' }}
         </p>
       </div>
 
-      @if (isActiveWorkoutLoading) {
-        <div class="h-40 animate-pulse rounded-lg border border-slate-200 bg-slate-100"></div>
-      } @else if (activeWorkout) {
+      @if (activeWorkout) {
         <section class="rounded-lg border border-green-200 bg-green-50 p-4 shadow-sm">
           <p class="text-sm font-semibold text-green-700">{{ t('activeWorkout') }}</p>
-          <h3 class="mt-2 text-2xl font-bold text-slate-950">{{ activeWorkoutName }}</h3>
-          <div class="mt-4 grid grid-cols-2 gap-2 text-sm">
+          <h3 class="mt-2 text-2xl font-bold leading-tight text-slate-950">{{ activeWorkoutName }}</h3>
+          <div class="mt-4 grid grid-cols-2 gap-2.5 text-sm">
             <div class="rounded-md bg-white p-3">
               <p class="text-xs font-medium text-slate-500">{{ t('started') }}</p>
               <p class="mt-1 font-semibold text-slate-950">{{ formatTime(activeWorkout.startedAt) }}</p>
@@ -63,33 +61,35 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
         </section>
       }
 
-      <a
-        routerLink="/exercises"
-        class="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white"
-      >
-        {{ t('exerciseLibrary') }}
-      </a>
+      <div class="grid gap-3">
+        <a
+          routerLink="/exercises"
+          class="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white shadow-sm"
+        >
+          {{ t('exerciseLibrary') }}
+        </a>
 
-      <a
-        routerLink="/templates"
-        class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-green-600 px-4 py-3 text-sm font-semibold text-green-700"
-      >
-        {{ t('workoutTemplates') }}
-      </a>
+        <a
+          routerLink="/templates"
+          class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-green-600 bg-white px-4 py-3 text-sm font-semibold text-green-700"
+        >
+          {{ t('workoutTemplates') }}
+        </a>
 
-      <a
-        routerLink="/history"
-        class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
-      >
-        {{ t('history') }}
-      </a>
+        <a
+          routerLink="/history"
+          class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
+        >
+          {{ t('history') }}
+        </a>
 
-      <a
-        routerLink="/settings"
-        class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800"
-      >
-        {{ t('settings') }}
-      </a>
+        <a
+          routerLink="/settings"
+          class="inline-flex min-h-12 w-full items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
+        >
+          {{ t('settings') }}
+        </a>
+      </div>
 
       @if (errorMessage) {
         <p class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

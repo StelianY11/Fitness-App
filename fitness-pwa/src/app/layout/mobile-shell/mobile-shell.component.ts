@@ -12,13 +12,13 @@ import { TranslationService } from '../../core/services/translation.service';
   template: `
     <main class="min-h-dvh bg-slate-50 text-slate-950">
       <div class="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white shadow-sm">
-        <header class="border-b border-slate-200 px-5 py-4">
-          <p class="text-xs font-semibold uppercase tracking-wide text-green-700">Fitness Tracker</p>
-          <h1 class="mt-1 text-2xl font-bold">{{ t('appTagline') }}</h1>
+        <header class="border-b border-slate-200 px-5 py-5">
+          <p class="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-green-700">Fitness Tracker</p>
+          <h1 class="mt-1.5 text-2xl font-bold leading-tight text-slate-950">{{ t('appTagline') }}</h1>
         </header>
 
         @if (activeWorkout()) {
-          <section class="border-b border-green-200 bg-green-50 px-5 py-3">
+          <section class="border-b border-green-200 bg-green-50 px-5 py-3.5">
             <div class="flex items-center justify-between gap-3">
               <div>
                 <p class="text-sm font-bold text-green-900">{{ t('activeWorkout') }}</p>
@@ -29,7 +29,7 @@ import { TranslationService } from '../../core/services/translation.service';
               <button
                 type="button"
                 (click)="resumeActiveWorkout()"
-                class="inline-flex min-h-11 shrink-0 items-center justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white"
+                class="inline-flex min-h-11 shrink-0 items-center justify-center rounded-md bg-green-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm"
               >
                 {{ t('resume') }}
               </button>
@@ -37,12 +37,12 @@ import { TranslationService } from '../../core/services/translation.service';
           </section>
         }
 
-        <section class="flex-1 px-5 py-6">
+        <section class="flex-1 px-5 py-6 sm:py-7">
           <router-outlet />
         </section>
 
         <nav
-          class="grid border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] text-sm font-medium"
+          class="grid border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] text-sm font-semibold"
           [class.grid-cols-2]="!currentSession()"
           [class.grid-cols-4]="currentSession()"
         >

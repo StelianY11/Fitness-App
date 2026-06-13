@@ -3,30 +3,55 @@
 
 :root {
   --app-accent: #16a34a;
+  --app-accent-strong: color-mix(in srgb, var(--app-accent) 88%, #0f172a);
   --app-accent-soft: #16a34a1a;
+  --app-surface: #ffffff;
+  --app-surface-soft: #f8fafc;
+  --app-border: #e2e8f0;
+  --app-text: #0f172a;
+  --app-muted: #64748b;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  background: #f1f5f9;
+}
+
+body {
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--app-accent) 8%, transparent), transparent 32rem),
+    #f1f5f9;
+  color: var(--app-text);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .bg-green-50 {
-  background-color: var(--app-accent-soft);
+  background-color: color-mix(in srgb, var(--app-accent) 10%, #ffffff);
 }
 
 .bg-green-100 {
-  background-color: var(--app-accent-soft);
+  background-color: color-mix(in srgb, var(--app-accent) 14%, #ffffff);
 }
 
 .bg-green-600 {
-  background-color: var(--app-accent);
+  background-color: var(--app-accent-strong);
 }
 
 .border-green-200,
 .border-green-600 {
-  border-color: var(--app-accent);
+  border-color: color-mix(in srgb, var(--app-accent) 42%, #cbd5e1);
 }
 
 .text-green-700,
 .text-green-800,
 .text-green-900 {
-  color: var(--app-accent);
+  color: color-mix(in srgb, var(--app-accent) 82%, #0f172a);
 }
 
 .focus\:border-green-600:focus {
@@ -37,20 +62,90 @@
   --tw-ring-color: var(--app-accent-soft);
 }
 
+button,
+a,
+input,
+select,
+textarea {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    transform 120ms ease,
+    opacity 160ms ease;
+}
+
+button:not(:disabled):active,
+a:active {
+  transform: translateY(1px);
+}
+
+.rounded-md {
+  border-radius: 0.65rem;
+}
+
+.rounded-lg {
+  border-radius: 0.85rem;
+}
+
+.border-slate-200,
+.border-slate-300 {
+  border-color: var(--app-border);
+}
+
+.shadow-sm {
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 0.04),
+    0 10px 24px rgb(15 23 42 / 0.035);
+}
+
+.animate-pulse {
+  animation-duration: 1.8s;
+  background-image: linear-gradient(
+    90deg,
+    rgb(241 245 249) 0%,
+    rgb(248 250 252) 48%,
+    rgb(241 245 249) 100%
+  );
+  background-size: 200% 100%;
+  border-color: rgb(226 232 240);
+}
+
+input,
+select,
+textarea {
+  background-color: #ffffff;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  box-shadow:
+    0 0 0 3px var(--app-accent-soft),
+    0 1px 2px rgb(15 23 42 / 0.04);
+}
+
 html.dark body {
-  background: #020617;
-  color: #e2e8f0;
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--app-accent) 10%, transparent), transparent 30rem),
+    #0b1120;
+  color: #e5edf6;
+}
+
+html.dark main {
+  background-color: #0b1120;
 }
 
 html.dark .bg-white,
 html.dark .bg-slate-50,
 html.dark .bg-slate-100 {
-  background-color: #0f172a;
+  background-color: #111827;
 }
 
 html.dark .border-slate-200,
 html.dark .border-slate-300 {
-  border-color: #334155;
+  border-color: #263244;
 }
 
 html.dark .text-slate-950,
@@ -62,5 +157,43 @@ html.dark .text-slate-800 {
 html.dark .text-slate-700,
 html.dark .text-slate-600,
 html.dark .text-slate-500 {
-  color: #cbd5e1;
+  color: #b8c4d4;
+}
+
+html.dark .bg-green-50,
+html.dark .bg-green-100 {
+  background-color: color-mix(in srgb, var(--app-accent) 16%, #111827);
+}
+
+html.dark .bg-green-600 {
+  background-color: color-mix(in srgb, var(--app-accent) 76%, #e5edf6);
+}
+
+html.dark .text-green-700,
+html.dark .text-green-800,
+html.dark .text-green-900 {
+  color: color-mix(in srgb, var(--app-accent) 72%, #e5edf6);
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+
+html.dark .shadow-sm {
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.16),
+    0 14px 32px rgb(0 0 0 / 0.18);
+}
+
+html.dark .animate-pulse {
+  background-image: linear-gradient(
+    90deg,
+    #111827 0%,
+    #172033 48%,
+    #111827 100%
+  );
+  border-color: #263244;
 }
