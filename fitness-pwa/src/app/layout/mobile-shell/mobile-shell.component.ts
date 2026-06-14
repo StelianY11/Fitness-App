@@ -37,7 +37,7 @@ import type { WorkoutSession } from '../../shared/models/fitness.models';
           </section>
         }
 
-        <section class="flex-1 px-5 py-6 sm:py-7">
+        <section class="app-route-shell flex-1 px-5 py-6 sm:py-7">
           <router-outlet />
         </section>
 
