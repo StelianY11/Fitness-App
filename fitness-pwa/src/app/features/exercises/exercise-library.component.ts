@@ -44,7 +44,7 @@ import {
           <button
             type="button"
             (click)="selectCategory(null)"
-            class="min-h-11 rounded-full border px-4 py-2 text-sm font-semibold"
+            class="app-chip"
             [class.border-green-600]="selectedCategoryId === null"
             [class.bg-green-600]="selectedCategoryId === null"
             [class.text-white]="selectedCategoryId === null"
@@ -58,7 +58,7 @@ import {
             <button
               type="button"
               (click)="selectCategory(category.id)"
-              class="min-h-11 rounded-full border px-4 py-2 text-sm font-semibold"
+              class="app-chip"
               [class.border-green-600]="selectedCategoryId === category.id"
               [class.bg-green-600]="selectedCategoryId === category.id"
               [class.text-white]="selectedCategoryId === category.id"

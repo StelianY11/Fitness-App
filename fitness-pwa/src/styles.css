@@ -3,13 +3,18 @@
 
 :root {
   --app-accent: #16a34a;
-  --app-accent-strong: color-mix(in srgb, var(--app-accent) 88%, #0f172a);
+  --app-accent-strong: color-mix(in srgb, var(--app-accent) 80%, #0f172a);
   --app-accent-soft: #16a34a1a;
   --app-surface: #ffffff;
   --app-surface-soft: #f8fafc;
   --app-border: #e2e8f0;
   --app-text: #0f172a;
   --app-muted: #64748b;
+  --app-radius-sm: 0.625rem;
+  --app-radius-md: 0.75rem;
+  --app-radius-lg: 1rem;
+  --app-shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 14px 30px rgb(15 23 42 / 0.045);
+  --app-shadow-button: 0 1px 2px rgb(15 23 42 / 0.05), 0 10px 22px rgb(15 23 42 / 0.04);
 }
 
 * {
@@ -22,7 +27,7 @@ html {
 
 body {
   background:
-    radial-gradient(circle at top, color-mix(in srgb, var(--app-accent) 8%, transparent), transparent 32rem),
+    radial-gradient(circle at top, color-mix(in srgb, var(--app-accent) 6%, transparent), transparent 32rem),
     #f1f5f9;
   color: var(--app-text);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
@@ -68,12 +73,17 @@ input,
 select,
 textarea {
   transition:
-    background-color 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease,
-    box-shadow 160ms ease,
-    transform 120ms ease,
-    opacity 160ms ease;
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease,
+    transform 140ms ease,
+    opacity 180ms ease;
+}
+
+button:not(:disabled):hover,
+a:hover {
+  filter: brightness(1.015);
 }
 
 button:not(:disabled):active,
@@ -82,11 +92,11 @@ a:active {
 }
 
 .rounded-md {
-  border-radius: 0.65rem;
+  border-radius: var(--app-radius-md);
 }
 
 .rounded-lg {
-  border-radius: 0.85rem;
+  border-radius: var(--app-radius-lg);
 }
 
 .border-slate-200,
@@ -95,18 +105,16 @@ a:active {
 }
 
 .shadow-sm {
-  box-shadow:
-    0 1px 2px rgb(15 23 42 / 0.04),
-    0 10px 24px rgb(15 23 42 / 0.035);
+  box-shadow: var(--app-shadow-card);
 }
 
 .animate-pulse {
   animation-duration: 1.8s;
   background-image: linear-gradient(
     90deg,
-    rgb(241 245 249) 0%,
-    rgb(248 250 252) 48%,
-    rgb(241 245 249) 100%
+    rgb(236 241 247) 0%,
+    rgb(248 250 252) 46%,
+    rgb(236 241 247) 100%
   );
   background-size: 200% 100%;
   border-color: rgb(226 232 240);
@@ -128,12 +136,10 @@ textarea:focus {
 
 .app-card {
   border: 1px solid var(--app-border);
-  border-radius: 0.85rem;
+  border-radius: var(--app-radius-lg);
   background: var(--app-surface);
-  padding: 1rem;
-  box-shadow:
-    0 1px 2px rgb(15 23 42 / 0.04),
-    0 10px 24px rgb(15 23 42 / 0.035);
+  padding: 1.0625rem;
+  box-shadow: var(--app-shadow-card);
 }
 
 .app-card.bg-slate-50 {
@@ -159,10 +165,10 @@ textarea:focus {
   width: 100%;
   align-items: center;
   justify-content: center;
-  border-radius: 0.65rem;
+  border-radius: var(--app-radius-md);
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 750;
   line-height: 1.25rem;
 }
 
@@ -209,14 +215,12 @@ textarea:focus {
   border: 1px solid var(--app-accent-strong);
   background: var(--app-accent-strong);
   color: #ffffff;
-  box-shadow:
-    0 1px 2px rgb(15 23 42 / 0.04),
-    0 10px 24px rgb(15 23 42 / 0.035);
+  box-shadow: var(--app-shadow-button);
 }
 
 .app-button-secondary {
   border: 1px solid var(--app-border);
-  background: var(--app-surface);
+  background: color-mix(in srgb, var(--app-surface) 94%, var(--app-surface-soft));
   color: #1e293b;
 }
 
@@ -237,9 +241,9 @@ textarea:focus {
 .app-input {
   width: 100%;
   border: 1px solid var(--app-border);
-  border-radius: 0.65rem;
+  border-radius: var(--app-radius-md);
   background: var(--app-surface);
-  padding: 0.75rem 0.875rem;
+  padding: 0.8125rem 0.9375rem;
   font-size: 1rem;
   line-height: 1.5rem;
   outline: none;
@@ -258,7 +262,7 @@ textarea:focus {
 .app-input:focus {
   border-color: var(--app-accent);
   box-shadow:
-    0 0 0 3px var(--app-accent-soft),
+    0 0 0 4px color-mix(in srgb, var(--app-accent) 16%, transparent),
     0 1px 2px rgb(15 23 42 / 0.04);
 }
 
@@ -267,11 +271,34 @@ textarea:focus {
   align-items: center;
   border-radius: 9999px;
   background: #f1f5f9;
-  padding: 0.25rem 0.75rem;
+  padding: 0.3125rem 0.75rem;
   font-size: 0.75rem;
   font-weight: 700;
   line-height: 1rem;
   color: #334155;
+}
+
+.app-chip {
+  min-height: 2.75rem;
+  border: 1px solid var(--app-border);
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--app-surface) 92%, var(--app-surface-soft));
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 750;
+  color: #475569;
+}
+
+.app-chip.border-green-600 {
+  border-color: color-mix(in srgb, var(--app-accent) 48%, #cbd5e1);
+}
+
+.app-chip.bg-green-600 {
+  background: var(--app-accent-strong);
+}
+
+.app-chip.text-white {
+  color: #ffffff;
 }
 
 .app-badge.bg-green-100 {
@@ -284,31 +311,39 @@ textarea:focus {
 
 .app-section-title {
   font-size: 1.125rem;
-  font-weight: 800;
+  font-weight: 850;
   line-height: 1.75rem;
   color: #020617;
 }
 
 html.dark body {
+  --app-accent-strong: color-mix(in srgb, var(--app-accent) 68%, #f8fafc);
+  --app-surface: #101722;
+  --app-surface-soft: #0d1420;
+  --app-border: #243044;
+  --app-text: #eef4fb;
+  --app-muted: #9aa8bb;
+  --app-shadow-card: 0 1px 2px rgb(0 0 0 / 0.22), 0 18px 42px rgb(0 0 0 / 0.22);
+  --app-shadow-button: 0 1px 2px rgb(0 0 0 / 0.18), 0 12px 28px rgb(0 0 0 / 0.2);
   background:
-    radial-gradient(circle at top, color-mix(in srgb, var(--app-accent) 10%, transparent), transparent 30rem),
-    #0b1120;
-  color: #e5edf6;
+    radial-gradient(circle at top, color-mix(in srgb, var(--app-accent) 7%, transparent), transparent 30rem),
+    #090f1a;
+  color: var(--app-text);
 }
 
 html.dark main {
-  background-color: #0b1120;
+  background-color: #090f1a;
 }
 
 html.dark .bg-white,
 html.dark .bg-slate-50,
 html.dark .bg-slate-100 {
-  background-color: #111827;
+  background-color: var(--app-surface);
 }
 
 html.dark .border-slate-200,
 html.dark .border-slate-300 {
-  border-color: #263244;
+  border-color: var(--app-border);
 }
 
 html.dark .text-slate-950,
@@ -320,16 +355,16 @@ html.dark .text-slate-800 {
 html.dark .text-slate-700,
 html.dark .text-slate-600,
 html.dark .text-slate-500 {
-  color: #b8c4d4;
+  color: var(--app-muted);
 }
 
 html.dark .bg-green-50,
 html.dark .bg-green-100 {
-  background-color: color-mix(in srgb, var(--app-accent) 16%, #111827);
+  background-color: color-mix(in srgb, var(--app-accent) 13%, var(--app-surface));
 }
 
 html.dark .bg-green-600 {
-  background-color: color-mix(in srgb, var(--app-accent) 76%, #e5edf6);
+  background-color: var(--app-accent-strong);
 }
 
 html.dark .text-green-700,
@@ -341,49 +376,47 @@ html.dark .text-green-900 {
 html.dark input,
 html.dark select,
 html.dark textarea {
-  background-color: #0f172a;
+  background-color: var(--app-surface-soft);
   color: #f8fafc;
 }
 
 html.dark .shadow-sm {
-  box-shadow:
-    0 1px 2px rgb(0 0 0 / 0.16),
-    0 14px 32px rgb(0 0 0 / 0.18);
+  box-shadow: var(--app-shadow-card);
 }
 
 html.dark .animate-pulse {
   background-image: linear-gradient(
     90deg,
-    #111827 0%,
-    #172033 48%,
-    #111827 100%
+    #101722 0%,
+    #172235 48%,
+    #101722 100%
   );
-  border-color: #263244;
+  border-color: var(--app-border);
 }
 
 html.dark .app-card {
-  border-color: #263244;
-  background: #111827;
+  border-color: var(--app-border);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--app-surface) 96%, #ffffff), var(--app-surface));
 }
 
 html.dark .app-card.bg-slate-50 {
-  background: #111827;
+  background: var(--app-surface-soft);
 }
 
 html.dark .app-card.bg-green-50 {
-  border-color: color-mix(in srgb, var(--app-accent) 36%, #263244);
-  background: color-mix(in srgb, var(--app-accent) 16%, #111827);
+  border-color: color-mix(in srgb, var(--app-accent) 28%, var(--app-border));
+  background: color-mix(in srgb, var(--app-accent) 12%, var(--app-surface));
 }
 
 html.dark .app-button-secondary {
-  border-color: #263244;
-  background: #111827;
+  border-color: var(--app-border);
+  background: color-mix(in srgb, var(--app-surface) 88%, var(--app-surface-soft));
   color: #f8fafc;
 }
 
 html.dark .app-button-danger {
-  border-color: #7f1d1d;
-  background: #111827;
+  border-color: color-mix(in srgb, #ef4444 42%, var(--app-border));
+  background: color-mix(in srgb, #ef4444 8%, var(--app-surface));
   color: #fca5a5;
 }
 
@@ -396,14 +429,14 @@ html.dark .app-button-secondary.text-green-700 {
 }
 
 html.dark .app-input {
-  border-color: #263244;
-  background: #0f172a;
+  border-color: var(--app-border);
+  background: var(--app-surface-soft);
   color: #f8fafc;
 }
 
 html.dark .app-badge {
-  background: #1f2937;
-  color: #dbeafe;
+  background: #182234;
+  color: #d7e3f2;
 }
 
 html.dark .app-badge.bg-green-100 {
@@ -416,4 +449,22 @@ html.dark .app-badge.text-green-800 {
 
 html.dark .app-section-title {
   color: #f8fafc;
+}
+
+html.dark .app-chip {
+  border-color: var(--app-border);
+  background: color-mix(in srgb, var(--app-surface) 84%, var(--app-surface-soft));
+  color: #c9d4e4;
+}
+
+html.dark .app-chip.border-green-600 {
+  border-color: color-mix(in srgb, var(--app-accent) 32%, var(--app-border));
+}
+
+html.dark .app-chip.bg-green-600 {
+  background: var(--app-accent-strong);
+}
+
+html.dark .app-chip.text-white {
+  color: #07111d;
 }

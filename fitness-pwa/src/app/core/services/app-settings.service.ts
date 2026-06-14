@@ -10,7 +10,7 @@ import {
 const STORAGE_KEY = 'fitness-app-settings';
 const DEFAULT_SETTINGS: AppSettings = {
   language: 'en',
-  theme: 'system',
+  theme: 'dark',
   accentColor: '#16a34a',
 };
 
