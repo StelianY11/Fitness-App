@@ -17,12 +17,12 @@ import {
   imports: [RouterLink],
   template: `
     <div class="space-y-5">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <p class="text-sm font-semibold text-green-700">{{ t('workoutDetails') }}</p>
-          <h2 class="mt-2 text-3xl font-bold">{{ workoutName }}</h2>
+      <header class="flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-700">{{ t('workoutDetails') }}</p>
+          <h2 class="mt-2 text-3xl font-bold leading-tight text-slate-950">{{ workoutName }}</h2>
           @if (session) {
-            <p class="mt-2 text-sm text-slate-600">
+            <p class="mt-2 text-sm leading-5 text-slate-600">
               {{ formatDateTime(session.startedAt) }}
             </p>
           }
@@ -34,7 +34,7 @@ import {
         >
           {{ t('back') }}
         </a>
-      </div>
+      </header>
 
       @if (isLoading) {
         <div class="space-y-3">
@@ -55,25 +55,33 @@ import {
           </button>
         </div>
       } @else if (session) {
-        <section class="app-card">
-          <div class="grid grid-cols-2 gap-2 text-sm">
-            <div class="rounded-md bg-slate-50 p-3">
+        <section class="app-card space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-[0.16em] text-green-700">{{ t('status') }}</p>
+              <h3 class="mt-1 text-xl font-bold capitalize leading-7 text-slate-950">{{ session.status }}</h3>
+            </div>
+            <span class="app-badge bg-green-100 text-green-800">{{ formatDuration(session) }}</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 border-t border-slate-200 pt-3 text-sm">
+            <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
               <p class="text-xs font-medium text-slate-500">{{ t('started') }}</p>
               <p class="mt-1 font-semibold text-slate-950">{{ formatDateTime(session.startedAt) }}</p>
             </div>
-            <div class="rounded-md bg-slate-50 p-3">
+            <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
               <p class="text-xs font-medium text-slate-500">{{ t('finished') }}</p>
               <p class="mt-1 font-semibold text-slate-950">
-                {{ session.finishedAt ? formatDateTime(session.finishedAt) : 'Open' }}
+                {{ session.finishedAt ? formatDateTime(session.finishedAt) : t('open') }}
               </p>
             </div>
-            <div class="rounded-md bg-slate-50 p-3">
+            <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
               <p class="text-xs font-medium text-slate-500">{{ t('duration') }}</p>
               <p class="mt-1 font-semibold text-slate-950">{{ formatDuration(session) }}</p>
             </div>
-            <div class="rounded-md bg-slate-50 p-3">
-              <p class="text-xs font-medium text-slate-500">{{ t('status') }}</p>
-              <p class="mt-1 font-semibold capitalize text-slate-950">{{ session.status }}</p>
+            <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
+              <p class="text-xs font-medium text-slate-500">{{ t('sets') }}</p>
+              <p class="mt-1 font-semibold text-slate-950">{{ totalSets }}</p>
             </div>
           </div>
         </section>
@@ -91,23 +99,14 @@ import {
               [routerLink]="['/templates', session.workoutTemplateId]"
               class="app-button app-button-primary"
             >
-              {{ t('templates') }}
+              {{ t('openTemplate') }}
             </a>
           } @else {
             <span class="app-button app-button-secondary text-slate-400">
-              No Template
+              {{ t('noTemplate') }}
             </span>
           }
         </div>
-
-        <button
-          type="button"
-          (click)="deleteWorkout()"
-          [disabled]="isDeleting"
-          class="app-button app-button-danger"
-        >
-          {{ isDeleting ? t('loading') : t('deleteWorkout') }}
-        </button>
 
         @if (workoutExercises.length === 0) {
           <div class="app-card bg-slate-50 p-5 text-center shadow-none">
@@ -117,13 +116,13 @@ import {
         } @else {
           <div class="space-y-4">
             @for (workoutExercise of workoutExercises; track workoutExercise.id; let exerciseIndex = $index) {
-              <article class="app-card">
+              <article class="app-card space-y-3">
                 <div class="flex items-start justify-between gap-3">
-                  <div>
-                    <p class="text-xs font-semibold uppercase tracking-wide text-green-700">
+                  <div class="min-w-0">
+                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-green-700">
                       {{ t('exercises') }} {{ exerciseIndex + 1 }}
                     </p>
-                    <h3 class="mt-1 text-lg font-bold text-slate-950">
+                    <h3 class="mt-1 text-lg font-bold leading-6 text-slate-950">
                       {{ getExerciseName(workoutExercise.exerciseId) }}
                     </h3>
                   </div>
@@ -133,19 +132,19 @@ import {
                 </div>
 
                 @if (getSets(workoutExercise.id).length === 0) {
-                  <div class="mt-4 rounded-md bg-slate-50 p-3 text-sm text-slate-600">
+                  <div class="rounded-md bg-slate-50 p-3 text-sm text-slate-600">
                     {{ t('noSetsLogged') }}
                   </div>
                 } @else {
-                  <div class="mt-4 space-y-2">
+                  <div class="space-y-2 border-t border-slate-200 pt-3">
                     @for (set of getSets(workoutExercise.id); track set.id) {
-                      <div class="rounded-md border border-slate-200 p-3">
+                      <div class="rounded-md border border-slate-200 bg-white px-3 py-2.5">
                         <div class="flex items-center justify-between gap-3">
                           <p class="font-semibold text-slate-950">{{ t('sets') }} {{ set.setNumber }}</p>
-                          <p class="text-sm text-slate-600">{{ formatSetSummary(set) }}</p>
+                          <p class="shrink-0 text-sm font-bold text-slate-700">{{ formatSetSummary(set) }}</p>
                         </div>
                         @if (set.notes) {
-                          <p class="mt-2 text-sm text-slate-600">{{ set.notes }}</p>
+                          <p class="mt-2 border-t border-slate-200 pt-2 text-sm leading-5 text-slate-600">{{ set.notes }}</p>
                         }
                       </div>
                     }
@@ -155,6 +154,23 @@ import {
             }
           </div>
         }
+
+        <section class="app-card bg-slate-50 shadow-none">
+          <div class="space-y-3">
+            <div>
+              <p class="text-sm font-bold text-slate-950">{{ t('deleteWorkout') }}</p>
+              <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('deleteWorkoutDescription') }}</p>
+            </div>
+            <button
+              type="button"
+              (click)="deleteWorkout()"
+              [disabled]="isDeleting"
+              class="app-button app-button-danger"
+            >
+              {{ isDeleting ? t('loading') : t('deleteWorkout') }}
+            </button>
+          </div>
+        </section>
       }
     </div>
   `,
@@ -171,7 +187,7 @@ export class WorkoutDetailComponent {
   readonly loadingCards = [1, 2, 3];
 
   session: WorkoutSession | null = null;
-  workoutName = 'Workout';
+  workoutName = this.t('workoutSession');
   workoutExercises: WorkoutExercise[] = [];
   setsByExercise: Record<string, WorkoutSet[]> = {};
   exerciseNames: Record<string, string> = {};
@@ -190,13 +206,20 @@ export class WorkoutDetailComponent {
     void this.loadWorkout();
   }
 
+  get totalSets(): number {
+    return Object.values(this.setsByExercise).reduce(
+      (total, sets) => total + sets.length,
+      0,
+    );
+  }
+
   async loadWorkout(): Promise<void> {
     const loadId = this.loadRunId + 1;
     this.loadRunId = loadId;
     this.isLoading = true;
     this.errorMessage = '';
     this.session = null;
-    this.workoutName = 'Workout';
+    this.workoutName = this.t('workoutSession');
     this.workoutExercises = [];
     this.setsByExercise = {};
     this.exerciseNames = {};
@@ -270,7 +293,7 @@ export class WorkoutDetailComponent {
 
   formatDuration(session: WorkoutSession): string {
     if (!session.finishedAt) {
-      return 'Open';
+      return this.t('open');
     }
 
     const minutes = Math.max(
@@ -355,18 +378,18 @@ export class WorkoutDetailComponent {
 
   private async loadWorkoutName(session: WorkoutSession): Promise<string> {
     if (!session.workoutTemplateId) {
-      return 'Workout';
+      return this.t('workoutSession');
     }
 
     const templateResult = await this.workoutTemplateService.getTemplateById(session.workoutTemplateId);
 
     if (templateResult.error) {
       console.error('Workout detail template load error:', templateResult.error);
-      return 'Template Workout';
+      return this.t('templateWorkout');
     }
 
     const template = templateResult.data as WorkoutTemplate | null;
-    return template?.name ?? 'Template Workout';
+    return template?.name ?? this.t('templateWorkout');
   }
 
   private async loadExerciseNames(): Promise<Record<string, string>> {

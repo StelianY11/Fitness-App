@@ -13,7 +13,7 @@ interface WorkoutHistoryItem {
 }
 
 interface WorkoutHistoryGroup {
-  label: string;
+  labelKey: string;
   items: WorkoutHistoryItem[];
 }
 
@@ -22,11 +22,11 @@ interface WorkoutHistoryGroup {
   imports: [RouterLink],
   template: `
     <div class="space-y-5">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <p class="text-sm font-semibold text-green-700">{{ t('history') }}</p>
-          <h2 class="mt-2 text-3xl font-bold">{{ t('history') }}</h2>
-          <p class="mt-2 text-sm text-slate-600">{{ t('workoutHistory') }}</p>
+      <header class="flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-700">{{ t('workoutHistory') }}</p>
+          <h2 class="mt-2 text-3xl font-bold leading-tight text-slate-950">{{ t('history') }}</h2>
+          <p class="mt-2 text-sm leading-5 text-slate-600">{{ t('trainingTimeline') }}</p>
         </div>
 
         <a
@@ -35,17 +35,25 @@ interface WorkoutHistoryGroup {
         >
           {{ t('back') }}
         </a>
-      </div>
+      </header>
 
       @if (historyItems.length > 0) {
-        <button
-          type="button"
-          (click)="clearAllHistory()"
-          [disabled]="isClearing"
-          class="app-button app-button-danger"
-        >
-          {{ isClearing ? t('loading') : t('clearAllHistory') }}
-        </button>
+        <section class="app-card bg-slate-50 shadow-none">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <p class="text-sm font-bold text-slate-950">{{ t('clearAllHistory') }}</p>
+              <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('clearHistoryDescription') }}</p>
+            </div>
+            <button
+              type="button"
+              (click)="clearAllHistory()"
+              [disabled]="isClearing"
+              class="app-button app-button-danger min-h-11 w-auto px-3 py-2"
+            >
+              {{ isClearing ? t('loading') : t('delete') }}
+            </button>
+          </div>
+        </section>
       }
 
       @if (isLoading) {
@@ -73,23 +81,23 @@ interface WorkoutHistoryGroup {
         </div>
       } @else {
         <div class="space-y-6">
-          @for (group of groups; track group.label) {
+          @for (group of groups; track group.labelKey) {
             @if (group.items.length > 0) {
               <section class="space-y-3">
-                <h3 class="text-sm font-bold uppercase tracking-wide text-slate-500">
-                  {{ group.label }}
+                <h3 class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+                  {{ t(group.labelKey) }}
                 </h3>
 
                 @for (item of group.items; track item.session.id) {
                   <a
                     [routerLink]="['/history', item.session.id]"
-                    class="app-card block"
+                    class="app-card block space-y-3"
                   >
                     <div class="flex items-start justify-between gap-3">
-                      <div>
-                        <h4 class="text-lg font-bold text-slate-950">{{ item.workoutName }}</h4>
-                        <p class="mt-1 text-sm text-slate-600">
-                          {{ formatTime(item.session.startedAt) }} - {{ item.session.finishedAt ? formatTime(item.session.finishedAt) : 'Open' }}
+                      <div class="min-w-0">
+                        <h4 class="text-lg font-bold leading-6 text-slate-950">{{ item.workoutName }}</h4>
+                        <p class="mt-1 text-sm leading-5 text-slate-600">
+                          {{ formatTime(item.session.startedAt) }} - {{ item.session.finishedAt ? formatTime(item.session.finishedAt) : t('open') }}
                         </p>
                       </div>
                       <span class="app-badge bg-green-100 text-green-800">
@@ -97,14 +105,14 @@ interface WorkoutHistoryGroup {
                       </span>
                     </div>
 
-                    <div class="mt-4 grid grid-cols-2 gap-2 text-sm">
-                      <div class="rounded-md bg-slate-50 p-3">
+                    <div class="grid grid-cols-2 gap-2 border-t border-slate-200 pt-3 text-sm">
+                      <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
                         <p class="text-xs font-medium text-slate-500">{{ t('exercises') }}</p>
-                        <p class="mt-1 font-semibold text-slate-950">{{ item.exerciseCount }}</p>
+                        <p class="mt-1 font-bold text-slate-950">{{ item.exerciseCount }}</p>
                       </div>
-                      <div class="rounded-md bg-slate-50 p-3">
+                      <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
                         <p class="text-xs font-medium text-slate-500">{{ t('sets') }}</p>
-                        <p class="mt-1 font-semibold text-slate-950">{{ item.setCount }}</p>
+                        <p class="mt-1 font-bold text-slate-950">{{ item.setCount }}</p>
                       </div>
                     </div>
                   </a>
@@ -240,7 +248,7 @@ export class WorkoutHistoryComponent {
 
   formatDuration(session: WorkoutSession): string {
     if (!session.finishedAt) {
-      return 'Open';
+      return this.t('open');
     }
 
     const minutes = Math.max(
@@ -376,8 +384,8 @@ export class WorkoutHistoryComponent {
 
   private getWorkoutName(session: WorkoutSession): string {
     return session.workoutTemplateId
-      ? this.templateNames[session.workoutTemplateId] ?? 'Template Workout'
-      : 'Workout';
+      ? this.templateNames[session.workoutTemplateId] ?? this.t('templateWorkout')
+      : this.t('workoutSession');
   }
 
   private isStaleLoad(loadId: number): boolean {
@@ -387,10 +395,10 @@ export class WorkoutHistoryComponent {
 
 function createEmptyGroups(): WorkoutHistoryGroup[] {
   return [
-    { label: 'Today', items: [] },
-    { label: 'Yesterday', items: [] },
-    { label: 'Earlier This Week', items: [] },
-    { label: 'Older', items: [] },
+    { labelKey: 'today', items: [] },
+    { labelKey: 'yesterday', items: [] },
+    { labelKey: 'earlierThisWeek', items: [] },
+    { labelKey: 'older', items: [] },
   ];
 }
 
