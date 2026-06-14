@@ -9,10 +9,11 @@ import { ExerciseHistoryWorkout } from '../../shared/models/fitness.models';
   imports: [RouterLink],
   template: `
     <div class="space-y-5">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <p class="text-sm font-semibold text-green-700">{{ t('history') }}</p>
-          <h2 class="mt-2 text-3xl font-bold">{{ exerciseName }}</h2>
+      <header class="flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-700">{{ t('exerciseHistory') }}</p>
+          <h2 class="mt-2 text-3xl font-bold leading-tight text-slate-950">{{ exerciseName }}</h2>
+          <p class="mt-2 text-sm leading-5 text-slate-600">{{ t('exerciseHistoryDescription') }}</p>
         </div>
 
         <a
@@ -21,7 +22,7 @@ import { ExerciseHistoryWorkout } from '../../shared/models/fitness.models';
         >
           {{ t('exerciseLibrary') }}
         </a>
-      </div>
+      </header>
 
       @if (isLoading) {
         <div class="space-y-3">
@@ -43,23 +44,33 @@ import { ExerciseHistoryWorkout } from '../../shared/models/fitness.models';
         </div>
       } @else if (history.length === 0) {
         <div class="app-card bg-slate-50 p-5 text-center shadow-none">
-          <p class="font-semibold text-slate-800">{{ t('noExercisesFound') }}</p>
+          <p class="font-semibold text-slate-800">{{ t('noExerciseHistory') }}</p>
           <p class="mt-1 text-sm text-slate-600">
-            Finish a workout with this exercise to see previous sets here.
+            {{ t('noExerciseHistoryDescription') }}
           </p>
         </div>
       } @else {
-        <section class="app-card border-green-200 bg-green-50">
-          <p class="text-sm font-semibold text-green-800">{{ t('workoutHistory') }}</p>
-          <h3 class="mt-1 text-xl font-bold text-slate-950">{{ history[0].workoutName }}</h3>
-          <p class="mt-1 text-sm text-slate-600">{{ formatDate(history[0].workoutDate) }}</p>
-          <div class="mt-3 space-y-2">
+        <section class="app-card border-green-200 bg-green-50 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-xs font-bold uppercase tracking-[0.16em] text-green-700">{{ t('lastWorkout') }}</p>
+              <h3 class="mt-1 text-xl font-bold leading-7 text-slate-950">{{ history[0].workoutName }}</h3>
+              <p class="mt-1 text-sm leading-5 text-slate-600">{{ formatDate(history[0].workoutDate) }}</p>
+            </div>
+            <span class="app-badge bg-green-100 text-green-800 shrink-0">
+              {{ history[0].sets.length }} {{ t('sets') }}
+            </span>
+          </div>
+
+          <div class="space-y-2 border-t border-green-200 pt-3">
             @for (set of history[0].sets; track set.id) {
-              <div class="rounded-md bg-white p-3 text-sm">
-                <p class="font-semibold text-slate-950">{{ t('sets') }} {{ set.setNumber }}</p>
-                <p class="mt-1 text-slate-600">{{ formatSet(set) }}</p>
+              <div class="rounded-md border border-green-200 bg-white px-3 py-2.5 text-sm">
+                <div class="flex items-center justify-between gap-3">
+                  <p class="font-semibold text-slate-950">{{ t('sets') }} {{ set.setNumber }}</p>
+                  <p class="shrink-0 font-bold text-slate-700">{{ formatSet(set) }}</p>
+                </div>
                 @if (set.notes) {
-                  <p class="mt-1 text-slate-500">{{ set.notes }}</p>
+                  <p class="mt-2 border-t border-slate-200 pt-2 text-slate-600">{{ set.notes }}</p>
                 }
               </div>
             }
@@ -68,26 +79,26 @@ import { ExerciseHistoryWorkout } from '../../shared/models/fitness.models';
 
         <div class="space-y-3">
           @for (workout of history; track workout.workoutSessionId) {
-            <article class="app-card">
+            <article class="app-card space-y-3">
               <div class="flex items-start justify-between gap-3">
-                <div>
-                  <h3 class="text-lg font-bold text-slate-950">{{ workout.workoutName }}</h3>
-                  <p class="mt-1 text-sm text-slate-600">{{ formatDate(workout.workoutDate) }}</p>
+                <div class="min-w-0">
+                  <h3 class="text-lg font-bold leading-6 text-slate-950">{{ workout.workoutName }}</h3>
+                  <p class="mt-1 text-sm leading-5 text-slate-600">{{ formatDate(workout.workoutDate) }}</p>
                 </div>
-                <span class="app-badge">
+                <span class="app-badge shrink-0">
                   {{ workout.sets.length }} {{ t('sets') }}
                 </span>
               </div>
 
-              <div class="mt-4 space-y-2">
+              <div class="space-y-2 border-t border-slate-200 pt-3">
                 @for (set of workout.sets; track set.id) {
-                  <div class="rounded-md bg-slate-50 p-3 text-sm">
+                  <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm">
                     <div class="flex items-center justify-between gap-3">
                       <p class="font-semibold text-slate-950">{{ t('sets') }} {{ set.setNumber }}</p>
-                      <p class="text-slate-600">{{ formatSet(set) }}</p>
+                      <p class="shrink-0 font-bold text-slate-700">{{ formatSet(set) }}</p>
                     </div>
                     @if (set.notes) {
-                      <p class="mt-2 text-slate-600">{{ set.notes }}</p>
+                      <p class="mt-2 border-t border-slate-200 pt-2 text-slate-600">{{ set.notes }}</p>
                     }
                   </div>
                 }

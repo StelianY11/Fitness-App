@@ -13,11 +13,11 @@ import {
   imports: [FormsModule, RouterLink],
   template: `
     <div class="space-y-5">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <p class="text-sm font-semibold text-green-700">{{ t('exerciseLibrary') }}</p>
-          <h2 class="mt-2 text-3xl font-bold">{{ t('exerciseLibrary') }}</h2>
-          <p class="mt-2 text-sm text-slate-600">{{ t('exerciseLibraryDescription') }}</p>
+      <header class="flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-700">{{ t('exerciseLibrary') }}</p>
+          <h2 class="mt-2 text-3xl font-bold leading-tight text-slate-950">{{ t('exerciseLibrary') }}</h2>
+          <p class="mt-2 text-sm leading-5 text-slate-600">{{ t('exerciseLibraryDescription') }}</p>
         </div>
 
         <a
@@ -26,18 +26,20 @@ import {
         >
           {{ t('back') }}
         </a>
-      </div>
+      </header>
 
-      <label class="block">
-        <span class="text-sm font-medium text-slate-700">{{ t('search') }}</span>
-        <input
-          type="search"
-          [(ngModel)]="searchQuery"
-          (ngModelChange)="onSearchChange($event)"
-          [placeholder]="t('searchExercises')"
-          class="app-input mt-2"
-        />
-      </label>
+      <section class="app-card bg-slate-50 shadow-none">
+        <label class="block">
+          <span class="text-sm font-bold text-slate-800">{{ t('search') }}</span>
+          <input
+            type="search"
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchChange($event)"
+            [placeholder]="t('searchExercises')"
+            class="app-input mt-2"
+          />
+        </label>
+      </section>
 
       <div class="-mx-5 overflow-x-auto px-5">
         <div class="flex min-w-max gap-2 pb-1">
@@ -74,7 +76,7 @@ import {
       @if (isLoading) {
         <div class="space-y-3">
           @for (item of loadingCards; track item) {
-            <div class="h-28 animate-pulse rounded-lg border border-slate-200 bg-slate-100"></div>
+            <div class="h-32 animate-pulse rounded-lg border border-slate-200 bg-slate-100"></div>
           }
         </div>
       } @else if (errorMessage) {
@@ -92,45 +94,47 @@ import {
       } @else if (filteredExercises.length === 0) {
         <div class="app-card bg-slate-50 p-5 text-center shadow-none">
           <p class="font-semibold text-slate-800">{{ t('noExercisesFound') }}</p>
-          <p class="mt-1 text-sm text-slate-600">{{ t('search') }}</p>
+          <p class="mt-1 text-sm text-slate-600">{{ t('tryDifferentSearch') }}</p>
         </div>
       } @else {
         <div class="space-y-3">
           @for (exercise of filteredExercises; track exercise.id) {
-            <article class="app-card">
+            <article class="app-card space-y-3">
               <div class="flex items-start justify-between gap-3">
-                <div>
-                  <p class="text-xs font-semibold uppercase tracking-wide text-green-700">
+                <div class="min-w-0">
+                  <p class="text-xs font-bold uppercase tracking-[0.16em] text-green-700">
                     {{ getCategoryName(exercise.categoryId) }}
                   </p>
-                  <h3 class="mt-1 text-lg font-bold text-slate-950">{{ exercise.name }}</h3>
+                  <h3 class="mt-1 text-lg font-bold leading-6 text-slate-950">{{ exercise.name }}</h3>
                 </div>
-                <span class="app-badge">
+                <span class="app-badge shrink-0">
                   {{ getDifficulty(exercise) }}
                 </span>
               </div>
 
-              <p class="mt-3 text-sm text-slate-600">
+              <p class="text-sm leading-5 text-slate-600">
                 {{ exercise.description || t('noDescription') }}
               </p>
 
-              <div class="mt-4 grid grid-cols-2 gap-2 text-sm">
-                <div class="rounded-md bg-slate-50 p-3">
+              <div class="grid grid-cols-2 gap-2 border-t border-slate-200 pt-3 text-sm">
+                <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
                   <p class="text-xs font-medium text-slate-500">{{ t('primaryMuscle') }}</p>
-                  <p class="mt-1 font-semibold text-slate-900">{{ getPrimaryMuscle(exercise) }}</p>
+                  <p class="mt-1 font-bold text-slate-900">{{ getPrimaryMuscle(exercise) }}</p>
                 </div>
-                <div class="rounded-md bg-slate-50 p-3">
+                <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
                   <p class="text-xs font-medium text-slate-500">{{ t('equipment') }}</p>
-                  <p class="mt-1 font-semibold text-slate-900">{{ exercise.equipment || t('noEquipment') }}</p>
+                  <p class="mt-1 font-bold text-slate-900">{{ exercise.equipment || t('noEquipment') }}</p>
                 </div>
               </div>
 
-              <a
-                [routerLink]="['/exercises', exercise.id, 'history']"
-                class="app-button app-button-secondary mt-4"
-              >
-                {{ t('history') }}
-              </a>
+              <div class="flex justify-end border-t border-slate-200 pt-3">
+                <a
+                  [routerLink]="['/exercises', exercise.id, 'history']"
+                  class="app-badge"
+                >
+                  {{ t('history') }}
+                </a>
+              </div>
             </article>
           }
         </div>
