@@ -119,7 +119,7 @@ export class ExerciseHistoryComponent {
   readonly loadingCards = [1, 2, 3];
 
   history: ExerciseHistoryWorkout[] = [];
-  exerciseName = 'Exercise';
+  exerciseName = this.t('exercise');
   isLoading = true;
   errorMessage = '';
 
@@ -156,7 +156,7 @@ export class ExerciseHistoryComponent {
       }
 
       this.history = result.data;
-      this.exerciseName = result.data[0]?.exerciseName ?? 'Exercise';
+      this.exerciseName = result.data[0]?.exerciseName ?? this.t('exercise');
     } catch (error) {
       if (this.isStaleLoad(loadId)) {
         return;
@@ -186,7 +186,7 @@ export class ExerciseHistoryComponent {
       set.assistanceType,
     ].filter(Boolean);
 
-    return pieces.length > 0 ? pieces.join(' / ') : 'Logged';
+    return pieces.length > 0 ? pieces.join(' / ') : this.t('saved');
   }
 
   private isStaleLoad(loadId: number): boolean {

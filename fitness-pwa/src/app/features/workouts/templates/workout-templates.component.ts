@@ -312,7 +312,7 @@ export class WorkoutTemplatesComponent {
     const name = this.newTemplateName.trim();
 
     if (!name) {
-      this.errorMessage = 'Template name is required.';
+      this.errorMessage = this.t('templateNameRequired');
       return;
     }
 
@@ -332,7 +332,7 @@ export class WorkoutTemplatesComponent {
       }
 
       this.closeCreateForm();
-      this.statusMessage = 'Template created.';
+      this.statusMessage = this.t('templateCreated');
       await this.loadTemplates();
     } catch (error) {
       this.errorMessage = getErrorMessage(error, 'Unable to create template.');
@@ -355,7 +355,7 @@ export class WorkoutTemplatesComponent {
         return;
       }
 
-      this.statusMessage = 'Template duplicated.';
+      this.statusMessage = this.t('templateDuplicated');
       await this.loadTemplates();
     } catch (error) {
       this.errorMessage = getErrorMessage(error, 'Unable to duplicate template.');
@@ -492,7 +492,7 @@ export class WorkoutTemplatesComponent {
         return;
       }
 
-      this.statusMessage = 'Template deleted.';
+      this.statusMessage = this.t('templateDeleted');
       this.templatePendingDelete = null;
       await this.loadTemplates();
     } catch (error) {
@@ -506,7 +506,7 @@ export class WorkoutTemplatesComponent {
   formatDuration(template: WorkoutTemplate): string {
     return template.estimatedDurationMinutes
       ? `${template.estimatedDurationMinutes} min`
-      : 'Not set';
+      : this.t('notSet');
   }
 
   async loadTemplates(): Promise<void> {

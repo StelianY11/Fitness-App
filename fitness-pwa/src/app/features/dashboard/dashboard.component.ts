@@ -191,7 +191,7 @@ export class DashboardComponent implements OnInit {
 
   userEmail = '';
   activeWorkout: WorkoutSession | null = null;
-  activeWorkoutName = 'Workout';
+  activeWorkoutName = this.t('workout');
   activeWorkoutExerciseCount = 0;
   activeWorkoutSetCount = 0;
   isLoading = false;
@@ -266,7 +266,7 @@ export class DashboardComponent implements OnInit {
       }
 
       this.activeWorkout = null;
-      this.activeWorkoutName = 'Workout';
+      this.activeWorkoutName = this.t('workout');
       this.activeWorkoutExerciseCount = 0;
       this.activeWorkoutSetCount = 0;
       this.showCancelActiveWorkoutModal = false;
@@ -311,7 +311,7 @@ export class DashboardComponent implements OnInit {
   private async loadActiveWorkout(): Promise<void> {
     this.isActiveWorkoutLoading = true;
     this.activeWorkout = null;
-    this.activeWorkoutName = 'Workout';
+    this.activeWorkoutName = this.t('workout');
     this.activeWorkoutExerciseCount = 0;
     this.activeWorkoutSetCount = 0;
 
@@ -371,12 +371,12 @@ export class DashboardComponent implements OnInit {
 
   private async getWorkoutName(session: WorkoutSession | null): Promise<string> {
     if (!session?.workoutTemplateId) {
-      return 'Workout';
+      return this.t('workout');
     }
 
     const templateResult = await this.workoutTemplateService.getTemplateById(session.workoutTemplateId);
     const template = templateResult.data as WorkoutTemplate | null;
 
-    return template?.name ?? 'Template Workout';
+    return template?.name ?? this.t('templateWorkout');
   }
 }

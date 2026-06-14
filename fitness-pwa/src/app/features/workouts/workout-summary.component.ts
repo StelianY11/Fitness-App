@@ -273,7 +273,7 @@ export class WorkoutSummaryComponent {
   }
 
   getExerciseName(exerciseId: string): string {
-    return this.exerciseNames[exerciseId] ?? 'Exercise';
+    return this.exerciseNames[exerciseId] ?? this.t('exercise');
   }
 
   formatSetSummary(set: WorkoutSet): string {
@@ -282,7 +282,7 @@ export class WorkoutSummaryComponent {
       set.weightKg === null ? null : `${set.weightKg} kg`,
     ].filter(Boolean);
 
-    return pieces.length > 0 ? pieces.join(' / ') : 'Logged';
+    return pieces.length > 0 ? pieces.join(' / ') : this.t('saved');
   }
 
   formatDate(value: string): string {

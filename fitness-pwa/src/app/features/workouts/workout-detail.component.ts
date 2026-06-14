@@ -308,7 +308,7 @@ export class WorkoutDetailComponent {
   }
 
   getExerciseName(exerciseId: string): string {
-    return this.exerciseNames[exerciseId] ?? 'Exercise';
+    return this.exerciseNames[exerciseId] ?? this.t('exercise');
   }
 
   formatSetSummary(set: WorkoutSet): string {
@@ -320,7 +320,7 @@ export class WorkoutDetailComponent {
       set.distanceMeters === null ? null : `${set.distanceMeters}m`,
     ].filter(Boolean);
 
-    return pieces.length > 0 ? pieces.join(' / ') : 'Logged';
+    return pieces.length > 0 ? pieces.join(' / ') : this.t('saved');
   }
 
   formatDateTime(value: string): string {

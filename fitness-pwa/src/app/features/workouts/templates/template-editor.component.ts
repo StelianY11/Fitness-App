@@ -702,7 +702,7 @@ export class TemplateEditorComponent {
       return;
     }
 
-    this.beginAction('Adding block...');
+    this.beginAction(this.t('addingBlock'));
     this.errorMessage = '';
     this.statusMessage = '';
 
@@ -722,7 +722,7 @@ export class TemplateEditorComponent {
 
       this.newBlockTitle = '';
       this.newBlockType = 'normal';
-      this.statusMessage = 'Block added.';
+      this.statusMessage = this.t('blockAdded');
       this.blocks = [...this.blocks, result.data].sort((a, b) => a.sortOrder - b.sortOrder);
       this.blockExercises = {
         ...this.blockExercises,
@@ -768,7 +768,7 @@ export class TemplateEditorComponent {
       return;
     }
 
-    this.beginAction('Removing block...');
+    this.beginAction(this.t('removingBlock'));
     this.errorMessage = '';
     this.statusMessage = '';
     const previousBlocks = this.blocks;
@@ -789,7 +789,7 @@ export class TemplateEditorComponent {
       }
 
       await this.saveBlockOrder();
-      this.statusMessage = 'Block removed.';
+      this.statusMessage = this.t('blockRemoved');
       this.blockPendingRemove = null;
     } catch (error) {
       this.blocks = previousBlocks;
@@ -814,7 +814,7 @@ export class TemplateEditorComponent {
     }
 
     const previousBlocks = this.blocks;
-    this.beginAction('Reordering blocks...');
+    this.beginAction(this.t('reorderingBlocks'));
     this.errorMessage = '';
 
     try {
@@ -1081,7 +1081,7 @@ export class TemplateEditorComponent {
     }
 
     const previousExercises = this.getBlockExercises(blockId);
-    this.beginAction('Reordering exercises...');
+    this.beginAction(this.t('reorderingExercises'));
     this.errorMessage = '';
 
     try {

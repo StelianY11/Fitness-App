@@ -466,6 +466,14 @@ html.dark .bg-green-100 {
   background-color: color-mix(in srgb, var(--app-accent) 13%, var(--app-surface));
 }
 
+html.dark .bg-red-50 {
+  background-color: color-mix(in srgb, #ef4444 10%, var(--app-surface));
+}
+
+html.dark .bg-amber-50 {
+  background-color: color-mix(in srgb, #f59e0b 11%, var(--app-surface));
+}
+
 html.dark .bg-green-600 {
   background-color: var(--app-accent-strong);
 }
@@ -474,6 +482,25 @@ html.dark .text-green-700,
 html.dark .text-green-800,
 html.dark .text-green-900 {
   color: color-mix(in srgb, var(--app-accent) 72%, #e5edf6);
+}
+
+html.dark .text-red-700,
+html.dark .text-red-800 {
+  color: #fca5a5;
+}
+
+html.dark .text-amber-800,
+html.dark .text-amber-900,
+html.dark .text-amber-950 {
+  color: #fcd58d;
+}
+
+html.dark .border-red-200 {
+  border-color: color-mix(in srgb, #ef4444 34%, var(--app-border));
+}
+
+html.dark .border-amber-200 {
+  border-color: color-mix(in srgb, #f59e0b 34%, var(--app-border));
 }
 
 html.dark input,
