@@ -11,37 +11,45 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
   imports: [RouterLink],
   template: `
     <div class="space-y-6">
-      <div>
-        <p class="text-sm font-semibold text-green-700">{{ t('welcome') }}</p>
-        <h2 class="mt-2 text-3xl font-bold leading-tight tracking-tight">{{ t('dashboard') }}</h2>
-        <p class="mt-2.5 text-sm leading-6 text-slate-600">
-          {{ userEmail || 'Your account is ready.' }}
-        </p>
-      </div>
+      <header class="space-y-3">
+        <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-700">{{ t('brandLabel') }}</p>
+        <div>
+          <p class="text-sm font-semibold text-slate-500">{{ t('dashboardGreeting') }}</p>
+          <h2 class="mt-1 text-3xl font-bold leading-tight tracking-tight text-slate-950">{{ dashboardName }}</h2>
+          <p class="mt-2 text-sm leading-6 text-slate-600">{{ t('trackYourTraining') }}</p>
+        </div>
+      </header>
 
       @if (activeWorkout) {
-        <section class="app-card border-green-200 bg-green-50">
-          <p class="text-sm font-semibold text-green-700">{{ t('activeWorkout') }}</p>
-          <h3 class="mt-2 text-2xl font-bold leading-tight text-slate-950">{{ activeWorkoutName }}</h3>
-          <div class="mt-4 grid grid-cols-2 gap-2.5 text-sm">
-            <div class="rounded-md bg-white p-3">
+        <section class="app-card border-green-200 bg-green-50 space-y-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-xs font-bold uppercase tracking-[0.16em] text-green-700">{{ t('liveSession') }}</p>
+              <h3 class="mt-2 text-2xl font-bold leading-tight text-slate-950">{{ activeWorkoutName }}</h3>
+            </div>
+            <span class="app-badge bg-green-100 text-green-800 shrink-0">{{ t('activeWorkout') }}</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5 text-sm">
+            <div class="rounded-md border border-green-200 bg-white p-3">
               <p class="text-xs font-medium text-slate-500">{{ t('started') }}</p>
               <p class="mt-1 font-semibold text-slate-950">{{ formatTime(activeWorkout.startedAt) }}</p>
             </div>
-            <div class="rounded-md bg-white p-3">
+            <div class="rounded-md border border-green-200 bg-white p-3">
               <p class="text-xs font-medium text-slate-500">{{ t('elapsed') }}</p>
               <p class="mt-1 font-semibold text-slate-950">{{ formatElapsed(activeWorkout.startedAt) }}</p>
             </div>
-            <div class="rounded-md bg-white p-3">
+            <div class="rounded-md border border-green-200 bg-white p-3">
               <p class="text-xs font-medium text-slate-500">{{ t('exercises') }}</p>
               <p class="mt-1 font-semibold text-slate-950">{{ activeWorkoutExerciseCount }}</p>
             </div>
-            <div class="rounded-md bg-white p-3">
+            <div class="rounded-md border border-green-200 bg-white p-3">
               <p class="text-xs font-medium text-slate-500">{{ t('sets') }}</p>
               <p class="mt-1 font-semibold text-slate-950">{{ activeWorkoutSetCount }}</p>
             </div>
           </div>
-          <div class="mt-4 grid grid-cols-2 gap-3">
+
+          <div class="grid grid-cols-2 gap-3">
             <button
               type="button"
               (click)="resumeWorkout()"
@@ -61,35 +69,60 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
         </section>
       }
 
-      <div class="grid gap-3">
+      <section class="space-y-3">
         <a
           routerLink="/exercises"
-          class="app-button app-button-primary"
+          class="app-card block border-green-200 bg-green-50"
         >
-          {{ t('exerciseLibrary') }}
+          <p class="text-xs font-bold uppercase tracking-[0.14em] text-green-700">{{ t('startStrong') }}</p>
+          <div class="mt-2 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <h3 class="text-lg font-bold leading-6 text-slate-950">{{ t('exerciseLibrary') }}</h3>
+              <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('exerciseLibraryDescription') }}</p>
+            </div>
+            <span class="app-badge bg-green-100 text-green-800">{{ t('open') }}</span>
+          </div>
         </a>
 
         <a
           routerLink="/templates"
-          class="app-button app-button-secondary border-green-600 text-green-700"
+          class="app-card block"
         >
-          {{ t('workoutTemplates') }}
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <h3 class="text-base font-bold leading-6 text-slate-950">{{ t('workoutTemplates') }}</h3>
+              <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('templatesDescription') }}</p>
+            </div>
+            <span class="app-badge">{{ t('open') }}</span>
+          </div>
         </a>
 
         <a
           routerLink="/history"
-          class="app-button app-button-secondary"
+          class="app-card block"
         >
-          {{ t('history') }}
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <h3 class="text-base font-bold leading-6 text-slate-950">{{ t('history') }}</h3>
+              <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('workoutHistory') }}</p>
+            </div>
+            <span class="app-badge">{{ t('open') }}</span>
+          </div>
         </a>
 
         <a
           routerLink="/settings"
-          class="app-button app-button-secondary"
+          class="app-card block"
         >
-          {{ t('settings') }}
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <h3 class="text-base font-bold leading-6 text-slate-950">{{ t('settings') }}</h3>
+              <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('settingsDescription') }}</p>
+            </div>
+            <span class="app-badge">{{ t('open') }}</span>
+          </div>
         </a>
-      </div>
+      </section>
 
       @if (errorMessage) {
         <p class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -134,6 +167,10 @@ export class DashboardComponent implements OnInit {
 
   t(key: Parameters<TranslationService['translate']>[0]): string {
     return this.translationService.translate(key);
+  }
+
+  get dashboardName(): string {
+    return this.userEmail || this.t('athlete');
   }
 
   ngOnInit(): void {
