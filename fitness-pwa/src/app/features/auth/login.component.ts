@@ -8,62 +8,74 @@ import { TranslationService } from '../../core/services/translation.service';
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink],
   template: `
-    <form class="space-y-5" [formGroup]="form" (ngSubmit)="submit()">
-      <div>
-        <p class="text-sm font-semibold text-green-700">{{ t('welcomeBack') }}</p>
-        <h2 class="mt-2 text-3xl font-bold">{{ t('login') }}</h2>
-        <p class="mt-2 text-sm text-slate-600">{{ t('signInDescription') }}</p>
-      </div>
+    <section class="space-y-6">
+      <header class="space-y-3">
+        <div class="inline-flex rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-green-800">
+          {{ t('brandLabel') }}
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-green-700">{{ t('welcomeBack') }}</p>
+          <h1 class="mt-2 text-3xl font-bold leading-tight text-slate-950">{{ t('login') }}</h1>
+          <p class="mt-2 max-w-sm text-sm leading-6 text-slate-600">{{ t('signInDescription') }}</p>
+        </div>
+      </header>
 
-      <div class="space-y-4">
-        <label class="block">
-          <span class="text-sm font-medium text-slate-700">{{ t('email') }}</span>
-          <input
-            type="email"
-            formControlName="email"
-            autocomplete="email"
-            class="app-input mt-2"
-          />
-          @if (showEmailRequiredError) {
-            <span class="mt-1 block text-sm text-red-700">{{ t('emailRequired') }}</span>
-          } @else if (showEmailFormatError) {
-            <span class="mt-1 block text-sm text-red-700">{{ t('validEmailRequired') }}</span>
-          }
-        </label>
+      <form class="app-card space-y-5" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="space-y-4">
+          <label class="block">
+            <span class="text-sm font-semibold text-slate-700">{{ t('email') }}</span>
+            <input
+              id="login-email"
+              name="email"
+              type="email"
+              formControlName="email"
+              autocomplete="email"
+              class="app-input mt-2"
+            />
+            @if (showEmailRequiredError) {
+              <span class="mt-2 block text-sm text-red-700">{{ t('emailRequired') }}</span>
+            } @else if (showEmailFormatError) {
+              <span class="mt-2 block text-sm text-red-700">{{ t('validEmailRequired') }}</span>
+            }
+          </label>
 
-        <label class="block">
-          <span class="text-sm font-medium text-slate-700">{{ t('password') }}</span>
-          <input
-            type="password"
-            formControlName="password"
-            autocomplete="current-password"
-            class="app-input mt-2"
-          />
-          @if (showPasswordRequiredError) {
-            <span class="mt-1 block text-sm text-red-700">{{ t('passwordRequired') }}</span>
-          }
-        </label>
-      </div>
+          <label class="block">
+            <span class="text-sm font-semibold text-slate-700">{{ t('password') }}</span>
+            <input
+              id="login-password"
+              name="password"
+              type="password"
+              formControlName="password"
+              autocomplete="current-password"
+              class="app-input mt-2"
+            />
+            @if (showPasswordRequiredError) {
+              <span class="mt-2 block text-sm text-red-700">{{ t('passwordRequired') }}</span>
+            }
+          </label>
+        </div>
 
-      @if (errorMessage) {
-        <p class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {{ errorMessage }}
+        @if (errorMessage) {
+          <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm leading-5 text-red-700">
+            <p class="font-semibold">{{ t('error') }}</p>
+            <p class="mt-1">{{ errorMessage }}</p>
+          </div>
+        }
+
+        <button
+          type="submit"
+          [disabled]="form.invalid || isLoading"
+          class="app-button app-button-primary"
+        >
+          {{ isLoading ? t('loading') : t('login') }}
+        </button>
+
+        <p class="border-t border-slate-200 pt-4 text-center text-sm text-slate-600">
+          {{ t('noAccountYet') }}
+          <a routerLink="/register" class="font-bold text-green-700">{{ t('register') }}</a>
         </p>
-      }
-
-      <button
-        type="submit"
-        [disabled]="form.invalid || isLoading"
-        class="app-button app-button-primary"
-      >
-        {{ isLoading ? t('loading') : t('login') }}
-      </button>
-
-      <p class="text-center text-sm text-slate-600">
-        {{ t('noAccountYet') }}
-        <a routerLink="/register" class="font-semibold text-green-700">{{ t('register') }}</a>
-      </p>
-    </form>
+      </form>
+    </section>
   `,
 })
 export class LoginComponent {
