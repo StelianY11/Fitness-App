@@ -227,61 +227,74 @@ interface QuickSetForm extends SetForm {
             </p>
           </div>
         } @else {
-          <div class="space-y-4">
+          <div class="space-y-5">
             @for (workoutExercise of workoutExercises; track workoutExercise.id; let exerciseIndex = $index) {
-              <article class="app-card">
-                <div class="flex items-start justify-between gap-3">
-                  <div>
-                    <p class="text-xs font-semibold uppercase tracking-wide text-green-700">
-                      {{ t('exerciseNumber') }} {{ exerciseIndex + 1 }}
-                    </p>
-                    <h3 class="mt-1 text-lg font-bold text-slate-950">
+              <article class="app-card space-y-4">
+                <div class="space-y-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="text-xs font-bold uppercase tracking-[0.16em] text-green-700">
+                        {{ t('exerciseNumber') }} {{ exerciseIndex + 1 }}
+                      </p>
+                      <h3 class="mt-1 text-xl font-bold leading-7 text-slate-950">
                       {{ getExerciseName(workoutExercise.exerciseId) }}
-                    </h3>
-                    @if (workoutExercise.notes) {
-                      <p class="mt-1 text-sm text-slate-600">{{ workoutExercise.notes }}</p>
-                    }
+                      </h3>
+                      @if (workoutExercise.notes) {
+                        <p class="mt-1 text-sm leading-5 text-slate-600">{{ workoutExercise.notes }}</p>
+                      }
+                    </div>
+                    <button
+                      type="button"
+                      (click)="openSetForm(workoutExercise.id)"
+                      [disabled]="session.status !== 'active' || savingSetExerciseId === workoutExercise.id"
+                      class="app-button app-button-secondary min-h-11 w-auto border-green-600 px-3 py-2 text-green-700 disabled:border-slate-300 disabled:text-slate-400"
+                    >
+                      {{ t('addSet') }}
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    (click)="openSetForm(workoutExercise.id)"
-                    [disabled]="session.status !== 'active' || savingSetExerciseId === workoutExercise.id"
-                    class="app-button app-button-secondary min-h-11 w-auto border-green-600 px-3 py-2 text-green-700 disabled:border-slate-300 disabled:text-slate-400"
-                  >
-                    {{ t('addSet') }}
-                  </button>
+
+                  <div class="flex flex-wrap items-center gap-2 border-t border-slate-200 pt-3">
+                    <span class="app-badge">{{ getSets(workoutExercise.id).length }} {{ t('sets') }}</span>
+                    @if (getQuickSetForms(workoutExercise.id).length > 0) {
+                      <span class="app-badge bg-green-100 text-green-800">
+                        {{ getPreFillSourceLabel(getQuickSetForms(workoutExercise.id)[0].source) }}
+                      </span>
+                    }
+                    <a
+                      [routerLink]="['/exercises', workoutExercise.exerciseId, 'history']"
+                      class="app-badge"
+                    >
+                      {{ t('history') }}
+                    </a>
+                  </div>
                 </div>
 
-                <a
-                  [routerLink]="['/exercises', workoutExercise.exerciseId, 'history']"
-                  class="app-button app-button-secondary mt-3 min-h-11 py-2"
-                >
-                  {{ t('history') }}
-                </a>
-
                 @if (getSets(workoutExercise.id).length > 0) {
-                  <div class="mt-4 space-y-2">
+                  <div class="space-y-2">
                     @for (set of getSets(workoutExercise.id); track set.id) {
                       <div
-                        class="rounded-md border p-3 transition"
+                        class="rounded-md border px-3 py-2.5 transition"
                         [class.border-green-200]="wasRecentlySaved(set.id)"
                         [class.bg-green-50]="wasRecentlySaved(set.id)"
                         [class.border-slate-200]="!wasRecentlySaved(set.id)"
-                        [class.bg-slate-50]="!wasRecentlySaved(set.id)"
+                        [class.bg-white]="!wasRecentlySaved(set.id)"
                       >
                         <div class="flex items-center justify-between gap-3">
-                          <div>
-                            <p class="text-xs font-bold uppercase tracking-wide text-green-700">
+                          <div class="flex min-w-0 items-center gap-2">
+                            <span class="h-2 w-2 shrink-0 rounded-full bg-green-700"></span>
+                            <div class="min-w-0">
+                              <p class="text-xs font-bold uppercase tracking-[0.14em] text-green-700">
                               {{ wasRecentlySaved(set.id) ? t('savedJustNow') : t('saved') }}
-                            </p>
-                            <p class="mt-1 font-semibold text-slate-950">{{ t('sets') }} {{ set.setNumber }}</p>
+                              </p>
+                              <p class="mt-0.5 font-semibold text-slate-950">{{ t('sets') }} {{ set.setNumber }}</p>
+                            </div>
                           </div>
-                          <p class="text-base font-bold text-slate-950">
+                          <p class="shrink-0 text-sm font-bold text-slate-950">
                             {{ formatSetSummary(set) }}
                           </p>
                         </div>
                         @if (set.notes) {
-                          <p class="mt-2 text-sm text-slate-600">{{ set.notes }}</p>
+                          <p class="mt-2 border-t border-slate-200 pt-2 text-sm leading-5 text-slate-600">{{ set.notes }}</p>
                         }
                       </div>
                     }
@@ -289,27 +302,32 @@ interface QuickSetForm extends SetForm {
                 }
 
                 @if (getQuickSetForms(workoutExercise.id).length > 0) {
-                  <div class="mt-4 space-y-3 rounded-md border border-amber-200 bg-amber-50 p-3">
-                    <div>
-                      <p class="text-sm font-semibold text-amber-950">
-                        {{ t('editableSuggestionsFrom') }} {{ getPreFillSourceLabel(getQuickSetForms(workoutExercise.id)[0].source) }}
-                      </p>
-                      <p class="mt-1 text-xs text-amber-800">
+                  <div class="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <p class="text-sm font-bold text-slate-950">
+                          {{ t('editableSuggestionsFrom') }}
+                        </p>
+                        <p class="mt-1 text-xs leading-5 text-slate-600">
                         {{ t('editOrSaveSuggestedSet') }}
-                      </p>
+                        </p>
+                      </div>
+                      <span class="app-badge shrink-0">
+                        {{ getPreFillSourceLabel(getQuickSetForms(workoutExercise.id)[0].source) }}
+                      </span>
                     </div>
 
                     @for (quickSet of getQuickSetForms(workoutExercise.id); track quickSet.key) {
                       <form
-                        class="space-y-3 rounded-md border border-amber-100 bg-white p-3"
+                        class="space-y-3 rounded-md border border-slate-200 bg-white p-3 transition"
                         (ngSubmit)="submitQuickSet(workoutExercise, quickSet)"
                       >
                         <div class="flex items-center justify-between gap-3">
                           <div>
-                            <p class="text-xs font-bold uppercase tracking-wide text-amber-700">{{ t('editable') }}</p>
-                            <p class="mt-1 font-semibold text-slate-950">{{ t('sets') }} {{ quickSet.setNumber }}</p>
+                            <p class="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">{{ t('editable') }}</p>
+                            <p class="mt-0.5 font-semibold text-slate-950">{{ t('sets') }} {{ quickSet.setNumber }}</p>
                           </div>
-                          <p class="text-sm font-semibold text-slate-600">
+                          <p class="text-sm font-bold text-slate-600">
                             {{ formatQuickSetSummary(quickSet) }}
                           </p>
                         </div>
@@ -330,7 +348,7 @@ interface QuickSetForm extends SetForm {
                               step="0.5"
                               [name]="'quickWeight' + quickSet.key"
                               [(ngModel)]="quickSet.weightKg"
-                              class="app-input mt-2 py-4"
+                              class="app-input mt-2 py-2"
                             />
                           </label>
 
@@ -342,7 +360,7 @@ interface QuickSetForm extends SetForm {
                               min="0"
                               [name]="'quickReps' + quickSet.key"
                               [(ngModel)]="quickSet.reps"
-                              class="app-input mt-2 py-4"
+                              class="app-input mt-2 py-2"
                             />
                           </label>
                         </div>
@@ -361,7 +379,7 @@ interface QuickSetForm extends SetForm {
                         <button
                           type="submit"
                           [disabled]="savingSetExerciseId === quickSet.key || isSavingSuggestedSets"
-                          class="app-button app-button-primary"
+                          class="app-button app-button-primary min-h-11"
                         >
                           {{ savingSetExerciseId === quickSet.key ? t('saving') : t('save') }}
                         </button>
@@ -376,7 +394,7 @@ interface QuickSetForm extends SetForm {
 
                 @if (activeSetFormExerciseId === workoutExercise.id) {
                   <form
-                    class="mt-4 space-y-3 rounded-md border border-slate-200 bg-slate-50 p-3"
+                    class="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-3"
                     (ngSubmit)="submitSet(workoutExercise)"
                   >
                     @if (getSaveError(workoutExercise.id)) {
@@ -395,7 +413,7 @@ interface QuickSetForm extends SetForm {
                           step="0.5"
                           [name]="'weightKg' + workoutExercise.id"
                           [(ngModel)]="setForm.weightKg"
-                          class="app-input mt-2 py-4"
+                          class="app-input mt-2 py-2"
                         />
                       </label>
 
@@ -407,7 +425,7 @@ interface QuickSetForm extends SetForm {
                           min="0"
                           [name]="'reps' + workoutExercise.id"
                           [(ngModel)]="setForm.reps"
-                          class="app-input mt-2 py-4"
+                          class="app-input mt-2 py-2"
                         />
                       </label>
                     </div>
@@ -851,14 +869,14 @@ export class LiveWorkoutComponent {
 
   getPreFillSourceLabel(source: LiveWorkoutPreFillSet['source']): string {
     if (source === 'LAST_WORKOUT') {
-      return 'last workout';
+      return this.t('lastWorkout');
     }
 
     if (source === 'TEMPLATE') {
-      return 'template targets';
+      return this.t('templateTargets');
     }
 
-    return 'empty defaults';
+    return this.t('emptyDefaults');
   }
 
   getUnsavedSuggestedSets(): Array<{ workoutExercise: WorkoutExercise; quickSet: QuickSetForm }> {
