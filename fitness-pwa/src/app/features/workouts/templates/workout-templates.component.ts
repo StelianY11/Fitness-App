@@ -11,11 +11,11 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
   imports: [FormsModule, RouterLink],
   template: `
     <div class="space-y-5">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <p class="text-sm font-semibold text-green-700">{{ t('workoutTemplates') }}</p>
-          <h2 class="mt-2 text-3xl font-bold">{{ t('workoutTemplates') }}</h2>
-          <p class="mt-2 text-sm text-slate-600">
+      <header class="flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-700">{{ t('workoutTemplates') }}</p>
+          <h2 class="mt-2 text-3xl font-bold leading-tight text-slate-950">{{ t('workoutTemplates') }}</h2>
+          <p class="mt-2 text-sm leading-5 text-slate-600">
             {{ t('templatesDescription') }}
           </p>
         </div>
@@ -26,7 +26,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
         >
           {{ t('back') }}
         </a>
-      </div>
+      </header>
 
       <button
         type="button"
@@ -38,16 +38,16 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
 
       @if (showCreateForm) {
         <form
-          class="app-card space-y-4"
+          class="app-card space-y-4 bg-slate-50 shadow-none"
           (ngSubmit)="createTemplate()"
         >
           <div>
             <h3 class="app-section-title">{{ t('newTemplate') }}</h3>
-            <p class="mt-1 text-sm text-slate-600">{{ t('description') }}</p>
+            <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('templatesDescription') }}</p>
           </div>
 
           <label class="block">
-            <span class="text-sm font-medium text-slate-700">{{ t('newTemplate') }}</span>
+            <span class="text-sm font-semibold text-slate-700">{{ t('templateName') }}</span>
             <input
               type="text"
               name="templateName"
@@ -58,7 +58,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
           </label>
 
           <label class="block">
-            <span class="text-sm font-medium text-slate-700">{{ t('description') }}</span>
+            <span class="text-sm font-semibold text-slate-700">{{ t('description') }}</span>
             <textarea
               name="templateDescription"
               [(ngModel)]="newTemplateDescription"
@@ -151,12 +151,12 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
       } @else {
         <div class="space-y-3">
           @for (template of templates; track template.id) {
-            <article class="app-card">
+            <article class="app-card space-y-4">
               <div class="flex items-start justify-between gap-3">
-                <div>
-                  <h3 class="text-lg font-bold text-slate-950">{{ template.name }}</h3>
+                <div class="min-w-0">
+                  <h3 class="text-lg font-bold leading-6 text-slate-950">{{ template.name }}</h3>
                   @if (template.description) {
-                    <p class="mt-1 text-sm text-slate-600">{{ template.description }}</p>
+                    <p class="mt-1 text-sm leading-5 text-slate-600">{{ template.description }}</p>
                   }
                 </div>
                 <span
@@ -170,25 +170,25 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                 </span>
               </div>
 
-              <div class="mt-4 grid grid-cols-2 gap-2 text-sm">
-                <div class="rounded-md bg-slate-50 p-3">
+              <div class="grid grid-cols-2 gap-2 border-t border-slate-200 pt-3 text-sm">
+                <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
                   <p class="text-xs font-medium text-slate-500">{{ t('trainingType') }}</p>
-                  <p class="mt-1 font-semibold text-slate-900">{{ template.goal || t('general') }}</p>
+                  <p class="mt-1 font-bold text-slate-900">{{ template.goal || t('general') }}</p>
                 </div>
-                <div class="rounded-md bg-slate-50 p-3">
+                <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
                   <p class="text-xs font-medium text-slate-500">{{ t('duration') }}</p>
-                  <p class="mt-1 font-semibold text-slate-900">
+                  <p class="mt-1 font-bold text-slate-900">
                     {{ formatDuration(template) }}
                   </p>
                 </div>
               </div>
 
-              <div class="mt-4 grid gap-2 sm:grid-cols-4">
+              <div class="grid gap-2 border-t border-slate-200 pt-3 sm:grid-cols-4">
                 <button
                   type="button"
                   (click)="startWorkout(template)"
                   [disabled]="processingTemplateId === template.id"
-                  class="app-button app-button-primary min-h-11 px-3 py-2"
+                  class="app-button app-button-primary min-h-11 px-3 py-2 sm:col-span-2"
                 >
                   {{ processingTemplateId === template.id ? t('loading') : t('startWorkout') }}
                 </button>
@@ -211,7 +211,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                     type="button"
                     (click)="deleteTemplate(template)"
                     [disabled]="processingTemplateId === template.id"
-                    class="app-button app-button-danger min-h-11 px-3 py-2"
+                    class="app-button app-button-danger min-h-11 px-3 py-2 sm:col-span-4"
                   >
                     {{ t('delete') }}
                   </button>

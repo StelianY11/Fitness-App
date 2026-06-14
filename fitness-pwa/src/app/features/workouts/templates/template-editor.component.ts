@@ -35,12 +35,12 @@ interface CustomExerciseForm {
   imports: [FormsModule, RouterLink],
   template: `
     <div class="space-y-5">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <p class="text-sm font-semibold text-green-700">{{ t('workoutTemplates') }}</p>
-          <h2 class="mt-2 text-3xl font-bold">{{ template?.name || t('template') }}</h2>
+      <header class="flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-700">{{ t('workoutTemplates') }}</p>
+          <h2 class="mt-2 text-3xl font-bold leading-tight text-slate-950">{{ template?.name || t('template') }}</h2>
           @if (template?.description) {
-            <p class="mt-2 text-sm text-slate-600">{{ template?.description }}</p>
+            <p class="mt-2 text-sm leading-5 text-slate-600">{{ template?.description }}</p>
           }
         </div>
 
@@ -62,7 +62,7 @@ interface CustomExerciseForm {
             {{ t('back') }}
           </a>
         </div>
-      </div>
+      </header>
 
       @if (template?.isBuiltin) {
         <p class="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
@@ -142,12 +142,15 @@ interface CustomExerciseForm {
       } @else {
         @if (canEdit) {
           <form
-            class="app-card space-y-4"
+            class="app-card space-y-4 bg-slate-50 shadow-none"
             (ngSubmit)="addBlock()"
           >
-            <h3 class="app-section-title">{{ t('addBlock') }}</h3>
+            <div>
+              <h3 class="app-section-title">{{ t('addBlock') }}</h3>
+              <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('builderBlockDescription') }}</p>
+            </div>
             <label class="block">
-              <span class="text-sm font-medium text-slate-700">{{ t('blockTitle') }}</span>
+              <span class="text-sm font-semibold text-slate-700">{{ t('blockTitle') }}</span>
               <input
                 type="text"
                 name="newBlockTitle"
@@ -158,7 +161,7 @@ interface CustomExerciseForm {
             </label>
 
             <label class="block">
-              <span class="text-sm font-medium text-slate-700">{{ t('blockType') }}</span>
+              <span class="text-sm font-semibold text-slate-700">{{ t('blockType') }}</span>
               <select
                 name="newBlockType"
                 [(ngModel)]="newBlockType"
@@ -188,11 +191,11 @@ interface CustomExerciseForm {
         } @else {
           <div class="space-y-4">
             @for (block of blocks; track block.id; let blockIndex = $index) {
-              <article class="app-card">
+              <article class="app-card space-y-4">
                 <div class="space-y-3">
                   <div class="flex items-start justify-between gap-3">
-                    <div>
-                      <p class="text-xs font-semibold uppercase tracking-wide text-green-700">
+                    <div class="min-w-0">
+                      <p class="text-xs font-bold uppercase tracking-[0.16em] text-green-700">
                         {{ getBlockTypeLabel(block.blockType) }}
                       </p>
                       @if (canEdit) {
@@ -204,7 +207,7 @@ interface CustomExerciseForm {
                           class="app-input mt-1 py-2 text-lg font-bold text-slate-950"
                         />
                       } @else {
-                        <h3 class="mt-1 text-lg font-bold text-slate-950">
+                        <h3 class="mt-1 text-lg font-bold leading-6 text-slate-950">
                           {{ block.title || t('untitledBlock') }}
                         </h3>
                       }
@@ -225,7 +228,7 @@ interface CustomExerciseForm {
                   </div>
 
                   @if (canEdit) {
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-3 gap-2 border-t border-slate-200 pt-3">
                       <select
                         [name]="'blockType' + block.id"
                         [(ngModel)]="block.blockType"
@@ -263,9 +266,9 @@ interface CustomExerciseForm {
                   }
 
                   @if (activeExerciseSearchBlockId === block.id) {
-                    <div class="space-y-3 rounded-md bg-slate-50 p-3">
+                    <div class="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
                       <label class="block">
-                        <span class="text-sm font-medium text-slate-700">{{ t('search') }}</span>
+                        <span class="text-sm font-bold text-slate-800">{{ t('addExercise') }}</span>
                         <input
                           type="search"
                           name="exerciseSearch"
@@ -283,7 +286,7 @@ interface CustomExerciseForm {
                           <div class="space-y-3 rounded-md border border-dashed border-slate-300 bg-white p-4">
                             <div>
                               <p class="font-semibold text-slate-900">{{ t('noExercisesFound') }}</p>
-                              <p class="mt-1 text-sm text-slate-600">
+                              <p class="mt-1 text-sm leading-5 text-slate-600">
                                 {{ t('createPrivateExerciseAdd') }}
                               </p>
                             </div>
@@ -336,11 +339,11 @@ interface CustomExerciseForm {
                         >
                           <div>
                             <h4 class="font-bold text-slate-950">{{ t('createCustomExercise') }}</h4>
-                            <p class="mt-1 text-sm text-slate-600">{{ t('privateExerciseDescription') }}</p>
+                            <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('privateExerciseDescription') }}</p>
                           </div>
 
                           <label class="block">
-                            <span class="text-sm font-medium text-slate-700">{{ t('newTemplate') }}</span>
+                            <span class="text-sm font-semibold text-slate-700">{{ t('name') }}</span>
                             <input
                               type="text"
                               name="customExerciseName"
@@ -435,15 +438,15 @@ interface CustomExerciseForm {
                       {{ t('noExercisesFound') }}
                     </div>
                   } @else {
-                    <div class="space-y-2">
+                    <div class="space-y-2 border-t border-slate-200 pt-3">
                       @for (templateExercise of getBlockExercises(block.id); track templateExercise.id; let exerciseIndex = $index) {
-                        <div class="rounded-md border border-slate-200 p-3">
+                        <div class="rounded-md border border-slate-200 bg-white p-3">
                           <div class="flex items-start justify-between gap-3">
-                            <div>
-                              <p class="font-semibold text-slate-950">
+                            <div class="min-w-0">
+                              <p class="font-bold leading-5 text-slate-950">
                                 {{ getExerciseName(templateExercise.exerciseId) }}
                               </p>
-                              <p class="mt-1 text-sm text-slate-600">
+                              <p class="mt-1 text-sm leading-5 text-slate-600">
                                 {{ getSetTypeLabel(templateExercise.setType) }}
                               </p>
                             </div>
@@ -463,14 +466,14 @@ interface CustomExerciseForm {
                           </div>
 
                           @if (canEdit) {
-                            <div class="mt-3 grid grid-cols-2 gap-2">
+                            <div class="mt-3 grid grid-cols-2 gap-2 border-t border-slate-200 pt-3">
                               <button
                                 type="button"
                                 (click)="moveExercise(block.id, exerciseIndex, -1)"
                                 [disabled]="exerciseIndex === 0 || isSaving"
                                 class="app-button app-button-secondary min-h-11 px-3 py-2"
                               >
-                                Up
+                                {{ t('up') }}
                               </button>
                               <button
                                 type="button"
@@ -478,7 +481,7 @@ interface CustomExerciseForm {
                                 [disabled]="exerciseIndex === getBlockExercises(block.id).length - 1 || isSaving"
                                 class="app-button app-button-secondary min-h-11 px-3 py-2"
                               >
-                                Down
+                                {{ t('down') }}
                               </button>
                             </div>
                           }
