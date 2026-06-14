@@ -31,12 +31,12 @@ interface QuickSetForm extends SetForm {
   imports: [FormsModule, RouterLink],
   template: `
     <div class="space-y-5">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <p class="text-sm font-semibold text-green-700">{{ t('liveWorkout') }}</p>
-          <h2 class="mt-2 text-3xl font-bold">{{ t('workoutSession') }}</h2>
+      <header class="flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-700">{{ t('liveWorkout') }}</p>
+          <h2 class="mt-2 text-3xl font-bold leading-tight text-slate-950">{{ t('workoutSession') }}</h2>
           @if (session) {
-            <p class="mt-2 text-sm text-slate-600">
+            <p class="mt-2 text-sm leading-5 text-slate-600">
               {{ t('started') }} {{ formatDate(session.startedAt) }}
             </p>
           }
@@ -48,7 +48,7 @@ interface QuickSetForm extends SetForm {
         >
           {{ t('templates') }}
         </a>
-      </div>
+      </header>
 
       @if (statusMessage) {
         <p class="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">
@@ -65,44 +65,39 @@ interface QuickSetForm extends SetForm {
 
       @if (showUnsavedPrefillWarning) {
         <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/60 px-4 py-5">
-          <div class="max-h-[85vh] w-full overflow-y-auto rounded-lg border border-amber-200 bg-amber-50 p-4 shadow-xl sm:max-w-lg">
-            <h3 class="text-lg font-bold text-amber-950">{{ t('unsavedSuggestedSets') }}</h3>
-            <p class="mt-2 text-sm text-amber-800">
-              {{ t('saveFinishDescription') }}
-            </p>
+          <div class="app-card max-h-[85vh] w-full overflow-y-auto p-4 sm:max-w-lg">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-[0.16em] text-green-700">{{ t('finishWorkout') }}</p>
+              <h3 class="mt-1 text-xl font-bold leading-7 text-slate-950">{{ t('unsavedSuggestedSets') }}</h3>
+              <p class="mt-2 text-sm leading-5 text-slate-600">
+                {{ t('saveFinishDescription') }}
+              </p>
+            </div>
 
             <div class="mt-4 space-y-2">
               @for (item of finishUnsavedSuggestedSets; track item.quickSet.key) {
-                <div class="rounded-md bg-white p-3">
+                <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
                   <div class="flex items-start justify-between gap-3">
-                    <div>
-                      <p class="font-semibold text-slate-950">
+                    <div class="min-w-0">
+                      <p class="font-bold leading-5 text-slate-950">
                         {{ getExerciseName(item.workoutExercise.exerciseId) }}
                       </p>
-                      <p class="mt-1 text-sm text-slate-600">{{ t('sets') }} {{ item.quickSet.setNumber }}</p>
+                      <p class="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                        {{ t('sets') }} {{ item.quickSet.setNumber }}
+                      </p>
                     </div>
-                    <span class="rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">
+                    <span class="app-badge shrink-0">
                       {{ getPreFillSourceLabel(item.quickSet.source) }}
                     </span>
                   </div>
 
-                  <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
-                    <div class="rounded-md bg-slate-50 p-2">
-                      <p class="text-xs font-medium text-slate-500">{{ t('weight') }}</p>
-                      <p class="mt-1 font-semibold text-slate-950">
-                        {{ formatQuickSetWeight(item.quickSet) }}
-                      </p>
-                    </div>
-                    <div class="rounded-md bg-slate-50 p-2">
-                      <p class="text-xs font-medium text-slate-500">{{ t('reps') }}</p>
-                      <p class="mt-1 font-semibold text-slate-950">
-                        {{ formatQuickSetReps(item.quickSet) }}
-                      </p>
-                    </div>
+                  <div class="mt-3 flex flex-wrap gap-2 text-sm">
+                    <span class="app-badge">{{ t('weight') }} {{ formatQuickSetWeight(item.quickSet) }}</span>
+                    <span class="app-badge">{{ t('reps') }} {{ formatQuickSetReps(item.quickSet) }}</span>
                   </div>
 
                   @if (item.quickSet.notes.trim()) {
-                    <p class="mt-3 rounded-md bg-slate-50 p-2 text-sm text-slate-700">
+                    <p class="mt-3 border-t border-slate-200 pt-2 text-sm leading-5 text-slate-600">
                       {{ item.quickSet.notes }}
                     </p>
                   }
@@ -133,11 +128,14 @@ interface QuickSetForm extends SetForm {
 
       @if (showFinishConfirmation) {
         <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/60 px-4 py-5">
-          <div class="w-full rounded-lg border border-slate-200 bg-white p-4 shadow-xl sm:max-w-lg">
-            <h3 class="text-lg font-bold text-slate-950">{{ t('finishWorkout') }}</h3>
-            <p class="mt-2 text-sm text-slate-600">
-              {{ t('finishReviewDescription') }}
-            </p>
+          <div class="app-card w-full p-4 sm:max-w-lg">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-[0.16em] text-green-700">{{ t('liveWorkout') }}</p>
+              <h3 class="mt-1 text-xl font-bold leading-7 text-slate-950">{{ t('finishWorkout') }}</h3>
+              <p class="mt-2 text-sm leading-5 text-slate-600">
+                {{ t('finishReviewDescription') }}
+              </p>
+            </div>
 
             @if (getTotalSavedSets() === 0) {
               <p class="mt-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-900">
@@ -146,15 +144,15 @@ interface QuickSetForm extends SetForm {
             }
 
             <div class="mt-4 grid grid-cols-3 gap-2 text-sm">
-              <div class="rounded-md bg-slate-50 p-3">
+              <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
                 <p class="text-xs font-medium text-slate-500">{{ t('exercises') }}</p>
                 <p class="mt-1 text-lg font-bold text-slate-950">{{ workoutExercises.length }}</p>
               </div>
-              <div class="rounded-md bg-slate-50 p-3">
+              <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
                 <p class="text-xs font-medium text-slate-500">{{ t('sets') }}</p>
                 <p class="mt-1 text-lg font-bold text-slate-950">{{ getTotalSavedSets() }}</p>
               </div>
-              <div class="rounded-md bg-slate-50 p-3">
+              <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
                 <p class="text-xs font-medium text-slate-500">{{ t('reps') }}</p>
                 <p class="mt-1 text-lg font-bold text-slate-950">{{ getTotalSavedReps() }}</p>
               </div>
@@ -201,11 +199,11 @@ interface QuickSetForm extends SetForm {
           </button>
         </div>
       } @else {
-        <section class="app-card">
-          <div class="flex items-center justify-between gap-3">
-            <div>
-              <p class="text-xs font-medium text-slate-500">{{ t('status') }}</p>
-              <p class="mt-1 text-lg font-bold capitalize text-slate-950">{{ session.status }}</p>
+        <section class="app-card space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-xs font-bold uppercase tracking-[0.16em] text-green-700">{{ t('workoutSession') }}</p>
+              <h3 class="mt-1 text-xl font-bold leading-7 text-slate-950">{{ t('liveWorkout') }}</h3>
             </div>
             <span
               class="app-badge"
@@ -214,8 +212,23 @@ interface QuickSetForm extends SetForm {
               [class.bg-slate-100]="session.status !== 'active'"
               [class.text-slate-700]="session.status !== 'active'"
             >
-              {{ workoutExercises.length }} {{ t('exercises') }}
+              {{ session.status }}
             </span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 border-t border-slate-200 pt-3 text-sm">
+            <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
+              <p class="text-xs font-medium text-slate-500">{{ t('started') }}</p>
+              <p class="mt-1 font-bold text-slate-950">{{ formatTime(session.startedAt) }}</p>
+            </div>
+            <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
+              <p class="text-xs font-medium text-slate-500">{{ t('exercises') }}</p>
+              <p class="mt-1 font-bold text-slate-950">{{ workoutExercises.length }}</p>
+            </div>
+            <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
+              <p class="text-xs font-medium text-slate-500">{{ t('sets') }}</p>
+              <p class="mt-1 font-bold text-slate-950">{{ getTotalSavedSets() }}</p>
+            </div>
           </div>
         </section>
 
@@ -936,6 +949,13 @@ export class LiveWorkoutComponent {
 
   formatDate(value: string): string {
     return new Date(value).toLocaleString();
+  }
+
+  formatTime(value: string): string {
+    return new Date(value).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 
   private async saveQuickSet(
