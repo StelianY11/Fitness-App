@@ -5,6 +5,7 @@ export interface AppSettings {
   language: AppLanguage;
   theme: AppTheme;
   accentColor: string;
+  displayName: string;
 }
 
 export interface AccentColorOption {

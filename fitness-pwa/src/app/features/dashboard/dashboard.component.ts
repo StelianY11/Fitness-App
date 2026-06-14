@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { AppSettingsService } from '../../core/services/app-settings.service';
 import { LiveWorkoutService } from '../../core/services/live-workout.service';
 import { TranslationService } from '../../core/services/translation.service';
 import { WorkoutTemplateService } from '../../core/services/workout-template.service';
@@ -143,6 +144,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
 })
 export class DashboardComponent implements OnInit {
   private readonly authService = inject(AuthService);
+  private readonly appSettingsService = inject(AppSettingsService);
   private readonly liveWorkoutService = inject(LiveWorkoutService);
   private readonly workoutTemplateService = inject(WorkoutTemplateService);
   private readonly translationService = inject(TranslationService);
@@ -170,7 +172,9 @@ export class DashboardComponent implements OnInit {
   }
 
   get dashboardName(): string {
-    return this.userEmail || this.t('athlete');
+    const displayName = this.appSettingsService.settings().displayName.trim();
+
+    return displayName || this.userEmail || this.t('athlete');
   }
 
   ngOnInit(): void {

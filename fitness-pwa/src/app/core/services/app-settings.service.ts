@@ -12,6 +12,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   language: 'en',
   theme: 'dark',
   accentColor: '#16a34a',
+  displayName: '',
 };
 
 @Injectable({ providedIn: 'root' })
@@ -21,6 +22,12 @@ export class AppSettingsService {
 
   readonly accentColorOptions: AccentColorOption[] = [
     { name: 'Fitness Green', value: '#16a34a' },
+    { name: 'Crimson Red', value: '#dc2626' },
+    { name: 'Rose Pink', value: '#e11d48' },
+    { name: 'Cyan', value: '#0891b2' },
+    { name: 'Royal Blue', value: '#2563eb' },
+    { name: 'Graphite', value: '#475569' },
+    { name: 'Golden Amber', value: '#d97706' },
     { name: 'Ocean Blue', value: '#0284c7' },
     { name: 'Ember Orange', value: '#ea580c' },
     { name: 'Electric Violet', value: '#7c3aed' },
@@ -49,6 +56,10 @@ export class AppSettingsService {
 
   updateAccentColor(accentColor: string): void {
     this.settings.update((settings) => ({ ...settings, accentColor }));
+  }
+
+  updateDisplayName(displayName: string): void {
+    this.settings.update((settings) => ({ ...settings, displayName }));
   }
 
   private applySettings(settings = this.settings()): void {
@@ -86,6 +97,10 @@ export class AppSettingsService {
           typeof parsed.accentColor === 'string' && parsed.accentColor.trim()
             ? parsed.accentColor
             : DEFAULT_SETTINGS.accentColor,
+        displayName:
+          typeof parsed.displayName === 'string'
+            ? parsed.displayName
+            : DEFAULT_SETTINGS.displayName,
       };
     } catch {
       return DEFAULT_SETTINGS;

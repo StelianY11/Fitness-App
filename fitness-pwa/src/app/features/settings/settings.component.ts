@@ -8,12 +8,12 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
   selector: 'app-settings',
   imports: [RouterLink],
   template: `
-    <div class="space-y-5">
-      <div class="flex items-start justify-between gap-4">
+    <div class="space-y-6">
+      <header class="flex items-start justify-between gap-4">
         <div>
-          <p class="text-sm font-semibold text-green-700">{{ t('settings') }}</p>
-          <h2 class="mt-2 text-3xl font-bold">{{ t('settings') }}</h2>
-          <p class="mt-2 text-sm text-slate-600">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-700">{{ t('settings') }}</p>
+          <h2 class="mt-2 text-3xl font-bold leading-tight text-slate-950">{{ t('settings') }}</h2>
+          <p class="mt-2 text-sm leading-6 text-slate-600">
             {{ t('settingsDescription') }}
           </p>
         </div>
@@ -24,23 +24,40 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
         >
           {{ t('dashboard') }}
         </a>
-      </div>
+      </header>
 
-      <section class="app-card space-y-3">
+      <section class="app-card space-y-4">
         <div>
-          <h3 class="app-section-title">{{ t('language') }}</h3>
-          <p class="mt-1 text-sm text-slate-600">{{ t('settingsDescription') }}</p>
+          <h3 class="app-section-title">{{ t('profile') }}</h3>
+          <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('profileDescription') }}</p>
         </div>
 
-        <div class="grid grid-cols-2 gap-2">
+        <label class="block space-y-2">
+          <span class="text-sm font-semibold text-slate-700">{{ t('displayName') }}</span>
+          <input
+            type="text"
+            class="app-input"
+            [value]="settings().displayName"
+            [placeholder]="t('displayNamePlaceholder')"
+            (input)="updateDisplayName($event)"
+          />
+        </label>
+      </section>
+
+      <section class="app-card space-y-4">
+        <div>
+          <h3 class="app-section-title">{{ t('language') }}</h3>
+          <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('languageDescription') }}</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-1.5 rounded-lg border border-slate-200 bg-slate-50 p-1">
           <button
             type="button"
             (click)="setLanguage('en')"
-            class="app-button border"
-            [class.border-green-600]="settings().language === 'en'"
+            class="app-button min-h-11 border border-transparent shadow-none"
             [class.bg-green-600]="settings().language === 'en'"
             [class.text-white]="settings().language === 'en'"
-            [class.border-slate-300]="settings().language !== 'en'"
+            [class.bg-white]="settings().language !== 'en'"
             [class.text-slate-800]="settings().language !== 'en'"
           >
             {{ t('english') }}
@@ -48,11 +65,10 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
           <button
             type="button"
             (click)="setLanguage('bg')"
-            class="app-button border"
-            [class.border-green-600]="settings().language === 'bg'"
+            class="app-button min-h-11 border border-transparent shadow-none"
             [class.bg-green-600]="settings().language === 'bg'"
             [class.text-white]="settings().language === 'bg'"
-            [class.border-slate-300]="settings().language !== 'bg'"
+            [class.bg-white]="settings().language !== 'bg'"
             [class.text-slate-800]="settings().language !== 'bg'"
           >
             {{ t('bulgarian') }}
@@ -63,19 +79,18 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
       <section class="app-card space-y-3">
         <div>
           <h3 class="app-section-title">{{ t('theme') }}</h3>
-          <p class="mt-1 text-sm text-slate-600">{{ t('systemThemeDescription') }}</p>
+          <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('systemThemeDescription') }}</p>
         </div>
 
-        <div class="grid grid-cols-3 gap-2">
+        <div class="grid grid-cols-3 gap-1.5 rounded-lg border border-slate-200 bg-slate-50 p-1">
           @for (theme of themeOptions; track theme) {
             <button
               type="button"
               (click)="setTheme(theme)"
-              class="app-button border px-3"
-              [class.border-green-600]="settings().theme === theme"
+              class="app-button min-h-11 border border-transparent px-3 shadow-none"
               [class.bg-green-600]="settings().theme === theme"
               [class.text-white]="settings().theme === theme"
-              [class.border-slate-300]="settings().theme !== theme"
+              [class.bg-white]="settings().theme !== theme"
               [class.text-slate-800]="settings().theme !== theme"
             >
               {{ t(theme) }}
@@ -84,33 +99,45 @@ import { AppLanguage, AppTheme } from '../../shared/models/settings.models';
         </div>
       </section>
 
-      <section class="app-card space-y-3">
+      <section class="app-card space-y-4">
         <div>
           <h3 class="app-section-title">{{ t('accentColor') }}</h3>
-          <p class="mt-1 text-sm text-slate-600">{{ t('accentDescription') }}</p>
+          <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('accentDescription') }}</p>
         </div>
 
-        <div class="grid gap-2">
+        <div class="grid grid-cols-2 gap-2">
           @for (color of accentColorOptions; track color.value) {
             <button
               type="button"
               (click)="setAccentColor(color.value)"
-              class="app-button app-button-secondary justify-between text-left"
+              class="app-card shadow-none flex min-h-[4.5rem] items-center justify-between gap-3 p-3 text-left"
               [class.border-green-600]="settings().accentColor === color.value"
               [class.border-slate-300]="settings().accentColor !== color.value"
             >
-              <span class="flex items-center gap-3">
+              <span class="flex min-w-0 items-center gap-3">
                 <span
-                  class="h-6 w-6 rounded-full border border-slate-200"
+                  class="h-7 w-7 shrink-0 rounded-full border border-slate-200 shadow-sm"
                   [style.background]="color.value"
                 ></span>
-                {{ color.name }}
+                <span class="truncate text-sm font-bold text-slate-800">{{ color.name }}</span>
               </span>
               @if (settings().accentColor === color.value) {
-              <span class="text-green-700">{{ t('selected') }}</span>
+                <span class="app-badge bg-green-100 text-green-800 shrink-0">{{ t('selected') }}</span>
               }
             </button>
           }
+        </div>
+      </section>
+
+      <section class="app-card space-y-3">
+        <div>
+          <h3 class="app-section-title">{{ t('appInfo') }}</h3>
+          <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('installableWebApp') }}</p>
+        </div>
+
+        <div class="rounded-md border border-slate-200 bg-slate-50 p-4">
+          <p class="text-xs font-bold uppercase tracking-[0.16em] text-green-700">{{ t('appName') }}</p>
+          <p class="mt-1 text-lg font-bold text-slate-950">{{ t('brandLabel') }}</p>
         </div>
       </section>
     </div>
@@ -134,6 +161,12 @@ export class SettingsComponent {
 
   setAccentColor(accentColor: string): void {
     this.appSettingsService.updateAccentColor(accentColor);
+  }
+
+  updateDisplayName(event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+
+    this.appSettingsService.updateDisplayName(input?.value ?? '');
   }
 
   t(key: Parameters<TranslationService['translate']>[0]): string {
