@@ -60,7 +60,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
             </button>
             <button
               type="button"
-              (click)="cancelActiveWorkout()"
+              (click)="openCancelActiveWorkoutModal()"
               [disabled]="isCancellingActiveWorkout"
               class="app-button app-button-danger"
             >
@@ -139,6 +139,44 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
       >
         {{ isLoading ? t('loading') : t('logout') }}
       </button>
+
+      @if (showCancelActiveWorkoutModal && activeWorkout) {
+        <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/60 px-4 py-5">
+          <div class="app-card w-full p-4 sm:max-w-lg">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-[0.16em] text-red-700">{{ t('cancelWorkout') }}</p>
+              <h3 class="mt-1 text-xl font-bold leading-7 text-slate-950">{{ t('cancelWorkoutModalTitle') }}</h3>
+              <p class="mt-2 text-sm leading-5 text-slate-600">
+                {{ t('cancelWorkoutDescription') }}
+              </p>
+            </div>
+
+            <div class="mt-4 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm">
+              <p class="font-bold text-slate-950">{{ activeWorkoutName }}</p>
+              <p class="mt-1 text-slate-600">{{ t('started') }} {{ formatTime(activeWorkout.startedAt) }}</p>
+            </div>
+
+            <div class="mt-4 grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                (click)="confirmCancelActiveWorkout()"
+                [disabled]="isCancellingActiveWorkout"
+                class="app-button app-button-danger"
+              >
+                {{ isCancellingActiveWorkout ? t('loading') : t('cancelWorkout') }}
+              </button>
+              <button
+                type="button"
+                (click)="closeCancelActiveWorkoutModal()"
+                [disabled]="isCancellingActiveWorkout"
+                class="app-button app-button-secondary"
+              >
+                {{ t('cancel') }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   `,
 })
@@ -159,6 +197,7 @@ export class DashboardComponent implements OnInit {
   isLoading = false;
   isActiveWorkoutLoading = true;
   isCancellingActiveWorkout = false;
+  showCancelActiveWorkoutModal = false;
   errorMessage = '';
 
   constructor() {
@@ -191,10 +230,28 @@ export class DashboardComponent implements OnInit {
     await this.router.navigate(['/workout/live', activeWorkout.id]);
   }
 
-  async cancelActiveWorkout(): Promise<void> {
+  openCancelActiveWorkoutModal(): void {
     const activeWorkout = this.liveWorkoutService.activeWorkout();
 
-    if (!activeWorkout || this.isCancellingActiveWorkout || !confirm(this.t('confirmCancelActiveWorkout'))) {
+    if (!activeWorkout || this.isCancellingActiveWorkout) {
+      return;
+    }
+
+    this.showCancelActiveWorkoutModal = true;
+  }
+
+  closeCancelActiveWorkoutModal(): void {
+    if (this.isCancellingActiveWorkout) {
+      return;
+    }
+
+    this.showCancelActiveWorkoutModal = false;
+  }
+
+  async confirmCancelActiveWorkout(): Promise<void> {
+    const activeWorkout = this.liveWorkoutService.activeWorkout();
+
+    if (!activeWorkout || this.isCancellingActiveWorkout) {
       return;
     }
 
@@ -212,6 +269,7 @@ export class DashboardComponent implements OnInit {
       this.activeWorkoutName = 'Workout';
       this.activeWorkoutExerciseCount = 0;
       this.activeWorkoutSetCount = 0;
+      this.showCancelActiveWorkoutModal = false;
     } catch (error) {
       this.errorMessage = error instanceof Error ? error.message : 'Unable to cancel workout.';
     } finally {

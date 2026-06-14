@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { LiveWorkoutService } from '../../core/services/live-workout.service';
 import { TranslationService } from '../../core/services/translation.service';
@@ -19,7 +20,7 @@ interface WorkoutHistoryGroup {
 
 @Component({
   selector: 'app-workout-history',
-  imports: [RouterLink],
+  imports: [FormsModule, RouterLink],
   template: `
     <div class="space-y-5">
       <header class="flex items-start justify-between gap-4">
@@ -46,7 +47,7 @@ interface WorkoutHistoryGroup {
             </div>
             <button
               type="button"
-              (click)="clearAllHistory()"
+              (click)="openClearHistoryModal()"
               [disabled]="isClearing"
               class="app-button app-button-danger min-h-11 w-auto px-3 py-2"
             >
@@ -133,6 +134,61 @@ interface WorkoutHistoryGroup {
           }
         </div>
       }
+
+      @if (showClearHistoryModal) {
+        <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/60 px-4 py-5">
+          <div class="app-card max-h-[85vh] w-full overflow-y-auto p-4 sm:max-w-lg">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-[0.16em] text-red-700">{{ t('clearAllHistory') }}</p>
+              <h3 class="mt-1 text-xl font-bold leading-7 text-slate-950">{{ t('clearHistoryModalTitle') }}</h3>
+              <p class="mt-2 text-sm leading-5 text-slate-600">
+                {{ t('clearHistoryModalDescription') }}
+              </p>
+            </div>
+
+            <div class="mt-4 grid grid-cols-2 gap-2 text-sm">
+              <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
+                <p class="text-xs font-medium text-slate-500">{{ t('workoutHistory') }}</p>
+                <p class="mt-1 font-bold text-slate-950">{{ historyItems.length }}</p>
+              </div>
+              <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
+                <p class="text-xs font-medium text-slate-500">{{ t('sets') }}</p>
+                <p class="mt-1 font-bold text-slate-950">{{ visibleSetCount }}</p>
+              </div>
+            </div>
+
+            <label class="mt-4 block">
+              <span class="text-sm font-semibold text-slate-700">{{ t('clearHistoryTypeInstruction') }}</span>
+              <input
+                type="text"
+                name="clearHistoryConfirmation"
+                [(ngModel)]="clearHistoryConfirmation"
+                class="app-input mt-2"
+                autocomplete="off"
+              />
+            </label>
+
+            <div class="mt-4 grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                (click)="confirmClearAllHistory()"
+                [disabled]="isClearing || clearHistoryConfirmation !== clearHistoryPhrase"
+                class="app-button app-button-danger"
+              >
+                {{ isClearing ? t('loading') : t('clearAllHistory') }}
+              </button>
+              <button
+                type="button"
+                (click)="closeClearHistoryModal()"
+                [disabled]="isClearing"
+                class="app-button app-button-secondary"
+              >
+                {{ t('cancel') }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   `,
 })
@@ -153,6 +209,9 @@ export class WorkoutHistoryComponent {
   isClearing = false;
   hasMore = false;
   errorMessage = '';
+  showClearHistoryModal = false;
+  clearHistoryConfirmation = '';
+  readonly clearHistoryPhrase = 'DELETE HISTORY';
   private loadRunId = 0;
 
   constructor() {
@@ -210,10 +269,26 @@ export class WorkoutHistoryComponent {
     }
   }
 
-  async clearAllHistory(): Promise<void> {
-    const confirmation = prompt('Type DELETE HISTORY to permanently delete all completed workout history.');
+  get visibleSetCount(): number {
+    return this.historyItems.reduce((total, item) => total + item.setCount, 0);
+  }
 
-    if (confirmation !== 'DELETE HISTORY') {
+  openClearHistoryModal(): void {
+    this.clearHistoryConfirmation = '';
+    this.showClearHistoryModal = true;
+  }
+
+  closeClearHistoryModal(): void {
+    if (this.isClearing) {
+      return;
+    }
+
+    this.showClearHistoryModal = false;
+    this.clearHistoryConfirmation = '';
+  }
+
+  async confirmClearAllHistory(): Promise<void> {
+    if (this.clearHistoryConfirmation !== this.clearHistoryPhrase) {
       return;
     }
 
@@ -230,6 +305,8 @@ export class WorkoutHistoryComponent {
       this.historyItems = [];
       this.groups = createEmptyGroups();
       this.hasMore = false;
+      this.showClearHistoryModal = false;
+      this.clearHistoryConfirmation = '';
     } catch (error) {
       this.errorMessage = getErrorMessage(error, 'Unable to clear workout history.');
       console.error('Workout history clear all failed:', error);

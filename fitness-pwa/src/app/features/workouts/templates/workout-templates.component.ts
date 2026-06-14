@@ -209,7 +209,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                 @if (!template.isBuiltin) {
                   <button
                     type="button"
-                    (click)="deleteTemplate(template)"
+                    (click)="openDeleteTemplateModal(template)"
                     [disabled]="processingTemplateId === template.id"
                     class="app-button app-button-danger min-h-11 px-3 py-2 sm:col-span-4"
                   >
@@ -219,6 +219,46 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
               </div>
             </article>
           }
+        </div>
+      }
+
+      @if (templatePendingDelete) {
+        <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/60 px-4 py-5">
+          <div class="app-card w-full p-4 sm:max-w-lg">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-[0.16em] text-red-700">{{ t('delete') }}</p>
+              <h3 class="mt-1 text-xl font-bold leading-7 text-slate-950">{{ t('deleteTemplateModalTitle') }}</h3>
+              <p class="mt-2 text-sm leading-5 text-slate-600">
+                {{ t('deleteTemplateDescription') }}
+              </p>
+            </div>
+
+            <div class="mt-4 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm">
+              <p class="font-bold text-slate-950">{{ templatePendingDelete.name }}</p>
+              @if (templatePendingDelete.description) {
+                <p class="mt-1 leading-5 text-slate-600">{{ templatePendingDelete.description }}</p>
+              }
+            </div>
+
+            <div class="mt-4 grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                (click)="confirmDeleteTemplate()"
+                [disabled]="processingTemplateId === templatePendingDelete.id"
+                class="app-button app-button-danger"
+              >
+                {{ processingTemplateId === templatePendingDelete.id ? t('loading') : t('delete') }}
+              </button>
+              <button
+                type="button"
+                (click)="closeDeleteTemplateModal()"
+                [disabled]="processingTemplateId === templatePendingDelete.id"
+                class="app-button app-button-secondary"
+              >
+                {{ t('cancel') }}
+              </button>
+            </div>
+          </div>
         </div>
       }
     </div>
@@ -247,6 +287,7 @@ export class WorkoutTemplatesComponent {
   activeWorkout: WorkoutSession | null = null;
   pendingStartTemplate: WorkoutTemplate | null = null;
   showActiveWorkoutPrompt = false;
+  templatePendingDelete: WorkoutTemplate | null = null;
 
   constructor() {
     void this.loadTemplates();
@@ -416,8 +457,26 @@ export class WorkoutTemplatesComponent {
     }
   }
 
-  async deleteTemplate(template: WorkoutTemplate): Promise<void> {
-    if (template.isBuiltin || !confirm(`${this.t('confirmDeleteTemplate')} ${template.name}`)) {
+  openDeleteTemplateModal(template: WorkoutTemplate): void {
+    if (template.isBuiltin || this.processingTemplateId === template.id) {
+      return;
+    }
+
+    this.templatePendingDelete = template;
+  }
+
+  closeDeleteTemplateModal(): void {
+    if (this.templatePendingDelete && this.processingTemplateId === this.templatePendingDelete.id) {
+      return;
+    }
+
+    this.templatePendingDelete = null;
+  }
+
+  async confirmDeleteTemplate(): Promise<void> {
+    const template = this.templatePendingDelete;
+
+    if (!template || template.isBuiltin) {
       return;
     }
 
@@ -434,6 +493,7 @@ export class WorkoutTemplatesComponent {
       }
 
       this.statusMessage = 'Template deleted.';
+      this.templatePendingDelete = null;
       await this.loadTemplates();
     } catch (error) {
       this.errorMessage = getErrorMessage(error, 'Unable to delete template.');

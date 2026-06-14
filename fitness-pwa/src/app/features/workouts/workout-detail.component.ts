@@ -163,7 +163,7 @@ import {
             </div>
             <button
               type="button"
-              (click)="deleteWorkout()"
+              (click)="openDeleteWorkoutModal()"
               [disabled]="isDeleting"
               class="app-button app-button-danger"
             >
@@ -171,6 +171,44 @@ import {
             </button>
           </div>
         </section>
+      }
+
+      @if (showDeleteWorkoutModal && session) {
+        <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/60 px-4 py-5">
+          <div class="app-card w-full p-4 sm:max-w-lg">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-[0.16em] text-red-700">{{ t('deleteWorkout') }}</p>
+              <h3 class="mt-1 text-xl font-bold leading-7 text-slate-950">{{ t('deleteWorkoutModalTitle') }}</h3>
+              <p class="mt-2 text-sm leading-5 text-slate-600">
+                {{ t('deleteWorkoutDescription') }}
+              </p>
+            </div>
+
+            <div class="mt-4 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm">
+              <p class="font-bold text-slate-950">{{ workoutName }}</p>
+              <p class="mt-1 text-slate-600">{{ formatDateTime(session.startedAt) }}</p>
+            </div>
+
+            <div class="mt-4 grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                (click)="confirmDeleteWorkout()"
+                [disabled]="isDeleting"
+                class="app-button app-button-danger"
+              >
+                {{ isDeleting ? t('loading') : t('deleteWorkout') }}
+              </button>
+              <button
+                type="button"
+                (click)="closeDeleteWorkoutModal()"
+                [disabled]="isDeleting"
+                class="app-button app-button-secondary"
+              >
+                {{ t('cancel') }}
+              </button>
+            </div>
+          </div>
+        </div>
       }
     </div>
   `,
@@ -193,6 +231,7 @@ export class WorkoutDetailComponent {
   exerciseNames: Record<string, string> = {};
   isLoading = true;
   isDeleting = false;
+  showDeleteWorkoutModal = false;
   errorMessage = '';
 
   private readonly sessionId = this.route.snapshot.paramMap.get('sessionId');
@@ -304,8 +343,24 @@ export class WorkoutDetailComponent {
     return `${minutes} min`;
   }
 
-  async deleteWorkout(): Promise<void> {
-    if (!this.session || this.isDeleting || !confirm(this.t('confirmDeleteWorkout'))) {
+  openDeleteWorkoutModal(): void {
+    if (!this.session || this.isDeleting) {
+      return;
+    }
+
+    this.showDeleteWorkoutModal = true;
+  }
+
+  closeDeleteWorkoutModal(): void {
+    if (this.isDeleting) {
+      return;
+    }
+
+    this.showDeleteWorkoutModal = false;
+  }
+
+  async confirmDeleteWorkout(): Promise<void> {
+    if (!this.session || this.isDeleting) {
       return;
     }
 
@@ -325,6 +380,7 @@ export class WorkoutDetailComponent {
       console.error('Workout detail delete failed:', error);
     } finally {
       this.isDeleting = false;
+      this.showDeleteWorkoutModal = false;
       this.changeDetectorRef.detectChanges();
     }
   }

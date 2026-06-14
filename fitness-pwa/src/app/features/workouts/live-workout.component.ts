@@ -480,7 +480,7 @@ interface QuickSetForm extends SetForm {
         <div class="grid grid-cols-2 gap-3">
           <button
             type="button"
-            (click)="cancelWorkout()"
+            (click)="openCancelWorkoutModal()"
             [disabled]="isCancelling || isFinishing || session.status !== 'active'"
             class="app-button app-button-danger"
           >
@@ -494,6 +494,54 @@ interface QuickSetForm extends SetForm {
           >
             {{ isFinishing ? t('finishing') : t('finishWorkout') }}
           </button>
+        </div>
+      }
+
+      @if (showCancelWorkoutModal && session) {
+        <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/60 px-4 py-5">
+          <div class="app-card w-full p-4 sm:max-w-lg">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-[0.16em] text-red-700">{{ t('cancelWorkout') }}</p>
+              <h3 class="mt-1 text-xl font-bold leading-7 text-slate-950">{{ t('cancelWorkoutModalTitle') }}</h3>
+              <p class="mt-2 text-sm leading-5 text-slate-600">
+                {{ t('cancelWorkoutDescription') }}
+              </p>
+            </div>
+
+            <div class="mt-4 grid grid-cols-3 gap-2 text-sm">
+              <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
+                <p class="text-xs font-medium text-slate-500">{{ t('exercises') }}</p>
+                <p class="mt-1 font-bold text-slate-950">{{ workoutExercises.length }}</p>
+              </div>
+              <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
+                <p class="text-xs font-medium text-slate-500">{{ t('sets') }}</p>
+                <p class="mt-1 font-bold text-slate-950">{{ getTotalSavedSets() }}</p>
+              </div>
+              <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
+                <p class="text-xs font-medium text-slate-500">{{ t('started') }}</p>
+                <p class="mt-1 font-bold text-slate-950">{{ formatTime(session.startedAt) }}</p>
+              </div>
+            </div>
+
+            <div class="mt-4 grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                (click)="confirmCancelWorkout()"
+                [disabled]="isCancelling"
+                class="app-button app-button-danger"
+              >
+                {{ isCancelling ? t('cancelling') : t('cancelWorkout') }}
+              </button>
+              <button
+                type="button"
+                (click)="closeCancelWorkoutModal()"
+                [disabled]="isCancelling"
+                class="app-button app-button-secondary"
+              >
+                {{ t('continueEditing') }}
+              </button>
+            </div>
+          </div>
         </div>
       }
     </div>
@@ -527,6 +575,7 @@ export class LiveWorkoutComponent {
   isPrefillLoading = false;
   showUnsavedPrefillWarning = false;
   showFinishConfirmation = false;
+  showCancelWorkoutModal = false;
   errorMessage = '';
   statusMessage = '';
 
@@ -831,8 +880,24 @@ export class LiveWorkoutComponent {
     }
   }
 
-  async cancelWorkout(): Promise<void> {
-    if (!this.session || this.isCancelling || !confirm(this.t('confirmCancelWorkout'))) {
+  openCancelWorkoutModal(): void {
+    if (!this.session || this.isCancelling) {
+      return;
+    }
+
+    this.showCancelWorkoutModal = true;
+  }
+
+  closeCancelWorkoutModal(): void {
+    if (this.isCancelling) {
+      return;
+    }
+
+    this.showCancelWorkoutModal = false;
+  }
+
+  async confirmCancelWorkout(): Promise<void> {
+    if (!this.session || this.isCancelling) {
       return;
     }
 
@@ -852,6 +917,7 @@ export class LiveWorkoutComponent {
       console.error('Live workout cancel failed:', error);
     } finally {
       this.isCancelling = false;
+      this.showCancelWorkoutModal = false;
       this.changeDetectorRef.detectChanges();
     }
   }

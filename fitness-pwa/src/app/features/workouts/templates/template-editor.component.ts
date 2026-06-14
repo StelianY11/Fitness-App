@@ -216,7 +216,7 @@ interface CustomExerciseForm {
                     @if (canEdit) {
                       <button
                         type="button"
-                        (click)="removeBlock(block)"
+                        (click)="openRemoveBlockModal(block)"
                         [disabled]="isSaving"
                         class="app-button app-button-danger min-h-11 w-auto px-3 py-2"
                         [class.cursor-not-allowed]="isSaving"
@@ -495,6 +495,44 @@ interface CustomExerciseForm {
           </div>
         }
       }
+
+      @if (blockPendingRemove) {
+        <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/60 px-4 py-5">
+          <div class="app-card w-full p-4 sm:max-w-lg">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-[0.16em] text-red-700">{{ t('delete') }}</p>
+              <h3 class="mt-1 text-xl font-bold leading-7 text-slate-950">{{ t('removeBlockModalTitle') }}</h3>
+              <p class="mt-2 text-sm leading-5 text-slate-600">
+                {{ t('removeBlockDescription') }}
+              </p>
+            </div>
+
+            <div class="mt-4 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm">
+              <p class="font-bold text-slate-950">{{ blockPendingRemove.title || t('untitledBlock') }}</p>
+              <p class="mt-1 text-slate-600">{{ getBlockTypeLabel(blockPendingRemove.blockType) }}</p>
+            </div>
+
+            <div class="mt-4 grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                (click)="confirmRemoveBlock()"
+                [disabled]="isSaving"
+                class="app-button app-button-danger"
+              >
+                {{ isSaving ? t('loading') : t('delete') }}
+              </button>
+              <button
+                type="button"
+                (click)="closeRemoveBlockModal()"
+                [disabled]="isSaving"
+                class="app-button app-button-secondary"
+              >
+                {{ t('cancel') }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   `,
 })
@@ -541,6 +579,7 @@ export class TemplateEditorComponent {
   actionMessage = '';
   activeWorkout: WorkoutSession | null = null;
   showActiveWorkoutPrompt = false;
+  blockPendingRemove: WorkoutTemplateBlock | null = null;
   private readonly addingExerciseKeys = new Set<string>();
   private readonly templateId = this.route.snapshot.paramMap.get('id');
   private mainLoadId = 0;
@@ -706,8 +745,26 @@ export class TemplateEditorComponent {
     await this.updateBlock(block, { blockType: block.blockType });
   }
 
-  async removeBlock(block: WorkoutTemplateBlock): Promise<void> {
-    if (!this.canEdit || this.isSaving || !confirm(`${this.t('confirmRemoveBlock')} ${block.title || this.t('untitledBlock')}`)) {
+  openRemoveBlockModal(block: WorkoutTemplateBlock): void {
+    if (!this.canEdit || this.isSaving) {
+      return;
+    }
+
+    this.blockPendingRemove = block;
+  }
+
+  closeRemoveBlockModal(): void {
+    if (this.isSaving) {
+      return;
+    }
+
+    this.blockPendingRemove = null;
+  }
+
+  async confirmRemoveBlock(): Promise<void> {
+    const block = this.blockPendingRemove;
+
+    if (!block || !this.canEdit || this.isSaving) {
       return;
     }
 
@@ -733,6 +790,7 @@ export class TemplateEditorComponent {
 
       await this.saveBlockOrder();
       this.statusMessage = 'Block removed.';
+      this.blockPendingRemove = null;
     } catch (error) {
       this.blocks = previousBlocks;
       this.blockExercises = previousBlockExercises;
