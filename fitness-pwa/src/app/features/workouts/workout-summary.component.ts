@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ExerciseService } from '../../core/services/exercise.service';
 import { LiveWorkoutService } from '../../core/services/live-workout.service';
 import { TranslationService } from '../../core/services/translation.service';
+import { WorkoutTemplateService } from '../../core/services/workout-template.service';
 import {
   Exercise,
   WorkoutExercise,
@@ -15,13 +16,13 @@ import {
   imports: [RouterLink],
   template: `
     <div class="space-y-5">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <p class="text-sm font-semibold text-green-700">{{ t('workoutSummary') }}</p>
-          <h2 class="mt-2 text-3xl font-bold">{{ t('workoutSummary') }}</h2>
+      <header class="flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-700">{{ t('workoutSummary') }}</p>
+          <h2 class="mt-2 text-3xl font-bold leading-tight text-slate-950">{{ workoutTitle }}</h2>
           @if (session) {
-            <p class="mt-2 text-sm text-slate-600">
-              {{ formatDate(session.startedAt) }} - {{ session.finishedAt ? formatDate(session.finishedAt) : 'Not finished' }}
+            <p class="mt-2 text-sm leading-5 text-slate-600">
+              {{ t('finished') }} {{ session.finishedAt ? formatDate(session.finishedAt) : t('notFinished') }}
             </p>
           }
         </div>
@@ -32,7 +33,7 @@ import {
         >
           {{ t('dashboard') }}
         </a>
-      </div>
+      </header>
 
       @if (isLoading) {
         <div class="space-y-3">
@@ -53,28 +54,31 @@ import {
           </button>
         </div>
       } @else if (session) {
-        <section class="app-card">
-          <div class="flex items-center justify-between gap-3">
-            <div>
-              <p class="text-xs font-medium text-slate-500">{{ t('status') }}</p>
-              <p class="mt-1 text-lg font-bold capitalize text-slate-950">{{ session.status }}</p>
+        <section class="app-card space-y-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-xs font-bold uppercase tracking-[0.16em] text-green-700">{{ t('completed') }}</p>
+              <h3 class="mt-1 text-xl font-bold leading-7 text-slate-950">{{ workoutTitle }}</h3>
+              <p class="mt-1 text-sm leading-5 text-slate-600">
+                {{ t('duration') }} {{ workoutDuration }}
+              </p>
             </div>
             <span class="app-badge bg-green-100 text-green-800">
-              {{ totalSets }} {{ t('sets') }}
+              {{ session.status }}
             </span>
           </div>
 
-          <div class="mt-4 grid grid-cols-3 gap-2 text-center">
-            <div class="rounded-md bg-slate-50 p-3">
-              <p class="text-xl font-bold text-slate-950">{{ workoutExercises.length }}</p>
+          <div class="grid grid-cols-3 gap-2 border-t border-slate-200 pt-3 text-center">
+            <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
+              <p class="text-lg font-bold text-slate-950">{{ workoutExercises.length }}</p>
               <p class="mt-1 text-xs font-medium text-slate-500">{{ t('exercises') }}</p>
             </div>
-            <div class="rounded-md bg-slate-50 p-3">
-              <p class="text-xl font-bold text-slate-950">{{ totalSets }}</p>
+            <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
+              <p class="text-lg font-bold text-slate-950">{{ totalSets }}</p>
               <p class="mt-1 text-xs font-medium text-slate-500">{{ t('sets') }}</p>
             </div>
-            <div class="rounded-md bg-slate-50 p-3">
-              <p class="text-xl font-bold text-slate-950">{{ totalReps }}</p>
+            <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
+              <p class="text-lg font-bold text-slate-950">{{ totalReps }}</p>
               <p class="mt-1 text-xs font-medium text-slate-500">{{ t('reps') }}</p>
             </div>
           </div>
@@ -88,13 +92,13 @@ import {
         } @else {
           <div class="space-y-4">
             @for (workoutExercise of workoutExercises; track workoutExercise.id; let exerciseIndex = $index) {
-              <article class="app-card">
+              <article class="app-card space-y-3">
                 <div class="flex items-start justify-between gap-3">
-                  <div>
-                    <p class="text-xs font-semibold uppercase tracking-wide text-green-700">
+                  <div class="min-w-0">
+                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-green-700">
                       {{ t('exercises') }} {{ exerciseIndex + 1 }}
                     </p>
-                    <h3 class="mt-1 text-lg font-bold text-slate-950">
+                    <h3 class="mt-1 text-lg font-bold leading-6 text-slate-950">
                       {{ getExerciseName(workoutExercise.exerciseId) }}
                     </h3>
                   </div>
@@ -104,19 +108,19 @@ import {
                 </div>
 
                 @if (getSets(workoutExercise.id).length === 0) {
-                  <div class="mt-4 rounded-md bg-slate-50 p-3 text-sm text-slate-600">
+                  <div class="rounded-md bg-slate-50 p-3 text-sm text-slate-600">
                     {{ t('noSetsLogged') }}
                   </div>
                 } @else {
-                  <div class="mt-4 space-y-2">
+                  <div class="space-y-2 border-t border-slate-200 pt-3">
                     @for (set of getSets(workoutExercise.id); track set.id) {
-                      <div class="rounded-md border border-slate-200 p-3">
+                      <div class="rounded-md border border-slate-200 bg-white px-3 py-2.5">
                         <div class="flex items-center justify-between gap-3">
                           <p class="font-semibold text-slate-950">{{ t('sets') }} {{ set.setNumber }}</p>
-                          <p class="text-sm text-slate-600">{{ formatSetSummary(set) }}</p>
+                          <p class="shrink-0 text-sm font-bold text-slate-700">{{ formatSetSummary(set) }}</p>
                         </div>
                         @if (set.notes) {
-                          <p class="mt-2 text-sm text-slate-600">{{ set.notes }}</p>
+                          <p class="mt-2 border-t border-slate-200 pt-2 text-sm leading-5 text-slate-600">{{ set.notes }}</p>
                         }
                       </div>
                     }
@@ -127,19 +131,27 @@ import {
           </div>
         }
 
-        <div class="grid grid-cols-2 gap-3">
-          <a
-            routerLink="/templates"
-            class="app-button app-button-secondary"
-          >
-            {{ t('templates') }}
-          </a>
+        <div class="grid gap-3">
           <a
             routerLink="/dashboard"
             class="app-button app-button-primary"
           >
-            {{ t('dashboard') }}
+            {{ t('backToDashboard') }}
           </a>
+          <a
+            routerLink="/history"
+            class="app-button app-button-secondary"
+          >
+            {{ t('viewHistory') }}
+          </a>
+          @if (session.workoutTemplateId) {
+            <a
+              [routerLink]="['/templates', session.workoutTemplateId]"
+              class="app-button app-button-secondary"
+            >
+              {{ t('openTemplate') }}
+            </a>
+          }
         </div>
       }
     </div>
@@ -149,6 +161,7 @@ export class WorkoutSummaryComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly liveWorkoutService = inject(LiveWorkoutService);
   private readonly exerciseService = inject(ExerciseService);
+  private readonly workoutTemplateService = inject(WorkoutTemplateService);
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
   private readonly translationService = inject(TranslationService);
 
@@ -158,6 +171,7 @@ export class WorkoutSummaryComponent {
   workoutExercises: WorkoutExercise[] = [];
   setsByExercise: Record<string, WorkoutSet[]> = {};
   exerciseNames: Record<string, string> = {};
+  workoutName = '';
   isLoading = true;
   errorMessage = '';
 
@@ -181,6 +195,23 @@ export class WorkoutSummaryComponent {
       .reduce((total, set) => total + (set.reps ?? 0), 0);
   }
 
+  get workoutTitle(): string {
+    return this.workoutName || this.t('workoutSession');
+  }
+
+  get workoutDuration(): string {
+    if (!this.session?.finishedAt) {
+      return '-';
+    }
+
+    const minutes = Math.max(
+      1,
+      Math.round((new Date(this.session.finishedAt).getTime() - new Date(this.session.startedAt).getTime()) / 60000),
+    );
+
+    return `${minutes} min`;
+  }
+
   constructor() {
     void this.loadSummary();
   }
@@ -193,6 +224,7 @@ export class WorkoutSummaryComponent {
     this.session = null;
     this.workoutExercises = [];
     this.setsByExercise = {};
+    this.workoutName = '';
 
     try {
       if (!this.sessionId) {
@@ -213,9 +245,10 @@ export class WorkoutSummaryComponent {
 
       this.session = sessionResult.data;
       this.workoutExercises = exercisesResult.data;
+      this.workoutName = sessionResult.data.workoutTemplateId ? this.t('templateWorkout') : this.t('workoutSession');
       this.isLoading = false;
       this.changeDetectorRef.detectChanges();
-      void this.loadSummarySecondaryData(loadId, exercisesResult.data);
+      void this.loadSummarySecondaryData(loadId, sessionResult.data, exercisesResult.data);
     } catch (error) {
       if (this.isStaleLoad(loadId)) {
         return;
@@ -224,6 +257,7 @@ export class WorkoutSummaryComponent {
       this.session = null;
       this.workoutExercises = [];
       this.setsByExercise = {};
+      this.workoutName = '';
       this.errorMessage = getErrorMessage(error, 'Unable to load workout summary.');
       console.error('Workout summary load failed:', error);
     } finally {
@@ -257,12 +291,14 @@ export class WorkoutSummaryComponent {
 
   private async loadSummarySecondaryData(
     loadId: number,
+    session: WorkoutSession,
     workoutExercises: WorkoutExercise[],
   ): Promise<void> {
     try {
-      const [setsByExercise, exerciseNames] = await Promise.all([
+      const [setsByExercise, exerciseNames, workoutName] = await Promise.all([
         this.loadSetsByExercise(workoutExercises),
         this.loadExerciseNames(),
+        this.loadWorkoutName(session),
       ]);
 
       if (this.isStaleLoad(loadId)) {
@@ -271,6 +307,7 @@ export class WorkoutSummaryComponent {
 
       this.setsByExercise = setsByExercise;
       this.exerciseNames = exerciseNames;
+      this.workoutName = workoutName;
       this.changeDetectorRef.detectChanges();
     } catch (error) {
       console.error('Workout summary secondary data load failed:', error);
@@ -318,6 +355,21 @@ export class WorkoutSummaryComponent {
       console.error('Workout summary exercise metadata load failed:', error);
       return {};
     }
+  }
+
+  private async loadWorkoutName(session: WorkoutSession): Promise<string> {
+    if (!session.workoutTemplateId) {
+      return this.t('workoutSession');
+    }
+
+    const result = await this.workoutTemplateService.getTemplateById(session.workoutTemplateId);
+
+    if (result.error) {
+      console.error('Workout summary template name load error:', result.error);
+      return this.t('templateWorkout');
+    }
+
+    return result.data?.name ?? this.t('templateWorkout');
   }
 
   private isStaleLoad(loadId: number): boolean {
