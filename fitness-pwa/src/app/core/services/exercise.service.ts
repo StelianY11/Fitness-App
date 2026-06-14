@@ -6,6 +6,21 @@ import {
   ExerciseCategory,
 } from '../../shared/models/fitness.models';
 
+const ALLOWED_TRAINING_TYPES = ['gym', 'calisthenics', 'street_workout', 'cardio', 'mobility'] as const;
+const ALLOWED_EXERCISE_TYPES = [
+  'gym',
+  'bodyweight',
+  'weighted_bodyweight',
+  'assisted',
+  'hold',
+  'time',
+  'distance',
+] as const;
+const ALLOWED_DEFAULT_UNITS = ['reps', 'kg', 'seconds', 'minutes', 'meters', 'kilometers'] as const;
+const DEFAULT_CUSTOM_TRAINING_TYPE = 'gym';
+const DEFAULT_CUSTOM_EXERCISE_TYPE = 'gym';
+const DEFAULT_CUSTOM_UNIT = 'reps';
+
 const BASE_EXERCISE_SELECT = [
   'id',
   'category_id',
@@ -44,6 +59,7 @@ export interface CreateCustomExerciseInput {
   description?: string | null;
   trainingType?: string | null;
   exerciseType?: string | null;
+  defaultUnit?: string | null;
   equipment?: string | null;
 }
 
@@ -94,6 +110,7 @@ interface BaseExerciseInsertRow {
 interface ExtendedExerciseInsertRow extends BaseExerciseInsertRow {
   training_type: string | null;
   exercise_type: string | null;
+  default_unit: string | null;
 }
 
 @Injectable({
@@ -162,8 +179,38 @@ export class ExerciseService {
     };
     const extendedPayload: ExtendedExerciseInsertRow = {
       ...basePayload,
-      training_type: input.trainingType ?? null,
-      exercise_type: input.exerciseType ?? null,
+      training_type: normalizeConstrainedValue(
+        input.trainingType,
+        ALLOWED_TRAINING_TYPES,
+        DEFAULT_CUSTOM_TRAINING_TYPE,
+        {
+          streetworkout: 'street_workout',
+          'street workout': 'street_workout',
+          'street-workout': 'street_workout',
+        },
+      ),
+      exercise_type: normalizeConstrainedValue(
+        input.exerciseType,
+        ALLOWED_EXERCISE_TYPES,
+        DEFAULT_CUSTOM_EXERCISE_TYPE,
+        {
+          body: 'bodyweight',
+          'body weight': 'bodyweight',
+          body_weight: 'bodyweight',
+          calisthenics: 'bodyweight',
+          street_workout: 'bodyweight',
+          streetworkout: 'bodyweight',
+          'street workout': 'bodyweight',
+          'weighted bodyweight': 'weighted_bodyweight',
+          weightedbodyweight: 'weighted_bodyweight',
+          weighted_body_weight: 'weighted_bodyweight',
+        },
+      ),
+      default_unit: normalizeConstrainedValue(
+        input.defaultUnit,
+        ALLOWED_DEFAULT_UNITS,
+        DEFAULT_CUSTOM_UNIT,
+      ),
     };
 
     const extendedResult = await this.insertExercise(
@@ -305,4 +352,31 @@ function mapExercise(row: ExerciseRow): Exercise {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
+}
+
+function normalizeConstrainedValue<T extends readonly string[]>(
+  value: string | null | undefined,
+  allowedValues: T,
+  fallback: T[number],
+  aliases: Record<string, T[number]> = {},
+): T[number] {
+  const normalizedValue = value
+    ?.trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .replace(/-/g, '_');
+
+  if (!normalizedValue) {
+    return fallback;
+  }
+
+  const aliasValue = aliases[normalizedValue] ?? aliases[normalizedValue.replace(/_/g, ' ')];
+
+  if (aliasValue) {
+    return aliasValue;
+  }
+
+  return allowedValues.includes(normalizedValue)
+    ? normalizedValue as T[number]
+    : fallback;
 }
