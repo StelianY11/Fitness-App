@@ -4,7 +4,7 @@ import { filter } from 'rxjs';
 import { AppSettingsService } from '../../core/services/app-settings.service';
 import { TranslationService } from '../../core/services/translation.service';
 import type { Session } from '@supabase/supabase-js';
-import type { WorkoutSession } from '../../shared/models/fitness.models';
+import type { Profile, WorkoutSession } from '../../shared/models/fitness.models';
 
 @Component({
   selector: 'app-mobile-shell',
@@ -43,8 +43,7 @@ import type { WorkoutSession } from '../../shared/models/fitness.models';
 
         <nav
           class="grid border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] text-sm font-semibold"
-          [class.grid-cols-2]="!currentSession()"
-          [class.grid-cols-4]="currentSession()"
+          [style.grid-template-columns]="navGridColumns"
         >
           @if (!currentSession()) {
             <a
@@ -90,6 +89,15 @@ import type { WorkoutSession } from '../../shared/models/fitness.models';
             >
               {{ t('settings') }}
             </a>
+            @if (currentProfile()?.isAdmin) {
+              <a
+                routerLink="/admin/users"
+                routerLinkActive="text-green-700"
+                class="px-3 py-4 text-center text-slate-600"
+              >
+                {{ t('admin') }}
+              </a>
+            }
           }
         </nav>
       </div>
@@ -104,9 +112,11 @@ export class MobileShellComponent implements OnInit {
 
   readonly activeWorkout = signal<WorkoutSession | null>(null);
   readonly currentSession = signal<Session | null>(null);
+  readonly currentProfile = signal<Profile | null>(null);
   readonly settings = this.appSettingsService.settings;
   private isAuthSynced = false;
   private isActiveWorkoutSynced = false;
+  private isProfileSynced = false;
 
   ngOnInit(): void {
     void this.refreshActiveWorkout();
@@ -143,6 +153,16 @@ export class MobileShellComponent implements OnInit {
     return this.translationService.translate(key);
   }
 
+  get navGridColumns(): string {
+    if (!this.currentSession()) {
+      return 'repeat(2, minmax(0, 1fr))';
+    }
+
+    return this.currentProfile()?.isAdmin
+      ? 'repeat(5, minmax(0, 1fr))'
+      : 'repeat(4, minmax(0, 1fr))';
+  }
+
   private async refreshActiveWorkout(): Promise<void> {
     const { AuthService } = await import('../../core/services/auth.service');
     const authService = this.injector.get(AuthService);
@@ -153,7 +173,17 @@ export class MobileShellComponent implements OnInit {
 
     if (!session) {
       this.activeWorkout.set(null);
+      this.currentProfile.set(null);
       return;
+    }
+
+    const { ProfileService } = await import('../../core/services/profile.service');
+    const profileService = this.injector.get(ProfileService);
+    this.syncProfileState(profileService);
+    const profileResult = await profileService.refreshCurrentProfile();
+
+    if (!profileResult.error) {
+      this.currentProfile.set(profileResult.data);
     }
 
     const { LiveWorkoutService } = await import('../../core/services/live-workout.service');
@@ -186,6 +216,19 @@ export class MobileShellComponent implements OnInit {
 
     this.isActiveWorkoutSynced = true;
     effect(() => this.activeWorkout.set(liveWorkoutService.activeWorkout()), {
+      injector: this.injector,
+    });
+  }
+
+  private syncProfileState(
+    profileService: InstanceType<typeof import('../../core/services/profile.service').ProfileService>,
+  ): void {
+    if (this.isProfileSynced) {
+      return;
+    }
+
+    this.isProfileSynced = true;
+    effect(() => this.currentProfile.set(profileService.currentProfile()), {
       injector: this.injector,
     });
   }

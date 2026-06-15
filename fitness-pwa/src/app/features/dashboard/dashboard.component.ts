@@ -3,9 +3,10 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { AppSettingsService } from '../../core/services/app-settings.service';
 import { LiveWorkoutService } from '../../core/services/live-workout.service';
+import { ProfileService } from '../../core/services/profile.service';
 import { TranslationService } from '../../core/services/translation.service';
 import { WorkoutTemplateService } from '../../core/services/workout-template.service';
-import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.models';
+import { Profile, WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.models';
 
 @Component({
   selector: 'app-dashboard',
@@ -123,6 +124,21 @@ import { WorkoutSession, WorkoutTemplate } from '../../shared/models/fitness.mod
             <span class="app-badge">{{ t('open') }}</span>
           </div>
         </a>
+
+        @if (currentProfile?.isAdmin) {
+          <a
+            routerLink="/admin/users"
+            class="app-card block"
+          >
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <h3 class="text-base font-bold leading-6 text-slate-950">{{ t('admin') }}</h3>
+                <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('userApprovals') }}</p>
+              </div>
+              <span class="app-badge">{{ t('open') }}</span>
+            </div>
+          </a>
+        }
       </section>
 
       @if (errorMessage) {
@@ -184,6 +200,7 @@ export class DashboardComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly appSettingsService = inject(AppSettingsService);
   private readonly liveWorkoutService = inject(LiveWorkoutService);
+  private readonly profileService = inject(ProfileService);
   private readonly workoutTemplateService = inject(WorkoutTemplateService);
   private readonly translationService = inject(TranslationService);
   private readonly router = inject(Router);
@@ -191,6 +208,7 @@ export class DashboardComponent implements OnInit {
 
   userEmail = '';
   activeWorkout: WorkoutSession | null = null;
+  currentProfile: Profile | null = null;
   activeWorkoutName = this.t('workout');
   activeWorkoutExerciseCount = 0;
   activeWorkoutSetCount = 0;
@@ -217,6 +235,7 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    void this.loadProfile();
     void this.loadActiveWorkout();
   }
 
@@ -367,6 +386,18 @@ export class DashboardComponent implements OnInit {
 
       this.activeWorkoutSetCount += setsResult.data.length;
     }
+  }
+
+  private async loadProfile(): Promise<void> {
+    const result = await this.profileService.refreshCurrentProfile();
+
+    if (result.error) {
+      console.error('Dashboard profile lookup failed:', result.error);
+      return;
+    }
+
+    this.currentProfile = result.data;
+    this.changeDetectorRef.detectChanges();
   }
 
   private async getWorkoutName(session: WorkoutSession | null): Promise<string> {

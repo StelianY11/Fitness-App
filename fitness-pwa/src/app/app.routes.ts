@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from './core/guards/admin.guard';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 
@@ -20,6 +21,20 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
+  },
+  {
+    path: 'pending-approval',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/auth/pending-approval.component').then(
+        (m) => m.PendingApprovalComponent,
+      ),
+  },
+  {
+    path: 'admin/users',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('./features/admin/admin-users.component').then((m) => m.AdminUsersComponent),
   },
   {
     path: 'settings',

@@ -1,4 +1,5 @@
 export type PreFillMode = 'LAST_WORKOUT' | 'TEMPLATE' | 'EMPTY';
+export type ApprovalStatus = 'pending' | 'approved' | 'rejected';
 
 export interface Profile {
   id: string;
@@ -6,6 +7,10 @@ export interface Profile {
   displayName: string | null;
   avatarUrl: string | null;
   preFillMode: PreFillMode;
+  approvalStatus: ApprovalStatus;
+  approvedAt: string | null;
+  approvedBy: string | null;
+  isAdmin: boolean;
   createdAt: string;
   updatedAt: string;
 }

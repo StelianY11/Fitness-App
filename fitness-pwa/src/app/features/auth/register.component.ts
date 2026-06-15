@@ -28,7 +28,7 @@ import { TranslationService } from '../../core/services/translation.service';
 
       <form class="app-card space-y-5" [formGroup]="form" (ngSubmit)="submit()">
         <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm leading-5 text-green-900">
-          {{ t('allowlistAccessNote') }}
+          {{ t('adminApprovalAccessNote') }}
         </div>
 
         <div class="space-y-4">
@@ -208,7 +208,7 @@ export class RegisterComponent {
       return;
     }
 
-    this.successMessage = this.t('registerSuccessConfirmation');
+    this.successMessage = this.t('registerSuccessApproval');
   }
 }
 
