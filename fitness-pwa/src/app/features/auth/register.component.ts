@@ -188,12 +188,18 @@ export class RegisterComponent {
     this.errorMessage = '';
     this.successMessage = '';
 
-    const { data, error } = await this.authService.signUp(email.trim().toLowerCase(), password);
+    const normalizedEmail = email.trim().toLowerCase();
+    const { data, error } = await this.authService.signUp(normalizedEmail, password);
 
     this.isLoading = false;
 
     if (error) {
-      this.errorMessage = error.message;
+      this.errorMessage = formatRegisterError(error);
+      console.error('Register failed:', {
+        flow: 'supabase.auth.signUp',
+        emailDomain: getEmailDomain(normalizedEmail),
+        error: getSafeRegisterErrorContext(error),
+      });
       return;
     }
 
@@ -213,4 +219,55 @@ function passwordsMatchValidator(control: AbstractControl): ValidationErrors | n
   return password && confirmPassword && password !== confirmPassword
     ? { passwordMismatch: true }
     : null;
+}
+
+function formatRegisterError(error: unknown): string {
+  const context = getSafeRegisterErrorContext(error);
+  const details = [
+    context.status ? `Status: ${context.status}` : null,
+    context.code ? `Code: ${context.code}` : null,
+  ].filter(Boolean);
+
+  return details.length > 0
+    ? `${context.message} (${details.join(', ')})`
+    : context.message;
+}
+
+function getSafeRegisterErrorContext(error: unknown): {
+  name: string;
+  message: string;
+  status: number | string | null;
+  code: string | null;
+} {
+  if (!isRecord(error)) {
+    return {
+      name: 'UnknownError',
+      message: 'Unable to create account.',
+      status: null,
+      code: null,
+    };
+  }
+
+  return {
+    name: typeof error['name'] === 'string' ? error['name'] : 'AuthError',
+    message: typeof error['message'] === 'string' ? error['message'] : 'Unable to create account.',
+    status: getStringOrNumber(error['status']),
+    code: getString(error['code']),
+  };
+}
+
+function getEmailDomain(email: string): string {
+  return email.includes('@') ? email.split('@').pop() ?? 'unknown' : 'unknown';
+}
+
+function getStringOrNumber(value: unknown): number | string | null {
+  return typeof value === 'number' || typeof value === 'string' ? value : null;
+}
+
+function getString(value: unknown): string | null {
+  return typeof value === 'string' ? value : null;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
 }

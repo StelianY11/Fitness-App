@@ -110,6 +110,27 @@ In Supabase Dashboard, configure Auth URLs after Vercel deployment:
 
 This is especially important for email confirmation and password recovery flows.
 
+## Register Troubleshooting
+
+If login works on Vercel but register fails, the Supabase client config is probably loaded correctly and the failure is usually signup-specific.
+
+Check these items:
+
+- Supabase **Authentication > URL Configuration > Site URL** is the deployed Vercel URL.
+- Supabase **Redirect URLs** include the deployed Vercel URL and any custom domain.
+- The registering email exists in `public.allowed_users` exactly as lowercase text.
+- Supabase SQL Editor can see the allowlist row:
+
+```sql
+select *
+from public.allowed_users
+where email = lower('athlete@example.com');
+```
+
+- Supabase **Auth Logs** and **Database Logs** do not show trigger errors from `require_allowed_user_email` or `create_profile_for_new_user`.
+
+The Angular register flow only calls `supabase.auth.signUp`. The allowlist is enforced by the database trigger from `supabase/schema.sql`, not by frontend code.
+
 ## PWA Notes
 
 Vercel provides HTTPS, which is required for real PWA install behavior.
