@@ -42,6 +42,9 @@ __screenshots__/
 # Local import source data
 tools/exercise-import/source/exercises.json
 
+# Generated local/Vercel build environment
+src/environments/environment.generated.ts
+
 # System files
 .DS_Store
 Thumbs.db

@@ -47,19 +47,38 @@ Static assets are still served from the build output before the rewrite fallback
 
 ## Environment Variables
 
-The Angular app currently reads Supabase values from:
+The Angular app reads Supabase browser client values from Angular environment files at build time.
 
-- `src/environments/environment.ts`
-- `src/environments/environment.development.ts`
+For Vercel, add these Environment Variables in **Project Settings > Environment Variables**:
 
-Required public client values:
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
 
-- `supabaseUrl`
-- `supabaseAnonKey`
+Use the Supabase project URL for `SUPABASE_URL`, for example:
+
+```text
+https://your-project-ref.supabase.co
+```
+
+Use the public anon/publishable key for `SUPABASE_ANON_KEY`.
 
 The Supabase anon publishable key is allowed in the browser. Never add the Supabase service role key to Angular, Vercel public environment variables, or any frontend bundle.
 
-If you later move to Vercel environment variables, remember Angular replaces values at build time unless you add a separate runtime configuration step.
+Angular does not automatically read Vercel variables at runtime. The `prebuild` script runs:
+
+```text
+node tools/write-environment.mjs
+```
+
+That script writes `src/environments/environment.generated.ts` from `SUPABASE_URL` and `SUPABASE_ANON_KEY`, then the production Angular build uses that generated file.
+
+If either variable is missing, the build still completes with placeholders, but the deployed app will log a clear console error and Supabase Auth will not work.
+
+For local development, `ng serve` uses:
+
+- `src/environments/environment.development.ts`
+
+Keep real local values out of commits. If you temporarily edit local environment files for testing, do not commit those values.
 
 ## Supabase Redirect and Site URL
 
