@@ -72,7 +72,23 @@ node tools/write-environment.mjs
 
 That script writes `src/environments/environment.generated.ts` from `SUPABASE_URL` and `SUPABASE_ANON_KEY`, then the production Angular build uses that generated file.
 
-If either variable is missing, the build still completes with placeholders, but the deployed app will log a clear console error and Supabase Auth will not work.
+If either variable is missing during a local build, the build can still complete with placeholders and the app will log a clear console error. On Vercel or CI, missing Supabase variables fail the build instead of deploying placeholders.
+
+Expected safe build log lines:
+
+```text
+Supabase environment diagnostics:
+- SUPABASE_URL exists: yes
+- SUPABASE_ANON_KEY exists: yes
+Wrote Angular production environment: .../src/environments/environment.generated.ts
+```
+
+If either value says `no`, check that the variable names are exactly:
+
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+
+Also confirm the variables are enabled for the environment you are deploying, such as **Production**, **Preview**, or both.
 
 For local development, `ng serve` uses:
 
