@@ -26,6 +26,8 @@ const TEMPLATE_SELECT = [
   'updated_at',
 ].join(', ');
 
+const SHARED_PROFILE_NAME_TIMEOUT_MS = 1500;
+
 const BLOCK_SELECT = [
   'id',
   'workout_template_id',
@@ -121,6 +123,11 @@ interface ProfileNameRow {
   id: string;
   email: string | null;
   display_name: string | null;
+}
+
+interface ProfileNameResult {
+  data: ProfileNameRow[] | null;
+  error: PostgrestError | null;
 }
 
 interface WorkoutTemplateBlockRow {
@@ -789,11 +796,21 @@ export class WorkoutTemplateService {
       return templates;
     }
 
-    const { data, error } = await this.supabase
-      .from('profiles')
-      .select('id,email,display_name')
-      .in('id', sharedByIds)
-      .returns<ProfileNameRow[]>();
+    const profileRequest = this.supabase
+      .rpc('get_shared_workout_profile_names', { profile_ids: sharedByIds })
+      .then((result) => result as unknown as ProfileNameResult);
+
+    const profileResult = await this.withTimeout(
+      Promise.resolve(profileRequest),
+      SHARED_PROFILE_NAME_TIMEOUT_MS,
+    );
+
+    if (!profileResult) {
+      console.error('Shared workout profile names load timed out.');
+      return templates;
+    }
+
+    const { data, error } = profileResult;
 
     if (error) {
       console.error('Shared workout profile names load failed:', error.message);
@@ -811,6 +828,23 @@ export class WorkoutTemplateService {
       ...template,
       sharedByName: template.sharedBy ? namesById.get(template.sharedBy) ?? null : null,
     }));
+  }
+
+  private async withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T | null> {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    try {
+      return await Promise.race([
+        promise,
+        new Promise<null>((resolve) => {
+          timeoutId = setTimeout(() => resolve(null), timeoutMs);
+        }),
+      ]);
+    } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    }
   }
 
   private async getCurrentUserId(): Promise<WorkoutTemplateServiceResult<string | null>> {

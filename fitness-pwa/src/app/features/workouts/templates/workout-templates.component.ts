@@ -200,7 +200,13 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                 </span>
               </div>
 
-              @if (template.visibility === 'shared' && (template.sharedByName || template.sharedBy === currentUserId)) {
+              @if (template.isBuiltin || template.visibility === 'builtin') {
+                <p class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
+                  {{ t('officialWorkout') }}
+                </p>
+              }
+
+              @if (template.visibility === 'shared') {
                 <p class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
                   {{ t('sharedBy') }} {{ getSharedByName(template) }}
                 </p>
@@ -394,7 +400,7 @@ export class WorkoutTemplatesComponent {
   getSharedByName(template: WorkoutTemplate): string {
     return template.sharedBy === this.currentUserId
       ? this.t('you')
-      : template.sharedByName ?? this.t('athlete');
+      : template.sharedByName ?? this.t('sharedWorkout');
   }
 
   openCreateForm(): void {
