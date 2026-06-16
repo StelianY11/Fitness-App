@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 import { LiveWorkoutService } from '../../../core/services/live-workout.service';
 import { TranslationService } from '../../../core/services/translation.service';
 import { WorkoutTemplateService } from '../../../core/services/workout-template.service';
@@ -14,7 +15,9 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
       <header class="flex items-start justify-between gap-4">
         <div class="min-w-0">
           <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-700">{{ t('workouts') }}</p>
-          <h2 class="mt-2 text-3xl font-bold leading-tight text-slate-950">{{ t('myWorkouts') }}</h2>
+          <h2 class="mt-2 text-3xl font-bold leading-tight text-slate-950">
+            {{ activeSection === 'mine' ? t('myWorkouts') : t('readyWorkouts') }}
+          </h2>
           <p class="mt-2 text-sm leading-5 text-slate-600">
             {{ t('workoutsDescription') }}
           </p>
@@ -197,9 +200,9 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                 </span>
               </div>
 
-              @if (template.visibility === 'shared' && template.sharedByName) {
+              @if (template.visibility === 'shared' && (template.sharedByName || template.sharedBy === currentUserId)) {
                 <p class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
-                  {{ t('sharedBy') }} {{ template.sharedByName }}
+                  {{ t('sharedBy') }} {{ getSharedByName(template) }}
                 </p>
               }
 
@@ -231,15 +234,17 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                 >
                   {{ canEditTemplate(template) ? t('edit') : t('view') }}
                 </a>
-                <button
-                  type="button"
-                  (click)="duplicateTemplate(template)"
-                  [disabled]="processingTemplateId === template.id"
-                  class="app-button app-button-secondary min-h-11 px-3 py-2"
-                >
-                  {{ processingTemplateId === template.id ? t('loading') : (activeSection === 'ready' ? t('copyToMyWorkouts') : t('duplicate')) }}
-                </button>
-                @if (activeSection === 'mine' && template.visibility === 'private') {
+                @if (activeSection === 'ready') {
+                  <button
+                    type="button"
+                    (click)="duplicateTemplate(template)"
+                    [disabled]="processingTemplateId === template.id"
+                    class="app-button app-button-secondary min-h-11 px-3 py-2"
+                  >
+                    {{ processingTemplateId === template.id ? t('loading') : t('copyToMyWorkouts') }}
+                  </button>
+                }
+                @if (activeSection === 'mine' && template.visibility === 'private' && canEditTemplate(template)) {
                   <button
                     type="button"
                     (click)="shareTemplate(template)"
@@ -249,7 +254,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                     {{ processingTemplateId === template.id ? t('loading') : t('share') }}
                   </button>
                 }
-                @if (activeSection === 'mine' && template.visibility === 'shared') {
+                @if (activeSection === 'mine' && template.visibility === 'shared' && canEditTemplate(template)) {
                   <button
                     type="button"
                     (click)="unshareTemplate(template)"
@@ -318,8 +323,10 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
   `,
 })
 export class WorkoutTemplatesComponent {
+  private readonly authService = inject(AuthService);
   private readonly workoutTemplateService = inject(WorkoutTemplateService);
   private readonly liveWorkoutService = inject(LiveWorkoutService);
+  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
   private readonly translationService = inject(TranslationService);
@@ -330,6 +337,7 @@ export class WorkoutTemplatesComponent {
   myTemplates: WorkoutTemplate[] = [];
   builtinTemplates: WorkoutTemplate[] = [];
   activeSection: 'mine' | 'ready' = 'mine';
+  currentUserId = '';
   isLoading = true;
   isSaving = false;
   showCreateForm = false;
@@ -344,6 +352,9 @@ export class WorkoutTemplatesComponent {
   templatePendingDelete: WorkoutTemplate | null = null;
 
   constructor() {
+    const tab = this.route.snapshot.queryParamMap.get('tab');
+    this.activeSection = tab === 'ready' ? 'ready' : 'mine';
+    void this.loadCurrentUser();
     void this.loadTemplates();
   }
 
@@ -356,7 +367,7 @@ export class WorkoutTemplatesComponent {
   }
 
   canEditTemplate(template: WorkoutTemplate): boolean {
-    return this.activeSection === 'mine' && !template.isBuiltin;
+    return !template.isBuiltin && template.ownerId === this.currentUserId;
   }
 
   getTemplateBadge(template: WorkoutTemplate): string {
@@ -367,6 +378,12 @@ export class WorkoutTemplatesComponent {
     return template.isBuiltin || template.visibility === 'builtin'
       ? this.t('readyWorkout')
       : this.t('myWorkout');
+  }
+
+  getSharedByName(template: WorkoutTemplate): string {
+    return template.sharedBy === this.currentUserId
+      ? this.t('you')
+      : template.sharedByName ?? this.t('athlete');
   }
 
   openCreateForm(): void {
@@ -427,7 +444,9 @@ export class WorkoutTemplatesComponent {
         return;
       }
 
-      this.statusMessage = template.isBuiltin ? this.t('workoutCopied') : this.t('workoutDuplicated');
+      this.statusMessage = this.activeSection === 'ready'
+        ? this.t('workoutCopied')
+        : this.t('workoutDuplicated');
       await this.loadTemplates();
     } catch (error) {
       this.errorMessage = getErrorMessage(error, 'Unable to duplicate template.');
@@ -660,6 +679,12 @@ export class WorkoutTemplatesComponent {
       this.isLoading = false;
       this.changeDetectorRef.detectChanges();
     }
+  }
+
+  private async loadCurrentUser(): Promise<void> {
+    const user = await this.authService.getCurrentUser();
+    this.currentUserId = user?.id ?? '';
+    this.changeDetectorRef.detectChanges();
   }
 }
 

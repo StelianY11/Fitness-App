@@ -88,12 +88,27 @@ import { Profile, WorkoutSession, WorkoutTemplate } from '../../shared/models/fi
 
         <a
           routerLink="/templates"
+          [queryParams]="{ tab: 'my' }"
           class="app-card block"
         >
           <div class="flex items-center justify-between gap-3">
             <div class="min-w-0">
               <h3 class="text-base font-bold leading-6 text-slate-950">{{ t('myWorkouts') }}</h3>
               <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('workoutsDescription') }}</p>
+            </div>
+            <span class="app-badge">{{ t('open') }}</span>
+          </div>
+        </a>
+
+        <a
+          routerLink="/templates"
+          [queryParams]="{ tab: 'ready' }"
+          class="app-card block"
+        >
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <h3 class="text-base font-bold leading-6 text-slate-950">{{ t('readyWorkouts') }}</h3>
+              <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('readyWorkoutsDescription') }}</p>
             </div>
             <span class="app-badge">{{ t('open') }}</span>
           </div>

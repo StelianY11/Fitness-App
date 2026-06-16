@@ -253,6 +253,7 @@ const TRANSLATIONS: Record<'en' | 'bg', Record<string, string>> = {
     duration: 'Duration',
     older: 'Older',
     yesterday: 'Yesterday',
+    you: 'you',
   },
   bg: {
     accentColor: 'Акцентен цвят',
@@ -505,6 +506,7 @@ const TRANSLATIONS: Record<'en' | 'bg', Record<string, string>> = {
     duration: 'Продължителност',
     older: 'По-стари',
     yesterday: 'Вчера',
+    you: 'теб',
   },
 };
 

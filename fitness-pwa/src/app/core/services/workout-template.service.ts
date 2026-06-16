@@ -256,6 +256,12 @@ export class WorkoutTemplateService {
   }
 
   async getReadyTemplates(): Promise<WorkoutTemplateServiceResult<WorkoutTemplate[]>> {
+    const userResult = await this.getCurrentUserId();
+
+    if (userResult.error || !userResult.data) {
+      return { data: [], error: userResult.error ?? 'No authenticated user.' };
+    }
+
     const { data, error } = await this.supabase
       .from('workout_templates')
       .select(TEMPLATE_SELECT)
@@ -263,7 +269,9 @@ export class WorkoutTemplateService {
       .returns<WorkoutTemplateRow[]>()
       .order('name', { ascending: true });
 
-    const templates = (data ?? []).map(mapWorkoutTemplate);
+    const templates = (data ?? [])
+      .map(mapWorkoutTemplate)
+      .filter((template) => template.isBuiltin || template.ownerId !== userResult.data);
     const hydratedTemplates = await this.hydrateSharedByNames(templates);
 
     return {
