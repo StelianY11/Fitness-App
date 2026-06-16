@@ -335,6 +335,12 @@ export class WorkoutTemplateService {
     id: string,
     input: UpdateWorkoutTemplateInput,
   ): Promise<WorkoutTemplateServiceResult<WorkoutTemplate | null>> {
+    const userResult = await this.getCurrentUserId();
+
+    if (userResult.error || !userResult.data) {
+      return { data: null, error: userResult.error ?? 'No authenticated user.' };
+    }
+
     const payload: WorkoutTemplateUpdateRow = {};
 
     if (input.name !== undefined) {
@@ -361,6 +367,7 @@ export class WorkoutTemplateService {
       .from('workout_templates')
       .update(payload)
       .eq('id', id)
+      .eq('owner_id', userResult.data)
       .eq('is_builtin', false)
       .select(TEMPLATE_SELECT)
       .returns<WorkoutTemplateRow>()
@@ -373,10 +380,17 @@ export class WorkoutTemplateService {
   }
 
   async deleteTemplate(id: string): Promise<WorkoutTemplateServiceResult<null>> {
+    const userResult = await this.getCurrentUserId();
+
+    if (userResult.error || !userResult.data) {
+      return { data: null, error: userResult.error ?? 'No authenticated user.' };
+    }
+
     const { error } = await this.supabase
       .from('workout_templates')
       .delete()
       .eq('id', id)
+      .eq('owner_id', userResult.data)
       .eq('is_builtin', false);
 
     return {
