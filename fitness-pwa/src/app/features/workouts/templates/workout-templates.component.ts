@@ -230,11 +230,12 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                 </button>
                 <a
                   [routerLink]="['/templates', template.id]"
+                  [queryParams]="activeSection === 'ready' ? { mode: 'view' } : null"
                   class="app-button app-button-secondary min-h-11 px-3 py-2"
                 >
-                  {{ canEditTemplate(template) ? t('edit') : t('view') }}
+                  {{ getTemplateOpenLabel(template) }}
                 </a>
-                @if (activeSection === 'ready') {
+                @if (activeSection === 'ready' && canCopyReadyTemplate(template)) {
                   <button
                     type="button"
                     (click)="duplicateTemplate(template)"
@@ -254,7 +255,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                     {{ processingTemplateId === template.id ? t('loading') : t('share') }}
                   </button>
                 }
-                @if (activeSection === 'mine' && template.visibility === 'shared' && canEditTemplate(template)) {
+                @if (template.visibility === 'shared' && canEditTemplate(template)) {
                   <button
                     type="button"
                     (click)="unshareTemplate(template)"
@@ -264,7 +265,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                     {{ processingTemplateId === template.id ? t('loading') : t('unshare') }}
                   </button>
                 }
-                @if (canEditTemplate(template)) {
+                @if (activeSection === 'mine' && canEditTemplate(template)) {
                   <button
                     type="button"
                     (click)="openDeleteTemplateModal(template)"
@@ -368,6 +369,16 @@ export class WorkoutTemplatesComponent {
 
   canEditTemplate(template: WorkoutTemplate): boolean {
     return !template.isBuiltin && template.ownerId === this.currentUserId;
+  }
+
+  canCopyReadyTemplate(template: WorkoutTemplate): boolean {
+    return this.activeSection === 'ready' && (template.isBuiltin || template.ownerId !== this.currentUserId);
+  }
+
+  getTemplateOpenLabel(template: WorkoutTemplate): string {
+    return this.activeSection === 'mine' && this.canEditTemplate(template)
+      ? this.t('edit')
+      : this.t('view');
   }
 
   getTemplateBadge(template: WorkoutTemplate): string {

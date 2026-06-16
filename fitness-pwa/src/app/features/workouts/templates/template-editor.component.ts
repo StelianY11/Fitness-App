@@ -585,6 +585,7 @@ export class TemplateEditorComponent {
   blockPendingRemove: WorkoutTemplateBlock | null = null;
   private readonly addingExerciseKeys = new Set<string>();
   private readonly templateId = this.route.snapshot.paramMap.get('id');
+  private readonly isViewMode = this.route.snapshot.queryParamMap.get('mode') === 'view';
   private mainLoadId = 0;
   private metadataLoadId = 0;
   private searchRequestId = 0;
@@ -592,7 +593,7 @@ export class TemplateEditorComponent {
   private readonly mainLoadingSafetyMs = 8000;
 
   get canEdit(): boolean {
-    return this.template?.isBuiltin === false && this.template.ownerId === this.currentUserId;
+    return !this.isViewMode && this.template?.isBuiltin === false && this.template.ownerId === this.currentUserId;
   }
 
   constructor() {
