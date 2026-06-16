@@ -53,21 +53,21 @@ import type { Profile, WorkoutSession } from '../../shared/models/fitness.models
         }
 
         <nav
-          class="grid border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] text-sm font-semibold"
+          class="grid gap-1 border-t border-slate-200 bg-white px-1.5 pb-[env(safe-area-inset-bottom)] text-[0.72rem] font-semibold sm:text-sm"
           [style.grid-template-columns]="navGridColumns"
         >
           @if (!currentSession()) {
             <a
               routerLink="/login"
               routerLinkActive="text-green-700"
-              class="px-3 py-4 text-center text-slate-600"
+              class="min-w-0 truncate px-1.5 py-4 text-center leading-tight text-slate-600"
             >
               {{ t('login') }}
             </a>
             <a
               routerLink="/register"
               routerLinkActive="text-green-700"
-              class="px-3 py-4 text-center text-slate-600"
+              class="min-w-0 truncate px-1.5 py-4 text-center leading-tight text-slate-600"
             >
               {{ t('register') }}
             </a>
@@ -75,28 +75,28 @@ import type { Profile, WorkoutSession } from '../../shared/models/fitness.models
             <a
               routerLink="/dashboard"
               routerLinkActive="text-green-700"
-              class="px-3 py-4 text-center text-slate-600"
+              class="min-w-0 truncate px-1.5 py-4 text-center leading-tight text-slate-600"
             >
               {{ t('dashboard') }}
             </a>
             <a
               routerLink="/templates"
               routerLinkActive="text-green-700"
-              class="px-3 py-4 text-center text-slate-600"
+              class="min-w-0 truncate px-1.5 py-4 text-center leading-tight text-slate-600"
             >
               {{ t('workouts') }}
             </a>
             <a
               routerLink="/history"
               routerLinkActive="text-green-700"
-              class="px-3 py-4 text-center text-slate-600"
+              class="min-w-0 truncate px-1.5 py-4 text-center leading-tight text-slate-600"
             >
               {{ t('history') }}
             </a>
             <a
               routerLink="/settings"
               routerLinkActive="text-green-700"
-              class="px-3 py-4 text-center text-slate-600"
+              class="min-w-0 truncate px-1.5 py-4 text-center leading-tight text-slate-600"
             >
               {{ t('settings') }}
             </a>
@@ -104,7 +104,7 @@ import type { Profile, WorkoutSession } from '../../shared/models/fitness.models
               <a
                 routerLink="/admin/users"
                 routerLinkActive="text-green-700"
-                class="px-3 py-4 text-center text-slate-600"
+                class="min-w-0 truncate px-1.5 py-4 text-center leading-tight text-slate-600"
               >
                 {{ t('admin') }}
               </a>
