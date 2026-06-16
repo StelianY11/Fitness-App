@@ -193,9 +193,15 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                   [class.bg-slate-100]="!template.isBuiltin"
                   [class.text-slate-700]="!template.isBuiltin"
                 >
-                  {{ template.isBuiltin ? t('readyWorkout') : t('myWorkout') }}
+                  {{ getTemplateBadge(template) }}
                 </span>
               </div>
+
+              @if (template.visibility === 'shared' && template.sharedByName) {
+                <p class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
+                  {{ t('sharedBy') }} {{ template.sharedByName }}
+                </p>
+              }
 
               <div class="grid grid-cols-2 gap-2 border-t border-slate-200 pt-3 text-sm">
                 <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
@@ -223,7 +229,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                   [routerLink]="['/templates', template.id]"
                   class="app-button app-button-secondary min-h-11 px-3 py-2"
                 >
-                  {{ template.isBuiltin ? t('view') : t('edit') }}
+                  {{ canEditTemplate(template) ? t('edit') : t('view') }}
                 </a>
                 <button
                   type="button"
@@ -231,9 +237,29 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                   [disabled]="processingTemplateId === template.id"
                   class="app-button app-button-secondary min-h-11 px-3 py-2"
                 >
-                  {{ processingTemplateId === template.id ? t('loading') : (template.isBuiltin ? t('copyToMyWorkouts') : t('duplicate')) }}
+                  {{ processingTemplateId === template.id ? t('loading') : (activeSection === 'ready' ? t('copyToMyWorkouts') : t('duplicate')) }}
                 </button>
-                @if (!template.isBuiltin) {
+                @if (activeSection === 'mine' && template.visibility === 'private') {
+                  <button
+                    type="button"
+                    (click)="shareTemplate(template)"
+                    [disabled]="processingTemplateId === template.id"
+                    class="app-button app-button-secondary min-h-11 px-3 py-2 sm:col-span-2"
+                  >
+                    {{ processingTemplateId === template.id ? t('loading') : t('share') }}
+                  </button>
+                }
+                @if (activeSection === 'mine' && template.visibility === 'shared') {
+                  <button
+                    type="button"
+                    (click)="unshareTemplate(template)"
+                    [disabled]="processingTemplateId === template.id"
+                    class="app-button app-button-secondary min-h-11 px-3 py-2 sm:col-span-2"
+                  >
+                    {{ processingTemplateId === template.id ? t('loading') : t('unshare') }}
+                  </button>
+                }
+                @if (canEditTemplate(template)) {
                   <button
                     type="button"
                     (click)="openDeleteTemplateModal(template)"
@@ -329,6 +355,20 @@ export class WorkoutTemplatesComponent {
     return this.activeSection === 'mine' ? this.myTemplates : this.builtinTemplates;
   }
 
+  canEditTemplate(template: WorkoutTemplate): boolean {
+    return this.activeSection === 'mine' && !template.isBuiltin;
+  }
+
+  getTemplateBadge(template: WorkoutTemplate): string {
+    if (template.visibility === 'shared') {
+      return this.t('shared');
+    }
+
+    return template.isBuiltin || template.visibility === 'builtin'
+      ? this.t('readyWorkout')
+      : this.t('myWorkout');
+  }
+
   openCreateForm(): void {
     this.showCreateForm = true;
     this.statusMessage = '';
@@ -391,6 +431,60 @@ export class WorkoutTemplatesComponent {
       await this.loadTemplates();
     } catch (error) {
       this.errorMessage = getErrorMessage(error, 'Unable to duplicate template.');
+    } finally {
+      this.processingTemplateId = null;
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  async shareTemplate(template: WorkoutTemplate): Promise<void> {
+    if (!this.canEditTemplate(template) || this.processingTemplateId) {
+      return;
+    }
+
+    this.processingTemplateId = template.id;
+    this.errorMessage = '';
+    this.statusMessage = '';
+
+    try {
+      const result = await this.workoutTemplateService.shareTemplate(template.id);
+
+      if (result.error) {
+        this.errorMessage = result.error;
+        return;
+      }
+
+      this.statusMessage = this.t('workoutShared');
+      await this.loadTemplates();
+    } catch (error) {
+      this.errorMessage = getErrorMessage(error, 'Unable to share workout.');
+    } finally {
+      this.processingTemplateId = null;
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  async unshareTemplate(template: WorkoutTemplate): Promise<void> {
+    if (!this.canEditTemplate(template) || this.processingTemplateId) {
+      return;
+    }
+
+    this.processingTemplateId = template.id;
+    this.errorMessage = '';
+    this.statusMessage = '';
+
+    try {
+      const result = await this.workoutTemplateService.unshareTemplate(template.id);
+
+      if (result.error) {
+        this.errorMessage = result.error;
+        return;
+      }
+
+      this.statusMessage = this.t('workoutUnshared');
+      await this.loadTemplates();
+    } catch (error) {
+      this.errorMessage = getErrorMessage(error, 'Unable to unshare workout.');
     } finally {
       this.processingTemplateId = null;
       this.changeDetectorRef.detectChanges();
@@ -490,7 +584,7 @@ export class WorkoutTemplatesComponent {
   }
 
   openDeleteTemplateModal(template: WorkoutTemplate): void {
-    if (template.isBuiltin || this.processingTemplateId === template.id) {
+    if (!this.canEditTemplate(template) || this.processingTemplateId === template.id) {
       return;
     }
 
@@ -508,7 +602,7 @@ export class WorkoutTemplatesComponent {
   async confirmDeleteTemplate(): Promise<void> {
     const template = this.templatePendingDelete;
 
-    if (!template || template.isBuiltin) {
+    if (!template || !this.canEditTemplate(template)) {
       return;
     }
 
@@ -548,7 +642,7 @@ export class WorkoutTemplatesComponent {
     try {
       const [myTemplatesResult, builtinTemplatesResult] = await Promise.all([
         this.workoutTemplateService.getMyTemplates(),
-        this.workoutTemplateService.getBuiltinTemplates(),
+        this.workoutTemplateService.getReadyTemplates(),
       ]);
 
       this.myTemplates = myTemplatesResult.data;

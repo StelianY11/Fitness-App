@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 import { ExerciseService } from '../../../core/services/exercise.service';
 import { LiveWorkoutService } from '../../../core/services/live-workout.service';
 import { TranslationService } from '../../../core/services/translation.service';
@@ -64,9 +65,9 @@ interface CustomExerciseForm {
         </div>
       </header>
 
-      @if (template?.isBuiltin) {
+      @if (template && !canEdit) {
         <p class="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          {{ t('builtinReadOnlyDescription') }}
+          {{ t('readyWorkoutReadOnlyDescription') }}
         </p>
       }
 
@@ -539,6 +540,7 @@ interface CustomExerciseForm {
 export class TemplateEditorComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
   private readonly workoutTemplateService = inject(WorkoutTemplateService);
   private readonly exerciseService = inject(ExerciseService);
   private readonly liveWorkoutService = inject(LiveWorkoutService);
@@ -577,6 +579,7 @@ export class TemplateEditorComponent {
   errorMessage = '';
   statusMessage = '';
   actionMessage = '';
+  currentUserId = '';
   activeWorkout: WorkoutSession | null = null;
   showActiveWorkoutPrompt = false;
   blockPendingRemove: WorkoutTemplateBlock | null = null;
@@ -589,16 +592,23 @@ export class TemplateEditorComponent {
   private readonly mainLoadingSafetyMs = 8000;
 
   get canEdit(): boolean {
-    return this.template?.isBuiltin === false;
+    return this.template?.isBuiltin === false && this.template.ownerId === this.currentUserId;
   }
 
   constructor() {
+    void this.loadCurrentUser();
     void this.reloadTemplate();
     void this.loadExerciseMetadata();
   }
 
   t(key: string): string {
     return this.translationService.translate(key);
+  }
+
+  private async loadCurrentUser(): Promise<void> {
+    const user = await this.authService.getCurrentUser();
+    this.currentUserId = user?.id ?? '';
+    this.changeDetectorRef.detectChanges();
   }
 
   async startWorkout(): Promise<void> {
