@@ -1,4 +1,5 @@
-import { Component, Injector, OnInit, effect, inject, signal } from '@angular/core';
+import { isPlatformBrowser, Location } from '@angular/common';
+import { Component, Injector, OnDestroy, OnInit, PLATFORM_ID, effect, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { AppSettingsService } from '../../core/services/app-settings.service';
@@ -40,6 +41,16 @@ import type { Profile, WorkoutSession } from '../../shared/models/fitness.models
         <section class="app-route-shell flex-1 px-5 py-6 sm:py-7">
           <router-outlet />
         </section>
+
+        @if (swipeIndicatorVisible()) {
+          <div
+            class="pointer-events-none fixed left-3 top-1/2 z-[900] flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-xl font-bold text-slate-700 shadow-sm transition-opacity"
+            [style.opacity]="swipeProgress()"
+            [style.transform]="'translateY(-50%) translateX(' + swipeProgress() * 12 + 'px)'"
+          >
+            ‹
+          </div>
+        }
 
         <nav
           class="grid border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] text-sm font-semibold"
@@ -104,21 +115,33 @@ import type { Profile, WorkoutSession } from '../../shared/models/fitness.models
     </main>
   `,
 })
-export class MobileShellComponent implements OnInit {
+export class MobileShellComponent implements OnInit, OnDestroy {
   private readonly injector = inject(Injector);
   private readonly appSettingsService = inject(AppSettingsService);
   private readonly translationService = inject(TranslationService);
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
+  private readonly platformId = inject(PLATFORM_ID);
 
   readonly activeWorkout = signal<WorkoutSession | null>(null);
   readonly currentSession = signal<Session | null>(null);
   readonly currentProfile = signal<Profile | null>(null);
+  readonly swipeProgress = signal(0);
+  readonly swipeIndicatorVisible = signal(false);
   readonly settings = this.appSettingsService.settings;
   private isAuthSynced = false;
   private isActiveWorkoutSynced = false;
   private isProfileSynced = false;
+  private touchStartX = 0;
+  private touchStartY = 0;
+  private isTrackingSwipe = false;
+  private removeSwipeListeners: Array<() => void> = [];
+  private readonly swipeEdgePx = 32;
+  private readonly swipeDistancePx = 85;
+  private readonly swipeVerticalToleranceRatio = 1.35;
 
   ngOnInit(): void {
+    this.setupSwipeBackGesture();
     void this.refreshActiveWorkout();
 
     this.router.events
@@ -126,6 +149,14 @@ export class MobileShellComponent implements OnInit {
       .subscribe(() => {
         void this.refreshActiveWorkout();
       });
+  }
+
+  ngOnDestroy(): void {
+    for (const removeListener of this.removeSwipeListeners) {
+      removeListener();
+    }
+
+    this.removeSwipeListeners = [];
   }
 
   async resumeActiveWorkout(): Promise<void> {
@@ -194,6 +225,155 @@ export class MobileShellComponent implements OnInit {
     if (!result.error) {
       this.activeWorkout.set(result.data);
     }
+  }
+
+  private setupSwipeBackGesture(): void {
+    if (!isPlatformBrowser(this.platformId) || !('ontouchstart' in window)) {
+      return;
+    }
+
+    const touchStart = (event: TouchEvent) => this.handleTouchStart(event);
+    const touchMove = (event: TouchEvent) => this.handleTouchMove(event);
+    const touchEnd = (event: TouchEvent) => this.handleTouchEnd(event);
+
+    window.addEventListener('touchstart', touchStart, { passive: true });
+    window.addEventListener('touchmove', touchMove, { passive: true });
+    window.addEventListener('touchend', touchEnd, { passive: true });
+    window.addEventListener('touchcancel', touchEnd, { passive: true });
+
+    this.removeSwipeListeners = [
+      () => window.removeEventListener('touchstart', touchStart),
+      () => window.removeEventListener('touchmove', touchMove),
+      () => window.removeEventListener('touchend', touchEnd),
+      () => window.removeEventListener('touchcancel', touchEnd),
+    ];
+  }
+
+  private handleTouchStart(event: TouchEvent): void {
+    const touch = event.touches.item(0);
+
+    if (!touch || event.touches.length !== 1) {
+      this.resetSwipeState();
+      return;
+    }
+
+    if (
+      touch.clientX > this.swipeEdgePx ||
+      this.isSwipeBackRouteDisabled() ||
+      this.shouldIgnoreSwipeTarget(event.target)
+    ) {
+      this.resetSwipeState();
+      return;
+    }
+
+    this.touchStartX = touch.clientX;
+    this.touchStartY = touch.clientY;
+    this.isTrackingSwipe = true;
+  }
+
+  private handleTouchMove(event: TouchEvent): void {
+    if (!this.isTrackingSwipe) {
+      return;
+    }
+
+    const touch = event.touches.item(0);
+
+    if (!touch) {
+      this.resetSwipeState();
+      return;
+    }
+
+    const distanceX = touch.clientX - this.touchStartX;
+    const distanceY = Math.abs(touch.clientY - this.touchStartY);
+
+    if (distanceX <= 0 || distanceY > Math.max(24, distanceX / this.swipeVerticalToleranceRatio)) {
+      this.swipeProgress.set(0);
+      this.swipeIndicatorVisible.set(false);
+      return;
+    }
+
+    const progress = Math.min(distanceX / this.swipeDistancePx, 1);
+    this.swipeProgress.set(progress);
+    this.swipeIndicatorVisible.set(!this.prefersReducedMotion() && progress > 0.18);
+  }
+
+  private handleTouchEnd(event: TouchEvent): void {
+    if (!this.isTrackingSwipe) {
+      return;
+    }
+
+    const touch = event.changedTouches.item(0);
+    const distanceX = touch ? touch.clientX - this.touchStartX : 0;
+    const distanceY = touch ? Math.abs(touch.clientY - this.touchStartY) : 0;
+    const isValidSwipe =
+      distanceX >= this.swipeDistancePx &&
+      distanceX > distanceY * this.swipeVerticalToleranceRatio &&
+      !this.isSwipeBackRouteDisabled() &&
+      !this.shouldIgnoreSwipeTarget(event.target);
+
+    this.resetSwipeState();
+
+    if (isValidSwipe) {
+      this.navigateBackFromSwipe();
+    }
+  }
+
+  private navigateBackFromSwipe(): void {
+    if (isPlatformBrowser(this.platformId) && window.history.length > 1) {
+      this.location.back();
+      return;
+    }
+
+    void this.router.navigate(['/dashboard']);
+  }
+
+  private resetSwipeState(): void {
+    this.isTrackingSwipe = false;
+    this.touchStartX = 0;
+    this.touchStartY = 0;
+    this.swipeProgress.set(0);
+    this.swipeIndicatorVisible.set(false);
+  }
+
+  private isSwipeBackRouteDisabled(): boolean {
+    const routePath = this.router.url.split('?')[0].split('#')[0];
+
+    return ['', '/', '/login', '/register', '/dashboard', '/pending-approval'].includes(routePath);
+  }
+
+  private shouldIgnoreSwipeTarget(target: EventTarget | null): boolean {
+    if (!(target instanceof HTMLElement)) {
+      return true;
+    }
+
+    if (
+      target.closest(
+        'input, textarea, select, button, a, label, [contenteditable="true"], [role="button"], [data-swipe-back-ignore], dialog, [aria-modal="true"], [role="dialog"]',
+      )
+    ) {
+      return true;
+    }
+
+    return this.isInsideFixedOverlay(target);
+  }
+
+  private isInsideFixedOverlay(target: HTMLElement): boolean {
+    let element: HTMLElement | null = target;
+
+    while (element) {
+      if (element.classList.contains('fixed') && element.classList.contains('inset-0')) {
+        return true;
+      }
+
+      element = element.parentElement;
+    }
+
+    return false;
+  }
+
+  private prefersReducedMotion(): boolean {
+    return isPlatformBrowser(this.platformId)
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
   private syncAuthState(authService: InstanceType<typeof import('../../core/services/auth.service').AuthService>): void {
