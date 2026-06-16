@@ -7,6 +7,7 @@ import {
   WorkoutTemplateBlockExercise,
   WorkoutTemplateBlockType,
   WorkoutTemplateSetType,
+  WorkoutTemplateVisibility,
 } from '../../shared/models/fitness.models';
 
 const TEMPLATE_SELECT = [
@@ -18,6 +19,9 @@ const TEMPLATE_SELECT = [
   'difficulty',
   'estimated_duration_minutes',
   'is_builtin',
+  'visibility',
+  'shared_at',
+  'shared_by',
   'created_at',
   'updated_at',
 ].join(', ');
@@ -106,8 +110,17 @@ interface WorkoutTemplateRow {
   difficulty: string | null;
   estimated_duration_minutes: number | null;
   is_builtin: boolean;
+  visibility: WorkoutTemplateVisibility | null;
+  shared_at: string | null;
+  shared_by: string | null;
   created_at: string;
   updated_at: string;
+}
+
+interface ProfileNameRow {
+  id: string;
+  email: string | null;
+  display_name: string | null;
 }
 
 interface WorkoutTemplateBlockRow {
@@ -149,6 +162,9 @@ interface WorkoutTemplateInsertRow {
   difficulty: string | null;
   estimated_duration_minutes: number | null;
   is_builtin: false;
+  visibility: 'private';
+  shared_at: null;
+  shared_by: null;
 }
 
 interface WorkoutTemplateUpdateRow {
@@ -157,6 +173,9 @@ interface WorkoutTemplateUpdateRow {
   goal?: string | null;
   difficulty?: string | null;
   estimated_duration_minutes?: number | null;
+  visibility?: 'private' | 'shared';
+  shared_at?: string | null;
+  shared_by?: string | null;
 }
 
 interface WorkoutTemplateBlockInsertRow {
@@ -236,6 +255,23 @@ export class WorkoutTemplateService {
     };
   }
 
+  async getReadyTemplates(): Promise<WorkoutTemplateServiceResult<WorkoutTemplate[]>> {
+    const { data, error } = await this.supabase
+      .from('workout_templates')
+      .select(TEMPLATE_SELECT)
+      .or('is_builtin.eq.true,visibility.in.(shared,builtin)')
+      .returns<WorkoutTemplateRow[]>()
+      .order('name', { ascending: true });
+
+    const templates = (data ?? []).map(mapWorkoutTemplate);
+    const hydratedTemplates = await this.hydrateSharedByNames(templates);
+
+    return {
+      data: hydratedTemplates,
+      error: this.formatError(error),
+    };
+  }
+
   async getTemplateById(
     id: string,
   ): Promise<WorkoutTemplateServiceResult<WorkoutTemplate | null>> {
@@ -269,6 +305,9 @@ export class WorkoutTemplateService {
       difficulty: input.difficulty ?? null,
       estimated_duration_minutes: input.estimatedDurationMinutes ?? null,
       is_builtin: false,
+      visibility: 'private',
+      shared_at: null,
+      shared_by: null,
     };
 
     const { data, error } = await this.supabase
@@ -334,6 +373,60 @@ export class WorkoutTemplateService {
 
     return {
       data: null,
+      error: this.formatError(error),
+    };
+  }
+
+  async shareTemplate(id: string): Promise<WorkoutTemplateServiceResult<WorkoutTemplate | null>> {
+    const userResult = await this.getCurrentUserId();
+
+    if (userResult.error || !userResult.data) {
+      return { data: null, error: userResult.error ?? 'No authenticated user.' };
+    }
+
+    const { data, error } = await this.supabase
+      .from('workout_templates')
+      .update({
+        visibility: 'shared',
+        shared_at: new Date().toISOString(),
+        shared_by: userResult.data,
+      })
+      .eq('id', id)
+      .eq('owner_id', userResult.data)
+      .eq('is_builtin', false)
+      .select(TEMPLATE_SELECT)
+      .returns<WorkoutTemplateRow>()
+      .maybeSingle();
+
+    return {
+      data: data ? mapWorkoutTemplate(data) : null,
+      error: this.formatError(error),
+    };
+  }
+
+  async unshareTemplate(id: string): Promise<WorkoutTemplateServiceResult<WorkoutTemplate | null>> {
+    const userResult = await this.getCurrentUserId();
+
+    if (userResult.error || !userResult.data) {
+      return { data: null, error: userResult.error ?? 'No authenticated user.' };
+    }
+
+    const { data, error } = await this.supabase
+      .from('workout_templates')
+      .update({
+        visibility: 'private',
+        shared_at: null,
+        shared_by: null,
+      })
+      .eq('id', id)
+      .eq('owner_id', userResult.data)
+      .eq('is_builtin', false)
+      .select(TEMPLATE_SELECT)
+      .returns<WorkoutTemplateRow>()
+      .maybeSingle();
+
+    return {
+      data: data ? mapWorkoutTemplate(data) : null,
       error: this.formatError(error),
     };
   }
@@ -664,6 +757,41 @@ export class WorkoutTemplateService {
     };
   }
 
+  private async hydrateSharedByNames(
+    templates: WorkoutTemplate[],
+  ): Promise<WorkoutTemplate[]> {
+    const sharedByIds = Array.from(
+      new Set(templates.map((template) => template.sharedBy).filter(Boolean)),
+    ) as string[];
+
+    if (sharedByIds.length === 0) {
+      return templates;
+    }
+
+    const { data, error } = await this.supabase
+      .from('profiles')
+      .select('id,email,display_name')
+      .in('id', sharedByIds)
+      .returns<ProfileNameRow[]>();
+
+    if (error) {
+      console.error('Shared workout profile names load failed:', error.message);
+      return templates;
+    }
+
+    const namesById = new Map(
+      (data ?? []).map((profile) => [
+        profile.id,
+        profile.display_name || profile.email || 'Athlete',
+      ]),
+    );
+
+    return templates.map((template) => ({
+      ...template,
+      sharedByName: template.sharedBy ? namesById.get(template.sharedBy) ?? null : null,
+    }));
+  }
+
   private async getCurrentUserId(): Promise<WorkoutTemplateServiceResult<string | null>> {
     const { data, error } = await this.supabase.auth.getUser();
 
@@ -688,6 +816,10 @@ function mapWorkoutTemplate(row: WorkoutTemplateRow): WorkoutTemplate {
     difficulty: row.difficulty,
     estimatedDurationMinutes: row.estimated_duration_minutes,
     isBuiltin: row.is_builtin,
+    visibility: row.visibility ?? (row.is_builtin ? 'builtin' : 'private'),
+    sharedAt: row.shared_at,
+    sharedBy: row.shared_by,
+    sharedByName: null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

@@ -13,10 +13,10 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
     <div class="space-y-5">
       <header class="flex items-start justify-between gap-4">
         <div class="min-w-0">
-          <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-700">{{ t('workoutTemplates') }}</p>
-          <h2 class="mt-2 text-3xl font-bold leading-tight text-slate-950">{{ t('workoutTemplates') }}</h2>
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-700">{{ t('workouts') }}</p>
+          <h2 class="mt-2 text-3xl font-bold leading-tight text-slate-950">{{ t('myWorkouts') }}</h2>
           <p class="mt-2 text-sm leading-5 text-slate-600">
-            {{ t('templatesDescription') }}
+            {{ t('workoutsDescription') }}
           </p>
         </div>
 
@@ -33,7 +33,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
         (click)="openCreateForm()"
         class="app-button app-button-primary"
       >
-        {{ t('newTemplate') }}
+        {{ t('newWorkout') }}
       </button>
 
       @if (showCreateForm) {
@@ -42,12 +42,12 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
           (ngSubmit)="createTemplate()"
         >
           <div>
-            <h3 class="app-section-title">{{ t('newTemplate') }}</h3>
-            <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('templatesDescription') }}</p>
+            <h3 class="app-section-title">{{ t('newWorkout') }}</h3>
+            <p class="mt-1 text-sm leading-5 text-slate-600">{{ t('workoutsDescription') }}</p>
           </div>
 
           <label class="block">
-            <span class="text-sm font-semibold text-slate-700">{{ t('templateName') }}</span>
+            <span class="text-sm font-semibold text-slate-700">{{ t('workoutName') }}</span>
             <input
               type="text"
               name="templateName"
@@ -143,14 +143,41 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
             {{ t('retry') }}
           </button>
         </div>
-      } @else if (templates.length === 0) {
-        <div class="app-card bg-slate-50 p-5 text-center shadow-none">
-          <p class="font-semibold text-slate-800">{{ t('noTemplatesYet') }}</p>
-          <p class="mt-1 text-sm text-slate-600">{{ t('newTemplate') }}</p>
-        </div>
       } @else {
-        <div class="space-y-3">
-          @for (template of templates; track template.id) {
+        <section class="space-y-4">
+          <div class="grid grid-cols-2 rounded-lg border border-slate-200 bg-slate-50 p-1">
+            <button
+              type="button"
+              (click)="activeSection = 'mine'"
+              class="app-button min-h-11 px-3 py-2"
+              [class.app-button-primary]="activeSection === 'mine'"
+              [class.app-button-secondary]="activeSection !== 'mine'"
+            >
+              {{ t('myWorkouts') }}
+            </button>
+            <button
+              type="button"
+              (click)="activeSection = 'ready'"
+              class="app-button min-h-11 px-3 py-2"
+              [class.app-button-primary]="activeSection === 'ready'"
+              [class.app-button-secondary]="activeSection !== 'ready'"
+            >
+              {{ t('readyWorkouts') }}
+            </button>
+          </div>
+
+          @if (displayedTemplates.length === 0) {
+            <div class="app-card bg-slate-50 p-5 text-center shadow-none">
+              <p class="font-semibold text-slate-800">
+                {{ activeSection === 'mine' ? t('noMyWorkoutsYet') : t('noReadyWorkoutsYet') }}
+              </p>
+              <p class="mt-1 text-sm text-slate-600">
+                {{ activeSection === 'mine' ? t('newWorkout') : t('readyWorkoutsDescription') }}
+              </p>
+            </div>
+          }
+
+          @for (template of displayedTemplates; track template.id) {
             <article class="app-card space-y-4">
               <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">
@@ -166,7 +193,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                   [class.bg-slate-100]="!template.isBuiltin"
                   [class.text-slate-700]="!template.isBuiltin"
                 >
-                  {{ template.isBuiltin ? t('builtin') : t('mine') }}
+                  {{ template.isBuiltin ? t('readyWorkout') : t('myWorkout') }}
                 </span>
               </div>
 
@@ -196,7 +223,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                   [routerLink]="['/templates', template.id]"
                   class="app-button app-button-secondary min-h-11 px-3 py-2"
                 >
-                  {{ t('edit') }}
+                  {{ template.isBuiltin ? t('view') : t('edit') }}
                 </a>
                 <button
                   type="button"
@@ -204,7 +231,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
                   [disabled]="processingTemplateId === template.id"
                   class="app-button app-button-secondary min-h-11 px-3 py-2"
                 >
-                  {{ processingTemplateId === template.id ? t('loading') : t('duplicate') }}
+                  {{ processingTemplateId === template.id ? t('loading') : (template.isBuiltin ? t('copyToMyWorkouts') : t('duplicate')) }}
                 </button>
                 @if (!template.isBuiltin) {
                   <button
@@ -219,7 +246,7 @@ import { WorkoutSession, WorkoutTemplate } from '../../../shared/models/fitness.
               </div>
             </article>
           }
-        </div>
+        </section>
       }
 
       @if (templatePendingDelete) {
@@ -276,6 +303,7 @@ export class WorkoutTemplatesComponent {
   templates: WorkoutTemplate[] = [];
   myTemplates: WorkoutTemplate[] = [];
   builtinTemplates: WorkoutTemplate[] = [];
+  activeSection: 'mine' | 'ready' = 'mine';
   isLoading = true;
   isSaving = false;
   showCreateForm = false;
@@ -295,6 +323,10 @@ export class WorkoutTemplatesComponent {
 
   t(key: Parameters<TranslationService['translate']>[0]): string {
     return this.translationService.translate(key);
+  }
+
+  get displayedTemplates(): WorkoutTemplate[] {
+    return this.activeSection === 'mine' ? this.myTemplates : this.builtinTemplates;
   }
 
   openCreateForm(): void {
@@ -332,7 +364,7 @@ export class WorkoutTemplatesComponent {
       }
 
       this.closeCreateForm();
-      this.statusMessage = this.t('templateCreated');
+      this.statusMessage = this.t('workoutCreated');
       await this.loadTemplates();
     } catch (error) {
       this.errorMessage = getErrorMessage(error, 'Unable to create template.');
@@ -355,7 +387,7 @@ export class WorkoutTemplatesComponent {
         return;
       }
 
-      this.statusMessage = this.t('templateDuplicated');
+      this.statusMessage = template.isBuiltin ? this.t('workoutCopied') : this.t('workoutDuplicated');
       await this.loadTemplates();
     } catch (error) {
       this.errorMessage = getErrorMessage(error, 'Unable to duplicate template.');

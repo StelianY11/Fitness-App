@@ -1,5 +1,6 @@
 export type PreFillMode = 'LAST_WORKOUT' | 'TEMPLATE' | 'EMPTY';
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected';
+export type WorkoutTemplateVisibility = 'private' | 'shared' | 'builtin';
 
 export interface Profile {
   id: string;
@@ -75,6 +76,10 @@ export interface WorkoutTemplate {
   difficulty: string | null;
   estimatedDurationMinutes: number | null;
   isBuiltin: boolean;
+  visibility: WorkoutTemplateVisibility;
+  sharedAt: string | null;
+  sharedBy: string | null;
+  sharedByName: string | null;
   createdAt: string;
   updatedAt: string;
 }

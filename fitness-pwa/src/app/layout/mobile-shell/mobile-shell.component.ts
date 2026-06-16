@@ -73,7 +73,7 @@ import type { Profile, WorkoutSession } from '../../shared/models/fitness.models
               routerLinkActive="text-green-700"
               class="px-3 py-4 text-center text-slate-600"
             >
-              {{ t('templates') }}
+              {{ t('workouts') }}
             </a>
             <a
               routerLink="/history"

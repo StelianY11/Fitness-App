@@ -37,7 +37,7 @@ interface CustomExerciseForm {
     <div class="space-y-5">
       <header class="flex items-start justify-between gap-4">
         <div class="min-w-0">
-          <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-700">{{ t('workoutTemplates') }}</p>
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-700">{{ t('workouts') }}</p>
           <h2 class="mt-2 text-3xl font-bold leading-tight text-slate-950">{{ template?.name || t('template') }}</h2>
           @if (template?.description) {
             <p class="mt-2 text-sm leading-5 text-slate-600">{{ template?.description }}</p>

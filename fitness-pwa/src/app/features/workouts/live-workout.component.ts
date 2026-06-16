@@ -46,7 +46,7 @@ interface QuickSetForm extends SetForm {
           routerLink="/templates"
           class="app-button app-button-secondary min-h-11 w-auto px-3 py-2"
         >
-          {{ t('templates') }}
+          {{ t('workouts') }}
         </a>
       </header>
 
