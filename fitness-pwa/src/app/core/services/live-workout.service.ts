@@ -177,6 +177,12 @@ interface WorkoutSetRow {
   updated_at: string;
 }
 
+interface PreviousWorkoutExercisePrefillRow {
+  id: string;
+  exercise_variant_id: string | null;
+  workout_template_block_exercise_id: string | null;
+}
+
 interface TemplateBlockRow {
   id: string;
   sort_order: number;
@@ -806,10 +812,10 @@ export class LiveWorkoutService {
 
     const { data: workoutExercises, error: exercisesError } = await this.supabase
       .from('workout_exercises')
-      .select('id,exercise_variant_id')
+      .select('id,exercise_variant_id,workout_template_block_exercise_id')
       .eq('workout_session_id', previousSession.id)
       .eq('exercise_id', workoutExercise.exerciseId)
-      .returns<{ id: string; exercise_variant_id: string | null }[]>()
+      .returns<PreviousWorkoutExercisePrefillRow[]>()
       .order('sort_order', { ascending: true });
 
     if (exercisesError) {
@@ -818,6 +824,7 @@ export class LiveWorkoutService {
 
     const matchingWorkoutExercises = this.getVariantScopedWorkoutExercises(
       workoutExercises ?? [],
+      workoutExercise.workoutTemplateBlockExerciseId,
       workoutExercise.exerciseVariantId,
     );
 
@@ -848,9 +855,20 @@ export class LiveWorkoutService {
   }
 
   private getVariantScopedWorkoutExercises(
-    workoutExercises: Array<{ id: string; exercise_variant_id: string | null }>,
+    workoutExercises: PreviousWorkoutExercisePrefillRow[],
+    templateBlockExerciseId: string | null,
     exerciseVariantId: string | null,
-  ): Array<{ id: string; exercise_variant_id: string | null }> {
+  ): PreviousWorkoutExercisePrefillRow[] {
+    if (templateBlockExerciseId) {
+      const sameTemplateSlotExercises = workoutExercises.filter(
+        (workoutExercise) => workoutExercise.workout_template_block_exercise_id === templateBlockExerciseId,
+      );
+
+      if (sameTemplateSlotExercises.length > 0) {
+        return sameTemplateSlotExercises;
+      }
+    }
+
     if (!exerciseVariantId) {
       return workoutExercises;
     }
