@@ -459,10 +459,7 @@ export class LiveWorkoutService {
     }
 
     if (mode === 'LAST_WORKOUT') {
-      const previousResult = await this.getPreviousSetsForExercise(
-        workoutExercise.exerciseId,
-        workoutExercise.workoutSessionId,
-      );
+      const previousResult = await this.getPreviousTemplateSetsForWorkoutExercise(workoutExercise);
 
       if (previousResult.error) {
         return previousResult;
@@ -765,9 +762,8 @@ export class LiveWorkoutService {
     };
   }
 
-  private async getPreviousSetsForExercise(
-    exerciseId: string,
-    currentSessionId: string,
+  private async getPreviousTemplateSetsForWorkoutExercise(
+    workoutExercise: WorkoutExercise,
   ): Promise<LiveWorkoutServiceResult<LiveWorkoutPreFillSet[]>> {
     const userResult = await this.getCurrentUserId();
 
@@ -775,62 +771,95 @@ export class LiveWorkoutService {
       return { data: [], error: userResult.error ?? 'No authenticated user.' };
     }
 
-    const { data: sessions, error: sessionsError } = await this.supabase
+    const currentSessionResult = await this.getWorkoutSessionById(workoutExercise.workoutSessionId);
+
+    if (currentSessionResult.error) {
+      return { data: [], error: currentSessionResult.error };
+    }
+
+    const currentTemplateId = currentSessionResult.data?.workoutTemplateId ?? null;
+
+    if (!currentTemplateId) {
+      return { data: [], error: null };
+    }
+
+    const { data: previousSessions, error: sessionsError } = await this.supabase
       .from('workout_sessions')
       .select('id')
       .eq('user_id', userResult.data)
       .eq('status', 'completed')
-      .neq('id', currentSessionId)
+      .eq('workout_template_id', currentTemplateId)
+      .neq('id', workoutExercise.workoutSessionId)
       .returns<{ id: string }[]>()
       .order('finished_at', { ascending: false })
-      .limit(20);
+      .limit(1);
 
     if (sessionsError) {
       return { data: [], error: this.formatError(sessionsError) };
     }
 
-    for (const session of sessions ?? []) {
-      const { data: workoutExercises, error: exercisesError } = await this.supabase
-        .from('workout_exercises')
-        .select('id')
-        .eq('workout_session_id', session.id)
-        .eq('exercise_id', exerciseId)
-        .returns<{ id: string }[]>()
-        .order('sort_order', { ascending: true });
+    const previousSession = previousSessions?.[0] ?? null;
 
-      if (exercisesError) {
-        return { data: [], error: this.formatError(exercisesError) };
-      }
-
-      const sessionSets: WorkoutSet[] = [];
-
-      for (const workoutExercise of workoutExercises ?? []) {
-        const setsResult = await this.getWorkoutSets(workoutExercise.id);
-
-        if (setsResult.error) {
-          return { data: [], error: setsResult.error };
-        }
-
-        sessionSets.push(...setsResult.data);
-      }
-
-      const previousSets = sessionSets
-        .filter((set) => set.reps !== null || set.weightKg !== null || set.notes)
-        .sort(compareWorkoutSetsForPreFill)
-        .map((set, index) => ({
-          setNumber: index + 1,
-          reps: set.reps,
-          weightKg: set.weightKg,
-          notes: set.notes,
-          source: 'LAST_WORKOUT' as const,
-        }));
-
-      if (previousSets.length > 0) {
-        return { data: previousSets, error: null };
-      }
+    if (!previousSession) {
+      return { data: [], error: null };
     }
 
-    return { data: [], error: null };
+    const { data: workoutExercises, error: exercisesError } = await this.supabase
+      .from('workout_exercises')
+      .select('id,exercise_variant_id')
+      .eq('workout_session_id', previousSession.id)
+      .eq('exercise_id', workoutExercise.exerciseId)
+      .returns<{ id: string; exercise_variant_id: string | null }[]>()
+      .order('sort_order', { ascending: true });
+
+    if (exercisesError) {
+      return { data: [], error: this.formatError(exercisesError) };
+    }
+
+    const matchingWorkoutExercises = this.getVariantScopedWorkoutExercises(
+      workoutExercises ?? [],
+      workoutExercise.exerciseVariantId,
+    );
+
+    const sessionSets: WorkoutSet[] = [];
+
+    for (const previousWorkoutExercise of matchingWorkoutExercises) {
+      const setsResult = await this.getWorkoutSets(previousWorkoutExercise.id);
+
+      if (setsResult.error) {
+        return { data: [], error: setsResult.error };
+      }
+
+      sessionSets.push(...setsResult.data);
+    }
+
+    const previousSets = sessionSets
+      .filter((set) => set.reps !== null || set.weightKg !== null || set.notes)
+      .sort(compareWorkoutSetsForPreFill)
+      .map((set, index) => ({
+        setNumber: index + 1,
+        reps: set.reps,
+        weightKg: set.weightKg,
+        notes: set.notes,
+        source: 'LAST_WORKOUT' as const,
+      }));
+
+    return { data: previousSets, error: null };
+  }
+
+  private getVariantScopedWorkoutExercises(
+    workoutExercises: Array<{ id: string; exercise_variant_id: string | null }>,
+    exerciseVariantId: string | null,
+  ): Array<{ id: string; exercise_variant_id: string | null }> {
+    if (!exerciseVariantId) {
+      return workoutExercises;
+    }
+
+    const sameVariantExercises = workoutExercises.filter(
+      (workoutExercise) => workoutExercise.exercise_variant_id === exerciseVariantId,
+    );
+
+    return sameVariantExercises.length > 0 ? sameVariantExercises : workoutExercises;
   }
 
   private async getTemplatePreFillSets(
